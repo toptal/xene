@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "declarationDir": "declarations",
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "inlineSourceMap": true,

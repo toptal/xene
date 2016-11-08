@@ -19,12 +19,14 @@
   },
   "files": [
     "bot.js",
+    "bot.d.ts",
     "chat.js",
+    "chat.d.ts",
+    "index.d.ts",
     "adapters",
     "queries",
     "types",
-    "helpers",
-    "declarations"
+    "helpers"
   ],
   "homepage": "https://github.com/dempfi/zruyts#readme",
   "devDependencies": {
