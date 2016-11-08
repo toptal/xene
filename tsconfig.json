@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
+    "declarationDir": "declarations",
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "inlineSourceMap": true,
     "module": "commonjs",
     "declaration": true,
-    "baseUrl": "src",
+    "baseUrl": "src/",
     "target": "es6",
-    "outDir": "js",
+    "rootDir": "src/",
+    "outDir": "./js",
     "lib": [
       "es6",
       "scripthost",
@@ -15,6 +17,7 @@
     ]
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "declarations"
   ]
 }
