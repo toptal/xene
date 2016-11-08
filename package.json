@@ -1,0 +1,27 @@
+{
+  "name": "zruyts",
+  "version": "0.0.1",
+  "description": "Conversational bot framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dempfi/zruyts.git"
+  },
+  "author": "Ike Ku <dempfi@yahoo.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/dempfi/zruyts/issues"
+  },
+  "homepage": "https://github.com/dempfi/zruyts#readme",
+  "devDependencies": {
+    "@types/lodash": "^4.14.38",
+    "@types/node": "^6.0.46",
+    "typescript": "^2.0.8"
+  },
+  "dependencies": {
+    "lodash": "^4.16.6"
+  }
+}
