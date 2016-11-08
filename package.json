@@ -17,6 +17,15 @@
   "bugs": {
     "url": "https://github.com/dempfi/zruyts/issues"
   },
+  "files": [
+    "bot.js",
+    "chat.js",
+    "adapters",
+    "queries",
+    "types",
+    "helpers",
+    "declarations"
+  ],
   "homepage": "https://github.com/dempfi/zruyts#readme",
   "devDependencies": {
     "@types/lodash": "^4.14.38",
