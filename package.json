@@ -2,7 +2,8 @@
   "name": "zruyts",
   "version": "0.0.1",
   "description": "Conversational bot framework",
-  "main": "index.js",
+  "main": "js/index.js",
+  "types": "js/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
