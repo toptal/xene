@@ -1,4 +1,5 @@
 import * as _ from 'lodash'
+import * as uuid from 'node-uuid'
 import Chat from './chat'
 
 import Topic from './types/topic'
@@ -18,13 +19,15 @@ export type BotOptions = {
 }
 
 export default class Bot extends SelfEmitter {
+  public id: string
   private adapter: Adapter
   private topics: Topic[]
   private commands: Command[]
   private chats: Map<string, Chat> = new Map()
 
-  constructor (options: BotOptions, public id: string) {
+  constructor (options: BotOptions, id?: string) {
     super()
+    this.id = id || uuid.v4()
     this.topics = options.topics
     this.adapter = options.adapter
     this.commands = options.commands

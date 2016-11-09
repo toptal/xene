@@ -14,7 +14,7 @@ export default class Bot extends SelfEmitter {
     private topics;
     private commands;
     private chats;
-    constructor(options: BotOptions, id: string);
+    constructor(options: BotOptions, id?: string);
     private pipeAdapter();
     private handleMessage(message);
     private getChat(id, text, user);
