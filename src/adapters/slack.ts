@@ -36,9 +36,13 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
   webClient: WebClient
   rtmClient: RtmClient
   messageChain = Promise.resolve(null)
+  name?: string
+  avatar?: string
 
-  constructor (token: string) {
+  constructor (token: string, options: {name?: string, avatar?: string} = {}) {
     super()
+    this.name = options.name
+    this.avatar = options.avatar
     this.runClients(token)
   }
 
@@ -107,9 +111,14 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     const {chat, text} = message
     const attachments = attachment.format(message.attachments)
     const channel = chat.split(SEPARATOR)[0]
+    const options = {
+      username: this.name,
+      icon_url: this.avatar,
+      attachments
+    }
     this.messageChain.then(() => {
       return new Promise((resolve, reject) => {
-        this.webClient.chat.postMessage(channel, text, { attachments })
+        this.webClient.chat.postMessage(channel, text, options)
           .then(resolve).catch(reject)
       })
     })

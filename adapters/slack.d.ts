@@ -9,7 +9,12 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     webClient: WebClient;
     rtmClient: RtmClient;
     messageChain: Promise<any>;
-    constructor(token: string);
+    name?: string;
+    avatar?: string;
+    constructor(token: string, options?: {
+        name?: string;
+        avatar?: string;
+    });
     private runClients(slackToken);
     private handleRtmMessage(payload);
     private isEvent(subtype);
