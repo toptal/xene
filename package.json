@@ -36,7 +36,7 @@
     "typescript": "^2.0.8"
   },
   "dependencies": {
-    "@slack/client": "git+ssh://git@github.com/dempfi/node-slack-sdk.git#add-types",
+    "@slack/client": "git+https://git@github.com/dempfi/node-slack-sdk.git#add-types",
     "lodash": "^4.16.6",
     "node-uuid": "^1.4.7"
   }
