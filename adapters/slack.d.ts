@@ -15,6 +15,10 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
         name?: string;
         avatar?: string;
     });
+    getChat(options: {
+        channel?: string;
+        user?: string;
+    }): Promise<string>;
     private runClients(slackToken);
     private handleRtmMessage(payload);
     private isEvent(subtype);

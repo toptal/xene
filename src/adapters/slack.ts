@@ -46,6 +46,25 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     this.runClients(token)
   }
 
+  async getChat (options: {channel?: string, user? :string}): Promise<string> {
+    const {channel, user} = options
+    // TODO fix this
+    if (channel) {
+      console.log(this.rtmStore.getChannelOrGroupByName(channel))
+      return this.rtmStore.getChannelOrGroupByName(channel) + '_'
+    }
+    const dm = this.rtmStore.getDMByName(user)
+    console.log(dm)
+    if (dm) {
+      return dm.id + '_'
+    } else {
+      const userId = this.rtmStore.getUserByName(user)
+      const ret = await this.webClient.im.open(userId)
+      console.log(ret)
+      return ret.channel.id + '_'
+    }
+  }
+
   private runClients (slackToken: string) {
     const webClient = new WebClient(slackToken)
     const rtmClient = new RtmClient(slackToken, {logLevel: 'error'})
@@ -93,7 +112,7 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     const isBotMentioned = this.isBotMentioned(payload.text)
     const isPrivate = Boolean(this.rtmStore.getDMById(payload.channel))
 
-    if (isPrivate || isBotMentioned) {
+    if (!isSelf && (isPrivate || isBotMentioned)) {
       this.emit('message', message)
     }
   }
@@ -109,11 +128,10 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
 
   public sendMessage (message: BotMessage) {
     const {chat, text} = message
-    const attachments = attachment.format(message.attachments)
+    const attachments = attachment.format(message.attachments || [])
     const channel = chat.split(SEPARATOR)[0]
     const options = {
-      username: this.name,
-      icon_url: this.avatar,
+      as_user: true,
       attachments
     }
     this.messageChain.then(() => {

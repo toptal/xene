@@ -13,16 +13,16 @@ import formatString from './helpers/format-string'
 import strictifyMessage from './helpers/strictify-message'
 
 export type BotOptions = {
-  adapter: Adapter
-  commands: Command[]
   topics: Topic[]
+  adapter: Adapter
+  commands?: Command[]
 }
 
 export default class Bot extends SelfEmitter {
   public id: string
-  private adapter: Adapter
-  private topics: Topic[]
-  private commands: Command[]
+  public adapter: Adapter
+  private topics: Topic[] = []
+  private commands: Command[] = []
   private chats: Map<string, Chat> = new Map()
 
   constructor (options: BotOptions, id?: string) {
@@ -30,7 +30,7 @@ export default class Bot extends SelfEmitter {
     this.id = id || uuid.v4()
     this.topics = options.topics
     this.adapter = options.adapter
-    this.commands = options.commands
+    this.commands = options.commands || []
     this.pipeAdapter()
   }
 
@@ -47,6 +47,11 @@ export default class Bot extends SelfEmitter {
     const chatId = message.chat
     const {text, user} = message
 
+    this.emit('message.get', message)
+    if (!this.commands || !this.topics) {
+      return
+    }
+
     const chat = this.getChat(chatId, text, user)
 
     if (this.isCommand(text)) {
@@ -56,7 +61,6 @@ export default class Bot extends SelfEmitter {
       return this.emit(`command.${command.command}`, command)
     }
 
-    this.emit('message.get', message)
     const {done, next} = await chat.handleMessage(text)
     if (done) {
       next ? chat.setTopic(this.getTopic(next)): this.resetChat(chatId)
@@ -97,6 +101,7 @@ export default class Bot extends SelfEmitter {
 
   private formatMessage (message: BotMessage): BotMessage {
     const chat = this.chats.get(message.chat)
+    if (!chat) { return message }
     const user = this.adapter.getUser(chat.user)
     message.text = formatString(message.text, { user })
     return message

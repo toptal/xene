@@ -4,13 +4,13 @@ import Adapter from './types/adapter';
 import { default as BotMessage } from './types/messages/bot';
 import SelfEmitter from './helpers/self-emitter';
 export declare type BotOptions = {
-    adapter: Adapter;
-    commands: Command[];
     topics: Topic[];
+    adapter: Adapter;
+    commands?: Command[];
 };
 export default class Bot extends SelfEmitter {
     id: string;
-    private adapter;
+    adapter: Adapter;
     private topics;
     private commands;
     private chats;
