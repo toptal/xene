@@ -48,23 +48,36 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     this.runClients(token)
   }
 
-  async getChat (options: {channel?: string, user? :string}): Promise<string> {
-    const {channel, user} = options
+  public async getChat (id: string, type: string = 'direct'): Promise<string> {
+    const isChannel = type == 'channel'
+    const isGroup = type == 'group'
+    const isDm = type == 'direct'
+
+    if (isDm) {
+      const result = await this.webClient.im.open(id)
+      return result.channel.id
+    }
+
+    if (isGroup) {
+      const result = await this.webClient.im.open(id)
+      return result.channel.id
+    }
+
     // TODO fix this
-    if (channel) {
-      console.log(this.rtmStore.getChannelOrGroupByName(channel))
-      return this.rtmStore.getChannelOrGroupByName(channel) + '_'
-    }
-    const dm = this.rtmStore.getDMByName(user)
-    console.log(dm)
-    if (dm) {
-      return dm.id + '_'
-    } else {
-      const userId = this.rtmStore.getUserByName(user)
-      const ret = await this.webClient.im.open(userId)
-      console.log(ret)
-      return ret.channel.id + '_'
-    }
+    // if (channel) {
+    //   console.log(this.rtmStore.getChannelOrGroupByName(channel))
+    //   return this.rtmStore.getChannelOrGroupByName(channel) + '_'
+    // }
+    // const dm = this.rtmStore.getDMByName(user)
+    // console.log(dm)
+    // if (dm) {
+    //   return dm.id + '_'
+    // } else {
+    //   const userId = this.rtmStore.getUserByName(user)
+    //   const ret = await this.webClient.im.open(userId)
+    //   console.log(ret)
+    // }
+    return ''
   }
 
   private runClients (slackToken: string) {

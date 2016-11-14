@@ -44,36 +44,16 @@ export default class Bot extends SelfEmitter {
   }
 
   @SelfEmitter.on('message')
-  private async handleMessage (message: UserMessage) {
-    const chatId = message.chat
-    const {text, user} = message
-
+  private async newMessage (message: UserMessage) {
     this.emit('message.get', message)
-    if (!this.commands || !this.topics) {
-      return
-    }
-
-    const chat = this.getChat(chatId, text, user)
-
-    if (this.isCommand(text)) {
-      const command = this.parseCommand(text)
-      const commandMessage = strictifyMessage(command.message, chatId)
-      this.sendMessage(commandMessage)
-      return this.emit(`command.${command.command}`, command)
-    }
-
-    const {done, next} = await chat.handleMessage(text)
-    if (done) {
-      next ? chat.setTopic(this.getTopic(next)): this.resetChat(chatId)
-    }
+    const chat = await this.chat(message.chat, message.type)
+    return await chat.newMessage(message)
   }
 
-  private getChat (id: string, text: string, user: string): Chat {
-    if (this.chats.has(id)) {
-      return this.chats.get(id)
-    }
-    const chat = new Chat(id, user, this)
-    chat.setTopic(this.parseTopic(text))
+  public async chat (nameOrId: string, type: string): Promise<Chat> {
+    const id = await this.adapter.getChat(nameOrId, type)
+    if (this.chats.has(id)) { return this.chats.get(id) }
+    const chat = new Chat(id, this)
     this.chats.set(id, chat)
     return chat
   }

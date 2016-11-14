@@ -5,9 +5,8 @@ import { default as User, SearchUser } from './user'
 
 interface Adapter extends EventEmitter {
   sendMessage (message: BotMessage): void
-  getUser (id: string): any
   findUser (idOrTerm: string | SearchUser): User
-  getChat (options: any): Promise<string>
+  getChat (userNameOrChatName: string, type: string): Promise<string>
 }
 
 export default Adapter

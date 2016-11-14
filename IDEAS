@@ -1,0 +1,9 @@
+_chat_ with _user|users_ at _channel_
+
+bob = avenger.user({name: 'bob'}) // id or partial user object
+
+chat = avenger.chat('avengers-general' /* userId | channel name */, 'direct' /* 'direct' | 'channel' | 'group' */)
+
+chat.thread('topic name', {qa: bob, lead: eve})
+
+`hi {users.some.name} and {users.lead.name}`

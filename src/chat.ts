@@ -1,18 +1,26 @@
 import * as _ from 'lodash'
 import Bot from './bot'
+import User from './types/user'
 import Topic from './types/topic'
 import Query from './queries/query'
-import {PartialMessage} from './types/messages/bot'
+import {default as Message, PartialMessage} from './types/messages/bot'
 
 import formatString from './helpers/format-string'
 import strictifyMessage from './helpers/strictify-message'
 
+/*
+Chat is a representation of channels or groups or even
+direct messages. Chats can hold more then one thread
+with multiple users in the Chat. Also Chat probides an API
+to add, or remove people from Chat or even destroy Chat
+if bot has enough ability to do so.
+*/
 export default class Chat {
   private query: Query
   private state: Object = {}
   private queries: Query[]
 
-  constructor (public id: string, public user:string, private bot: Bot) { }
+  constructor (public id: string, private bot: Bot) { }
 
   public setTopic (topic: Topic) {
     const resolvedQueries = topic.queries.map(q => q())
@@ -20,43 +28,16 @@ export default class Chat {
     this.query = _.head(resolvedQueries)
   }
 
-  public async handleMessage (messageText: string): Promise<{done: boolean, next?: string, error?: any}> {
-    try {
-      var result = await this.query.handle(this.state, this.bot, messageText)
-    } catch (e) {
-      return this.error(e)
-    }
+  public async newMessage (message: Message) {
 
-    if (result.message) {
-      this.sendMessage(result.message)
-    }
-
-    const {exit, done, nextTopic} = result
-    if (exit || !done) {
-      return { done: exit, next: (exit ? nextTopic : null) }
-    }
-
-    this.nextQuery(result.nextStep)
-
-    const {storeAs, value} = result
-    if (storeAs && value) {
-      this.state[storeAs] = value
-    }
-    return await this.handleMessage(messageText)
+    return await this.newMessage(message)
   }
 
-  private error (e) {
-    console.error(e)
-    return { error: e, done: true, next: null }
+  public thread (name: string, user: User | {[name: string]: User}) {
+    const users =
   }
 
-  private nextQuery (key) {
-    let nextIndex = this.queries.indexOf(this.query) + 1
-    nextIndex = key ? _.findIndex(this.queries, ['step', key]) : nextIndex
-    this.query = this.queries[nextIndex]
-  }
-
-  private sendMessage (message: string | PartialMessage) {
+  private sendMessage (message: string | Message, PartialMessage) {
     const botMessage = strictifyMessage(message, this.id)
     botMessage.text = formatString(botMessage.text, this.state),
     this.bot.sendMessage(botMessage)
