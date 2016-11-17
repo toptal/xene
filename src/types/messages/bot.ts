@@ -37,8 +37,8 @@ export interface Attachment {
 
 type Message = {
   text: string
-  chat: string
-  attachments?: Attachment[]
+  chat?: string
+  attachments: Attachment[]
 }
 
 export default Message

@@ -4,7 +4,7 @@ import { default as UserMessage } from './messages/user'
 import { default as User, SearchUser } from './user'
 
 interface Adapter extends EventEmitter {
-  sendMessage (message: BotMessage): void
+  sendMessage (chat: string, message: BotMessage): Promise<any>
   findUser (idOrTerm: string | SearchUser): User
   getChat (userNameOrChatName: string, type: string): Promise<string>
 }

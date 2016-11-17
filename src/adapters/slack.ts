@@ -141,14 +141,10 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     return idrx.test(text)
   }
 
-  public sendMessage (message: BotMessage) {
-    const {chat, text} = message
-    const attachments = attachment.format(message.attachments || [])
-    const channel = chat.split(SEPARATOR)[0]
-    const options = {
-      as_user: true,
-      attachments
-    }
+  public sendMessage (channel: string, message: BotMessage) {
+    let {text, attachments} = message
+    attachments = attachment.format(attachments)
+    const options = { as_user: true, attachments }
     this.messageChain.then(() => {
       return new Promise((resolve, reject) => {
         this.webClient.chat.postMessage(channel, text, options)
