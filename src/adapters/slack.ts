@@ -23,14 +23,12 @@ const KNOWN_EVENTS = {
 import * as attachment from './helpers/attachment'
 
 interface SlackPayload {
-  text: string
   ts: string
+  text: string
   user?: string
   channel: string
   subtype?: string
 }
-
-const SEPARATOR = '_'
 
 export default class SlackAdapter extends EventEmitter implements Adapter {
   profile: any
@@ -121,7 +119,8 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
       id: payload.ts,
       text: payload.text,
       user: payload.user,
-      chat: payload.channel + SEPARATOR + payload.user
+      chat: payload.channel,
+      type: this.chatType(payload.channel)
     }
 
     const isBotMentioned = this.isBotMentioned(payload.text)
@@ -129,6 +128,14 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
 
     if (!isSelf && (isPrivate || isBotMentioned)) {
       this.emit('message', message)
+    }
+  }
+
+  private chatType (str): 'channel' | 'group' | 'direct' {
+    switch (str.substring(0, 1)) {
+      case 'C': return 'channel'
+      case 'G': return 'group'
+      case 'D': return 'direct'
     }
   }
 
@@ -145,12 +152,12 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     let {text, attachments} = message
     attachments = attachment.format(attachments)
     const options = { as_user: true, attachments }
-    this.messageChain.then(() => {
-      return new Promise((resolve, reject) => {
-        this.webClient.chat.postMessage(channel, text, options)
-          .then(resolve).catch(reject)
-      })
+    const request = new Promise((resolve, reject) => {
+      this.webClient.chat.postMessage(channel, text, options)
+        .then(resolve).catch(reject)
     })
+    this.messageChain.then(() => request)
+    return request
   }
 
   public findUser (idOrTerm: string | SearchUser): User {
