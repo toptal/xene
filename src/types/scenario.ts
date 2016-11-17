@@ -1,9 +1,9 @@
 import Query from '../queries/query'
 
-interface Topic {
-  topic: string | symbol
+interface Scenario {
+  title: string
   matcher: (message: string) => boolean
   queries: (() => Query)[]
 }
 
-export default Topic
+export default Scenario

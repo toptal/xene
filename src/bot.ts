@@ -2,10 +2,13 @@ import * as _ from 'lodash'
 import * as uuid from 'node-uuid'
 import Chat from './chat'
 
-import Topic from './types/topic'
-import Command from './types/command'
 import Adapter from './types/adapter'
+<<<<<<< 298ee47f9ba259d9e59842878c8e06f1d9d41ca5
 import { default as User, SearchUser } from './types/user'
+=======
+import Command from './types/command'
+import Scenario from './types/scenario'
+>>>>>>> WIP
 import { default as BotMessage } from './types/messages/bot'
 import { default as UserMessage } from './types/messages/user'
 
@@ -14,24 +17,38 @@ import formatString from './helpers/format-string'
 import strictifyMessage from './helpers/strictify-message'
 
 export type BotOptions = {
-  topics: Topic[]
   adapter: Adapter
   commands?: Command[]
+  scenarios: Scenario[]
 }
+
+const handler = {
+  get (target, key) {
+    if (key in target) { return target[key]}
+
+    return 'some'
+  }
+}
+
+function searchable (some: any[]) {
+  return new Proxy<Array<any>>(some, handler)
+}
+
 
 export default class Bot extends SelfEmitter {
   public id: string
   public adapter: Adapter
-  private topics: Topic[] = []
-  private commands: Command[] = []
   private chats: Map<string, Chat> = new Map()
+  private declarations: {
+    scenarios: Scenario[],
+    commands: Command[]
+  }
 
-  constructor (options: BotOptions, id?: string) {
+  constructor ({adapter, scenarios, commands}: BotOptions, id?: string) {
     super()
+    this.adapter = adapter
     this.id = id || uuid.v4()
-    this.topics = options.topics
-    this.adapter = options.adapter
-    this.commands = options.commands || []
+    this.declarations = { scenarios, commands: commands || [] }
     this.pipeAdapter()
   }
 
@@ -44,10 +61,10 @@ export default class Bot extends SelfEmitter {
   }
 
   @SelfEmitter.on('message')
-  private async newMessage (message: UserMessage) {
+  private async userInput (message: UserMessage) {
     this.emit('message.get', message)
     const chat = await this.chat(message.chat, message.type)
-    return await chat.newMessage(message)
+    return await chat.input(message)
   }
 
   public async chat (nameOrId: string, type: string): Promise<Chat> {
@@ -58,26 +75,27 @@ export default class Bot extends SelfEmitter {
     return chat
   }
 
+  public getScenario (title: string): Scenario {
+    const {scenarios} = this.declarations
+    return _.find(scenarios, ['title', title])
+  }
+
+  public matchScenario (message: string): Scenario {
+    const defaultScenario = this.getScenario('default')
+    const predicate = t => t.matcher && t.matcher(message)
+    return this.declarations.scenarios.find(predicate) || defaultScenario
+  }
+
   public resetChat (id: string) {
     this.chats.delete(id)
   }
 
   private isCommand (message: string): boolean {
-    return _.some(this.commands, c => c.matcher(message))
+    return _.some(this.declarations.commands, c => c.matcher(message))
   }
 
-  private parseCommand (message: string): Command {
-    return _.find<Command>(this.commands, c => c.matcher(message))
-  }
-
-  private parseTopic (message: string): Topic {
-    const defaultTopic = this.getTopic('default')
-    const predicate = t => t.matcher && t.matcher(message)
-    return this.topics.find(predicate) || defaultTopic
-  }
-
-  private getTopic (topic: string): Topic {
-    return _.find(this.topics, t => t.topic === topic)
+  private macthCommand (message: string): Command {
+    return _.find<Command>(this.declarations.commands, c => c.matcher(message))
   }
 
   private formatMessage (message: BotMessage): BotMessage {

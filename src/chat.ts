@@ -1,45 +1,80 @@
 import * as _ from 'lodash'
 import Bot from './bot'
-import User from './types/user'
-import Topic from './types/topic'
 import Query from './queries/query'
-import {default as Message, PartialMessage} from './types/messages/bot'
+import Performer from './performer'
+import Scenario from './types/scenario'
+import UserMessage from './types/messages/user'
+import {PartialMessage} from './types/messages/bot'
 
 import formatString from './helpers/format-string'
 import strictifyMessage from './helpers/strictify-message'
 
 /*
 Chat is a representation of channels or groups or even
-direct messages. Chats can hold more then one thread
+direct messages. Chat can hold more then one performers
 with multiple users in the Chat. Also Chat probides an API
 to add, or remove people from Chat or even destroy Chat
 if bot has enough ability to do so.
 */
 export default class Chat {
-  private query: Query
-  private state: Object = {}
-  private queries: Query[]
 
-  constructor (public id: string, private bot: Bot) { }
+  /*
+  NOTE we can store userless performers at key `common`
+  and check it after check for specific performers for user
+  but before we try to create new performer from message
+  */
+  private performers: Map<string, Performer>
 
-  public setTopic (topic: Topic) {
-    const resolvedQueries = topic.queries.map(q => q())
-    this.queries = resolvedQueries
-    this.query = _.head(resolvedQueries)
+  constructor (public id: string, private bot: Bot) {}
+
+  public async input (message: UserMessage) {
+    const performer = this.getOrCreatePerformer(message)
+    try {
+      const done = await performer.input(message.text)
+      if (done) { this.removePerformer(performer) }
+    } catch (error) {
+      // TODO do something with error
+    }
   }
 
-  public async newMessage (message: Message) {
-
-    return await this.newMessage(message)
+  public performByScenario (
+    title: string,
+    user: string | {[key: string]: string}
+  ): Performer {
+    const scenario = this.bot.getScenario(title)
+    return this.setPerformer(scenario, user)
   }
 
-  public thread (name: string, user: User | {[name: string]: User}) {
-    const users =
+  private getOrCreatePerformer(message: UserMessage): Performer {
+    if (this.performers.has(message.user)) {
+      return this.performers.get(message.user)
+    }
+    // either scenario based on user message or default
+    const scenario = this.bot.matchScenario(message.text)
+    return this.setPerformer(scenario, message.user)
   }
 
-  private sendMessage (message: string | Message, PartialMessage) {
-    const botMessage = strictifyMessage(message, this.id)
-    botMessage.text = formatString(botMessage.text, this.state),
-    this.bot.sendMessage(botMessage)
+  private setPerformer (
+    scenario: Scenario,
+    user: string | {[key: string]: string}
+  ): Performer {
+    // TODO load users here
+    const performer = new Performer(scenario, user)
+    const users = _.isString(user) ? [user] : _.values(user)
+    users.forEach(user => this.performers.set(user, performer))
+    return performer
   }
+
+  private removePerformer (performer: Performer) {
+    this.performers.forEach((value, userId, performers) => {
+      if (value !== performer) { return }
+      performers.delete(userId)
+    })
+  }
+
+  // private sendMessage (message: string | PartialMessage) {
+  //   const botMessage = strictifyMessage(message, this.id)
+  //   botMessage.text = formatString(botMessage.text, this.state),
+  //   this.bot.sendMessage(botMessage)
+  // }
 }

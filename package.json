@@ -31,13 +31,13 @@
   "homepage": "https://github.com/dempfi/zruyts#readme",
   "devDependencies": {
     "@types/lodash": "^4.14.38",
-    "@types/node": "^6.0.46",
+    "@types/node": "^6.0.47",
     "@types/node-uuid": "0.0.28",
+    "@types/lodash": "^4.14.38",
     "typescript": "^2.0.8"
   },
   "dependencies": {
     "@slack/client": "git+https://git@github.com/dempfi/node-slack-sdk.git#add-types",
-    "@types/lodash": "^4.14.38",
     "lodash": "^4.16.6",
     "node-uuid": "^1.4.7"
   }

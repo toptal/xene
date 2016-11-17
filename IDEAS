@@ -4,6 +4,6 @@ bob = avenger.user({name: 'bob'}) // id or partial user object
 
 chat = avenger.chat('avengers-general' /* userId | channel name */, 'direct' /* 'direct' | 'channel' | 'group' */)
 
-chat.thread('topic name', {qa: bob, lead: eve})
+chat.startThread('topic name', {qa: bob.id, lead: eve.id})
 
-`hi {users.some.name} and {users.lead.name}`
+`hi {users.qa.name} and {users.lead.name}`
