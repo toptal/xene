@@ -1,5 +1,6 @@
 // import * as config from 'config'
 // import {post} from 'lib/utils/request'
+import * as _ from 'lodash'
 import {EventEmitter} from 'events'
 import {
    RtmClient,
@@ -9,6 +10,7 @@ import {
    RTM_MESSAGE_SUBTYPES
 } from '@slack/client'
 
+import { default as User, SearchUser } from '../types/user'
 import { default as BotMessage } from '../types/messages/bot'
 import { default as UserMessage } from '../types/messages/user'
 import Adapter from '../types/adapter'
@@ -140,6 +142,29 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
           .then(resolve).catch(reject)
       })
     })
+  }
+
+  public findUser (idOrTerm: string | SearchUser): User {
+    let user
+    if (_.isString(idOrTerm)) {
+      user = this.rtmStore.getUserById(idOrTerm)
+    } else if (idOrTerm.email) {
+      user = this.rtmStore.getUserByEmail(idOrTerm.email)
+    } else if (idOrTerm.handler) {
+      user = this.rtmStore.getUserByName(idOrTerm.handler)
+    }
+
+    const firstName = user.profile.first_name || ''
+    const lastName = user.profile.last_name || ''
+
+    return {
+      id: user.id,
+      email: user.profile.email,
+      handler: `<@${user.id}>`,
+      fullName: `${firstName ? firstName + ' ': '' }` + lastName,
+      firstName,
+      lastName
+    }
   }
 
   public getUser (id) {

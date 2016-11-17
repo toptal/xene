@@ -1,6 +1,7 @@
 import Topic from './types/topic';
 import Command from './types/command';
 import Adapter from './types/adapter';
+import { default as User, SearchUser } from './types/user';
 import { default as BotMessage } from './types/messages/bot';
 import SelfEmitter from './helpers/self-emitter';
 export declare type BotOptions = {
@@ -24,5 +25,6 @@ export default class Bot extends SelfEmitter {
     private parseTopic(message);
     private getTopic(topic);
     private formatMessage(message);
+    user(idOrKeys: string | SearchUser): User;
     sendMessage(message: BotMessage): void;
 }

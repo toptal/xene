@@ -5,6 +5,7 @@ import Chat from './chat'
 import Topic from './types/topic'
 import Command from './types/command'
 import Adapter from './types/adapter'
+import { default as User, SearchUser } from './types/user'
 import { default as BotMessage } from './types/messages/bot'
 import { default as UserMessage } from './types/messages/user'
 
@@ -105,6 +106,10 @@ export default class Bot extends SelfEmitter {
     const user = this.adapter.getUser(chat.user)
     message.text = formatString(message.text, { user })
     return message
+  }
+
+  public user (idOrKeys: string | SearchUser): User {
+    return this.adapter.findUser(idOrKeys)
   }
 
   public sendMessage (message: BotMessage) {
