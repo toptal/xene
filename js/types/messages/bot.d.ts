@@ -1,3 +1,4 @@
+/// <reference types="chai" />
 export interface RelaxedButton {
     label: string;
     value: string;

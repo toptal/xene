@@ -2,11 +2,11 @@
   "name": "zruyts",
   "version": "0.0.1",
   "description": "Conversational bot framework",
-  "main": "index.js",
-  "types": "declarations",
+  "main": "js/index.js",
+  "types": "js/",
   "scripts": {
-    "start": "tsc; rm -rf adapters; rm -rf helpers; rm -rf queries; rm -rf types; mv -f js/* .; rm -rf js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "tsc --watch",
+    "test": "mocha js/test --recursive --watch"
   },
   "repository": {
     "type": "git",
@@ -17,23 +17,17 @@
   "bugs": {
     "url": "https://github.com/dempfi/zruyts/issues"
   },
-  "files": [
-    "bot.js",
-    "bot.d.ts",
-    "chat.js",
-    "chat.d.ts",
-    "index.d.ts",
-    "adapters",
-    "queries",
-    "types",
-    "helpers"
-  ],
+  "files": ["js"],
   "homepage": "https://github.com/dempfi/zruyts#readme",
   "devDependencies": {
+    "@types/chai": "^3.4.34",
     "@types/lodash": "^4.14.38",
+    "@types/mocha": "^2.2.33",
     "@types/node": "^6.0.47",
     "@types/node-uuid": "0.0.28",
-    "@types/lodash": "^4.14.38",
+    "chai": "^3.5.0",
+    "mocha": "^3.1.2",
+    "typedoc": "^0.5.1",
     "typescript": "^2.0.8"
   },
   "dependencies": {

@@ -88,6 +88,6 @@ export default class Bot extends SelfEmitter {
     if (_.isString(message)) message = {text: message, attachments: []}
     const predicate = a => _.set<Attachment>(a, 'callbackId', this.id)
     message.attachments = message.attachments.map(predicate)
-    return this.adapter.sendMessage(chat, message)
+    return this.adapter.send(chat, message)
   }
 }

@@ -21,7 +21,7 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     private chatType(str);
     private isEvent(subtype);
     private isBotMentioned(text);
-    sendMessage(channel: string, message: BotMessage): Promise<{}>;
+    send(channel: string, message: BotMessage): Promise<{}>;
     getUser(id: any): {
         firstName: any;
         lastName: any;

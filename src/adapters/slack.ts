@@ -148,7 +148,7 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     return idrx.test(text)
   }
 
-  public sendMessage (channel: string, message: BotMessage) {
+  public send (channel: string, message: BotMessage) {
     let {text, attachments} = message
     attachments = attachment.format(attachments)
     const options = { as_user: true, attachments }
