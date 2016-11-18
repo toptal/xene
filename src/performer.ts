@@ -69,7 +69,11 @@ export default class Performer {
   }
 
   private loadUsers (user: string | {[name: string]: string}) {
-    // TODO
+    if (_.isString(user))
+      this.user = this.chat.bot.adapter.getUser(user)
+    else
+      this.users = _.mapValues(user, id =>
+        this.chat.bot.adapter.getUser(id))
   }
 
   private trySendMessage (partialMessage: string | PartialMessage) {

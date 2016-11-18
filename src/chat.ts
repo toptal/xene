@@ -57,7 +57,6 @@ export default class Chat {
     scenario: Scenario,
     user: string | {[key: string]: string}
   ): Performer {
-    // TODO load users here
     const performer = new Performer(scenario, user, this)
     const users = _.isString(user) ? [user] : _.values(user)
     users.forEach(user => this.performers.set(user, performer))
