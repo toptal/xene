@@ -3,6 +3,7 @@ import Chat from './chat';
 import Adapter from './types/adapter';
 import Command from './types/command';
 import Scenario from './types/scenario';
+import { default as User, SearchUser } from './types/user';
 import { default as BotMessage } from './types/messages/bot';
 export declare type BotOptions = {
     adapter: Adapter;
@@ -23,5 +24,6 @@ export default class Bot extends SelfEmitter {
     resetChat(id: string): void;
     private isCommand(message);
     private macthCommand(message);
+    user(idOrKeys: string | SearchUser): User;
     send(chat: string, message: string | BotMessage): Promise<any>;
 }

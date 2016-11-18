@@ -1,6 +1,7 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
 import { RtmClient, WebClient } from '@slack/client';
+import { default as User, SearchUser } from '../types/user';
 import { default as BotMessage } from '../types/messages/bot';
 import Adapter from '../types/adapter';
 export default class SlackAdapter extends EventEmitter implements Adapter {
@@ -22,6 +23,7 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     private isEvent(subtype);
     private isBotMentioned(text);
     send(channel: string, message: BotMessage): Promise<{}>;
+    findUser(idOrTerm: string | SearchUser): User;
     getUser(id: any): {
         firstName: any;
         lastName: any;
