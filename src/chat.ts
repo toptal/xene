@@ -23,7 +23,7 @@ export default class Chat {
   and check it after check for specific performers for user
   but before we try to create new performer from message
   */
-  private performers: Map<string, Performer>
+  private performers: Map<string, Performer> = new Map()
 
   constructor (public id: string, public bot: Bot) {}
 

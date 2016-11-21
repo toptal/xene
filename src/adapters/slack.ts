@@ -51,31 +51,43 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     const isGroup = type == 'group'
     const isDm = type == 'direct'
 
+    // id is an id of existing channel, group or dm
+    let chat = this.rtmStore.getChannelGroupOrDMById(id)
+    if (chat) return chat.id
+
+    // id is a name of user
     if (isDm) {
-      const result = await this.webClient.im.open(id)
-      return result.channel.id
+      chat = this.rtmStore.getDMByName(id)
+      if (chat) return chat.id
+      try {
+        chat = await this.webClient.im.open(id)
+        return chat.id
+      } catch (e) {
+        throw new Error(e)
+      }
+    }
+
+    // id is an name of existing channel or group
+    chat = this.rtmStore.getChannelOrGroupByName(id)
+    if (chat) return chat.id
+
+    if (isChannel) {
+      try {
+        chat = await this.webClient.channels.create(id)
+        return chat.id
+      } catch (e) {
+        throw new Error(e)
+      }
     }
 
     if (isGroup) {
-      const result = await this.webClient.im.open(id)
-      return result.channel.id
+      try {
+        chat = await this.webClient.groups.create(id)
+        return chat.id
+      } catch (e) {
+        throw new Error(e)
+      }
     }
-
-    // TODO fix this
-    // if (channel) {
-    //   console.log(this.rtmStore.getChannelOrGroupByName(channel))
-    //   return this.rtmStore.getChannelOrGroupByName(channel) + '_'
-    // }
-    // const dm = this.rtmStore.getDMByName(user)
-    // console.log(dm)
-    // if (dm) {
-    //   return dm.id + '_'
-    // } else {
-    //   const userId = this.rtmStore.getUserByName(user)
-    //   const ret = await this.webClient.im.open(userId)
-    //   console.log(ret)
-    // }
-    return ''
   }
 
   private runClients (slackToken: string) {
