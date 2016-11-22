@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Conversational bot framework",
   "main": "js/index.js",
-  "types": "js/",
+  "types": "js/index.d.ts",
   "scripts": {
     "start": "tsc --watch",
     "test": "mocha js/test --recursive --watch"
