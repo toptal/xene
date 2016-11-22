@@ -59,8 +59,7 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     if (isDm) {
       try {
         chat = await this.webClient.im.open(id)
-        console.log(chat)
-        return chat.id
+        return chat.channel.id
       } catch (e) {
         throw new Error(e)
       }
