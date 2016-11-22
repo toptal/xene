@@ -4,6 +4,8 @@ bob = avenger.user({name: 'bob'}) // id or partial user object
 
 chat = avenger.chat('avengers-general' /* userId | channel name */, 'direct' /* 'direct' | 'channel' | 'group' */)
 
-chat.startThread('topic name', {qa: bob.id, lead: eve.id})
+chat.perform('post-mortem', {qa: bob.id, lead: eve.id})
 
 `hi {users.qa.name} and {users.lead.name}`
+
+// consistent api

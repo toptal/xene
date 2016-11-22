@@ -55,12 +55,11 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     let chat = this.rtmStore.getChannelGroupOrDMById(id)
     if (chat) return chat.id
 
-    // id is a name of user
+    // id is an id of user
     if (isDm) {
-      chat = this.rtmStore.getDMByName(id)
-      if (chat) return chat.id
       try {
         chat = await this.webClient.im.open(id)
+        console.log(chat)
         return chat.id
       } catch (e) {
         throw new Error(e)
@@ -68,24 +67,35 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
     }
 
     // id is an name of existing channel or group
-    chat = this.rtmStore.getChannelOrGroupByName(id)
-    if (chat) return chat.id
-
     if (isChannel) {
+      chat = this.rtmStore.getChannelByName(id);
+
+      if (chat) {
+        try {
+          await this.webClient.channels.join(id)
+          return chat.id
+        } catch (e) {
+          throw new Error(`Can't join channel '${id}' — ${e.toString()}`)
+        }
+      }
+
       try {
         chat = await this.webClient.channels.create(id)
         return chat.id
       } catch (e) {
-        throw new Error(e)
+        throw new Error(`Can't create channel '${id}' — ${e.toString()}`)
       }
     }
 
     if (isGroup) {
+      chat = this.rtmStore.getGroupByName(id);
+      if (chat) return chat.id
+
       try {
         chat = await this.webClient.groups.create(id)
         return chat.id
       } catch (e) {
-        throw new Error(e)
+        throw new Error(`Can't create group '${id}' — ${e.toString()}`)
       }
     }
   }
@@ -189,7 +199,7 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
       id: user.id,
       email: user.profile.email,
       handler: `<@${user.id}>`,
-      fullName: `${firstName ? firstName + ' ': '' }` + lastName,
+      fullName: firstName + `${lastName ? ' ' + lastName : '' }`,
       firstName,
       lastName
     }
