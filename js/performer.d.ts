@@ -10,7 +10,7 @@ export default class Performer {
     constructor(scenario: Scenario, user: string | {
         [name: string]: string;
     }, chat: Chat);
-    input(text: string): Promise<boolean>;
+    input(text?: string): Promise<boolean>;
     private setScenario(scenario);
     private tryReplaceScenario(scenarioTitle?);
     private trySaveState(key?, value?);

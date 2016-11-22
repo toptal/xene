@@ -1,6 +1,7 @@
 import * as _ from 'lodash'
 import Bot from './bot'
 import Query from './queries/query'
+import {Parse} from './queries/parse'
 import Performer from './performer'
 import Scenario from './types/scenario'
 import UserMessage from './types/messages/user'
@@ -37,12 +38,14 @@ export default class Chat {
     }
   }
 
-  public performByScenario (
-    title: string,
-    user: string | {[key: string]: string}
-  ): Performer {
+  public perform (title: string, user: string | {[key: string]: string}) {
     const scenario = this.bot.getScenario(title)
-    return this.setPerformer(scenario, user)
+    const firstQuery = _.head(scenario.queries)()
+    if (firstQuery instanceof Parse) {
+      throw new Error('Scenario starts with Parse query. Nothing yet to parse.')
+    }
+    const performer = this.setPerformer(scenario, user)
+    performer.input()
   }
 
   private getOrCreatePerformer(message: UserMessage): Performer {

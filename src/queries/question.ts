@@ -26,7 +26,6 @@ export class Question extends Parse {
     }
 
     if (!this.isMessageSend) {
-      console.log('sendMessage')
       this.isMessageSend = true
       return this.returnValue({
         message: this.formatMessage(this.question, state),

@@ -1,5 +1,4 @@
 import Bot from './bot';
-import Performer from './performer';
 import UserMessage from './types/messages/user';
 import Message from './types/messages/bot';
 export default class Chat {
@@ -8,9 +7,9 @@ export default class Chat {
     private performers;
     constructor(id: string, bot: Bot);
     input(message: UserMessage): Promise<void>;
-    performByScenario(title: string, user: string | {
+    perform(title: string, user: string | {
         [key: string]: string;
-    }): Performer;
+    }): void;
     private getOrCreatePerformer(message);
     private setPerformer(scenario, user);
     private removePerformer(performer);

@@ -26,7 +26,7 @@ export default class Performer {
     this.loadUsers(user)
   }
 
-  public async input (text: string): Promise<boolean>  {
+  public async input (text?: string): Promise<boolean>  {
     let result
     try {
       result = await this.query.handle(this.state, this.chat.bot, text)
@@ -37,12 +37,15 @@ export default class Performer {
     }
 
     this.trySendMessage(result.message)
+
+    if (!result.done) return false
+
+    if (!result.exit) this.setNextQuery(result.nextStep)
+    this.trySaveState(result.storeAs, result.value)
+
+    if (result.exit && !result.nextTopic) return true
     this.tryReplaceScenario(result.nextTopic)
 
-    if (result.exit || result.done) return true
-
-    this.setNextQuery(result.nextStep)
-    this.trySaveState(result.storeAs, result.value)
     return await this.input(text)
   }
 

@@ -16,9 +16,8 @@ export interface ParserOptions extends QueryOptions {
 }
 export declare class Parse extends Query {
     parser: Parser;
-    errorMessage: RelaxedMessage;
     validators: Validators;
-    _options: ParserOptions;
+    errorMessage: RelaxedMessage;
     constructor(parser: Parser, options: ParserOptions);
     handle(state: Object, bot: Bot, message: string): QueryReturn;
     validate(parsed: any, state: any): PartialQueryReturn;

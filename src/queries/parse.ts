@@ -23,15 +23,14 @@ export interface ParserOptions extends QueryOptions {
 
 export class Parse extends Query {
   parser: Parser
-  errorMessage: RelaxedMessage
   validators: Validators
-  _options: ParserOptions
+  errorMessage: RelaxedMessage
 
   constructor (parser: Parser, options: ParserOptions) {
     super(options)
+    this.parser = parser
     this.validators = options.validators || [{ validator: options.validator }]
     this.errorMessage = options.errorMessage
-    this.parser = parser
   }
 
   handle (state: Object, bot: Bot, message: string): QueryReturn {
