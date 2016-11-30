@@ -1,9 +1,12 @@
-_chat_ with _user|users_ at _channel_
+const bob = avenger.slack.user({handler: 'bob'}) // id or partial user object
+const userList = avenger.slack.users()
 
-bob = avenger.user({name: 'bob'}) // id or partial user object
+const channel = avenger.slack.channel('avengers-general')
+const group = avenger.slack.group('avengers-general')
+const im = avenger.slack.im({handler: 'bob'})
+const im = avenger.slack.createGroup({handler: 'bob'})
 
-chat = avenger.chat('avengers-general' /* userId | channel name */, 'direct' /* 'direct' | 'channel' | 'group' */)
-
+const chat = avenger.chat(channel.id)
 chat.perform('post-mortem', {qa: bob.id, lead: eve.id})
 
 `hi {users.qa.name} and {users.lead.name}`

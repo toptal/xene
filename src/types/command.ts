@@ -1,9 +1,11 @@
-import {PartialMessage, PartialMessageResolver} from './messages/bot'
+import Chat from '../chat'
+import UserMessage from './messages/user'
+import {PartialMessage} from './messages/bot'
 
 interface Command {
-  command: string | symbol
-  message: string | PartialMessage | PartialMessageResolver
   matcher: (message: string) => boolean
+  message?: string | PartialMessage
+  action?: (chat: Chat, message: UserMessage) => boolean | Promise<boolean>
 }
 
 export default Command

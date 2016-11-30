@@ -13,3 +13,9 @@ export type SearchUser = {
   handler?: string
 }
 
+export type UserOption = {
+  user?: User
+  users?: {
+    [key: string]: User
+  }
+}

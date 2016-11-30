@@ -1,14 +1,15 @@
 import * as _ from 'lodash'
 import Bot from './bot'
 import Query from './queries/query'
-import {Parse} from './queries/parse'
 import Performer from './performer'
+
+import Message from './types/messages/bot'
 import Scenario from './types/scenario'
 import UserMessage from './types/messages/user'
-import Message from './types/messages/bot'
+import {default as User, UserOption} from './types/user'
 
 import formatString from './helpers/format-string'
-
+import formatMessage from './helpers/format-message'
 
 /*
 Chat is a representation of channels or groups or even
@@ -28,51 +29,50 @@ export default class Chat {
 
   constructor (public id: string, public bot: Bot) {}
 
-  public async input (message: UserMessage) {
-    const performer = this.getOrCreatePerformer(message)
+  async message (message: UserMessage) {
+    const performer = await this.performerByMessage(message)
+    const eventOpts = { chat: this.id, scenario: performer.scenario, message }
+    this.bot.emit('message.get', eventOpts)
     try {
       const isDone = await performer.input(message.text)
       if (isDone) this.removePerformer(performer)
-    } catch (error) {
-      // TODO do something with error
-    }
+    } catch (e) { throw e }
   }
 
-  public perform (title: string, user: string | {[key: string]: string}) {
-    const scenario = this.bot.getScenario(title)
-    const firstQuery = _.head(scenario.queries)()
-    if (firstQuery instanceof Parse) {
-      throw new Error('Scenario starts with Parse query. Nothing yet to parse.')
-    }
-    const performer = this.setPerformer(scenario, user)
-    performer.input()
+  async command (message: UserMessage) {
+    const command = this.bot.macthCommand(message.text)
+    const res = await command.action(this, message)
+    if (res === false) return
+    const user = await this.bot.adapter.user(message.user)
+    this.send(formatMessage(command.message, {user}))
   }
 
-  private getOrCreatePerformer(message: UserMessage): Performer {
+  private async performerByMessage(message: UserMessage): Promise<Performer> {
     if (this.performers.has(message.user))
       return this.performers.get(message.user)
     // either scenario based on user message or default
+    const user = await this.bot.adapter.user(message.user)
     const scenario = this.bot.matchScenario(message.text)
-    return this.setPerformer(scenario, message.user)
+    return this.setPerformer(scenario, {user})
   }
 
-  private setPerformer (
-    scenario: Scenario,
-    user: string | {[key: string]: string}
-  ): Performer {
-    const performer = new Performer(scenario, user, this)
-    const users = _.isString(user) ? [user] : _.values(user)
-    users.forEach(user => this.performers.set(user, performer))
+  setPerformer (scenario: Scenario, userOption: UserOption): Performer {
+    this.bot.emit('scenario.start', scenario.title, userOption)
+    const performer = new Performer(scenario, userOption, this)
+    const users = userOption.user ? [userOption.user] : _.values(userOption.users)
+    users.forEach(user => this.performers.set(user.id, performer))
     return performer
   }
 
-  private removePerformer (performer: Performer) {
+  removePerformer (performer: Performer) {
+    const {scenario, user, users} = performer
+    this.bot.emit('scenario.finish', scenario, user || users)
     this.performers.forEach((value, userId, performers) => {
       if (value == performer) performers.delete(userId)
     })
   }
 
-  public send (message: string | Message) {
+  send (message: Message) {
     return this.bot.send(this.id, message)
   }
 }

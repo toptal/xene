@@ -3,7 +3,6 @@ type Message = {
   text: string
   user: string
   chat: string
-  type: 'direct' | 'channel' | 'group'
 }
 
 export default Message

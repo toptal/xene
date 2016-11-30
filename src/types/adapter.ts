@@ -3,10 +3,12 @@ import { default as BotMessage } from './messages/bot'
 import { default as UserMessage } from './messages/user'
 import { default as User, SearchUser } from './user'
 
-interface Adapter extends EventEmitter {
+interface Adapter {
+  on (event: string | symbol, listener: Function): EventEmitter
+  emit (event: string | symbol, ...args: any[]): boolean
+
   send (chat: string, message: BotMessage): Promise<any>
-  findUser (idOrTerm: string | SearchUser): User
-  getChat (userNameOrChatName: string, type: string): Promise<string>
+  user (id: string | SearchUser): Promise<User>
 }
 
 export default Adapter

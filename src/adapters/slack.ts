@@ -4,11 +4,12 @@ import * as _ from 'lodash'
 import {EventEmitter} from 'events'
 import {
    RtmClient,
-   WebClient,
    RTM_EVENTS,
    CLIENT_EVENTS,
    RTM_MESSAGE_SUBTYPES
 } from '@slack/client'
+
+import SlackClient from 'slack-client'
 
 import { default as User, SearchUser } from '../types/user'
 import { default as BotMessage } from '../types/messages/bot'
@@ -30,99 +31,36 @@ interface SlackPayload {
   subtype?: string
 }
 
-export default class SlackAdapter extends EventEmitter implements Adapter {
+export default class SlackAdapter extends SlackClient implements Adapter {
   profile: any
   rtmStore: any
-  webClient: WebClient
   rtmClient: RtmClient
   messageChain = Promise.resolve(null)
-  name?: string
-  avatar?: string
 
-  constructor (token: string, options: {name?: string, avatar?: string} = {}) {
-    super()
-    this.name = options.name
-    this.avatar = options.avatar
+  emmiter: EventEmitter
+  on: (event: string | symbol, listener: Function) => EventEmitter
+  emit: (event: string | symbol, ...args: any[]) => boolean
+
+  constructor (token: string) {
+    super(token)
     this.runClients(token)
+    this.bindEmiiter()
   }
 
-  public async getChat (id: string, type: string = 'direct'): Promise<string> {
-    const isChannel = type == 'channel'
-    const isGroup = type == 'group'
-    const isDm = type == 'direct'
-
-    // id is an id of existing channel, group or dm
-    let chat = this.rtmStore.getChannelGroupOrDMById(id)
-    if (chat) return chat.id
-
-    // id is an id of user
-    if (isDm) {
-      try {
-        chat = await this.webClient.im.open(id)
-        return chat.channel.id
-      } catch (e) {
-        throw new Error(e)
-      }
-    }
-
-    // id is an name of existing channel or group
-    if (isChannel) {
-      chat = this.rtmStore.getChannelByName(id);
-
-      if (chat) {
-        try {
-          await this.webClient.channels.join(id)
-          return chat.id
-        } catch (e) {
-          throw new Error(`Can't join channel '${id}' — ${e.toString()}`)
-        }
-      }
-
-      try {
-        chat = await this.webClient.channels.create(id)
-        return chat.id
-      } catch (e) {
-        throw new Error(`Can't create channel '${id}' — ${e.toString()}`)
-      }
-    }
-
-    if (isGroup) {
-      chat = this.rtmStore.getGroupByName(id);
-      if (chat) return chat.id
-
-      try {
-        chat = await this.webClient.groups.create(id)
-        return chat.id
-      } catch (e) {
-        throw new Error(`Can't create group '${id}' — ${e.toString()}`)
-      }
-    }
+  private bindEmiiter () {
+    this.emmiter = new EventEmitter()
+    this.on = this.emmiter.on.bind(this.emmiter)
+    this.emit = this.emmiter.emit.bind(this.emmiter)
   }
 
   private runClients (slackToken: string) {
-    const webClient = new WebClient(slackToken)
     const rtmClient = new RtmClient(slackToken, {logLevel: 'error'})
     rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.profile = d.self))
     rtmClient.on(RTM_EVENTS.MESSAGE, this.handleRtmMessage.bind(this))
     rtmClient.start()
-    this.webClient = webClient
     this.rtmClient = rtmClient
     this.rtmStore = rtmClient.dataStore
   }
-
-  // static async oauthAccess (toptalToken, code) {
-  //   const {id, secret, api} = config.slack
-  //   const {url} = config.app
-  //   return await post({
-  //     uri: api + 'oauth.access',
-  //     form: {
-  //       redirect_uri: `${url}authorize?token=${toptalToken}`,
-  //       client_secret: secret,
-  //       client_id: id,
-  //       code
-  //     }
-  //   })
-  // }
 
    private handleRtmMessage (payload: SlackPayload) {
     if (!payload.user) {
@@ -140,8 +78,7 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
       id: payload.ts,
       text: payload.text,
       user: payload.user,
-      chat: payload.channel,
-      type: this.chatType(payload.channel)
+      chat: payload.channel
     }
 
     const isBotMentioned = this.isBotMentioned(payload.text)
@@ -170,49 +107,7 @@ export default class SlackAdapter extends EventEmitter implements Adapter {
   }
 
   public send (channel: string, message: BotMessage) {
-    let {text, attachments} = message
-    attachments = attachment.format(attachments)
-    const options = { as_user: true, attachments }
-    const request = new Promise((resolve, reject) => {
-      this.webClient.chat.postMessage(channel, text, options)
-        .then(resolve).catch(reject)
-    })
-    this.messageChain.then(() => request)
-    return request
-  }
-
-  public findUser (idOrTerm: string | SearchUser): User {
-    let user
-    if (_.isString(idOrTerm)) {
-      user = this.rtmStore.getUserById(idOrTerm)
-    } else if (idOrTerm.email) {
-      user = this.rtmStore.getUserByEmail(idOrTerm.email)
-    } else if (idOrTerm.handler) {
-      user = this.rtmStore.getUserByName(idOrTerm.handler)
-    }
-
-    const firstName = user.profile.first_name || ''
-    const lastName = user.profile.last_name || ''
-
-    return {
-      id: user.id,
-      email: user.profile.email,
-      handler: `<@${user.id}>`,
-      fullName: firstName + `${lastName ? ' ' + lastName : '' }`,
-      firstName,
-      lastName
-    }
-  }
-
-  public getUser (id) {
-    const user = this.rtmStore.getUserById(id)
-    return {
-      firstName: user.profile.first_name || `<@${id}>`,
-      lastName: user.profile.last_name || '',
-      handler: `<@${id}>`,
-      team: user.team_id,
-      name: user.name,
-      id
-    }
+    message.attachments = attachment.format(message.attachments)
+    return super.send(channel, message)
   }
 }

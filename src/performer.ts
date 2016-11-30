@@ -1,9 +1,9 @@
 import * as _ from 'lodash'
 import Chat from './chat'
-import User from './types/user'
 import Query from './queries/query'
 import Scenario from './types/scenario'
 import {PartialMessage} from './types/messages/bot'
+import {default as User, UserOption} from './types/user'
 
 import formatString from './helpers/format-message'
 import formatMessage from './helpers/format-message'
@@ -11,19 +11,18 @@ import formatMessage from './helpers/format-message'
 class QueryError extends Error {}
 
 export default class Performer {
-  private user: User
-  private users: {[key: string]: User}
+  public user: User
+  public users: {[key: string]: User}
+  public scenario: string
+
   private state: Object = {}
   private query: Query
   private queries: Query[]
 
-  constructor (
-    scenario: Scenario,
-    user: string | {[name: string]: string},
-    private chat: Chat
-  ) {
+  constructor (scenario: Scenario, {user, users}: UserOption, private chat: Chat) {
+    this.user = user
+    this.users = users
     this.setScenario(scenario)
-    this.loadUsers(user)
   }
 
   public async input (text?: string): Promise<boolean>  {
@@ -50,6 +49,7 @@ export default class Performer {
   }
 
   private setScenario (scenario: Scenario) {
+    this.scenario = scenario.title
     this.queries = scenario.queries.map(q => q())
     this.query = _.head(this.queries)
   }
@@ -71,19 +71,14 @@ export default class Performer {
     this.query = this.queries[index]
   }
 
-  private loadUsers (user: string | {[name: string]: string}) {
-    if (!_.isString(user))
-      this.users = _.mapValues(user, id => this.chat.bot.user(id))
-    else
-      this.user = this.chat.bot.user(user)
-  }
-
-  private trySendMessage (partialMessage: string | PartialMessage) {
+  private async trySendMessage (partialMessage: string | PartialMessage) {
     if (!partialMessage) return
     const formatOptions = _.cloneDeep<any>(this.state)
     if (this.user) formatOptions.user = this.user
     if (this.users) formatOptions.users = this.users
     const message = formatMessage(partialMessage, formatOptions)
+    const eventOpts = {chat: this.chat.id, scenario: this.scenario, message}
+    this.chat.bot.emit('message.send', eventOpts)
     this.chat.send(message)
   }
 }

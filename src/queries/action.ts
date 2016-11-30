@@ -11,7 +11,7 @@ export class Action extends Query {
   onError?: string
   onSuccess?: string
 
-  constructor (action: (state: Object, bot: Bot) => Promise<any>, options: ActionOptions) {
+  constructor (action: (state: Object, bot: Bot) => any | Promise<any>, options: ActionOptions) {
     super(options)
     this.action = action
     this.onError = options.onError || null
@@ -36,6 +36,6 @@ export class Action extends Query {
   }
 }
 
-export default (action: (state: Object, bot: Bot) => Promise<any>, options: ActionOptions = {}): () => Action => {
+export default (action: (state: Object, bot: Bot) => any | Promise<any>, options: ActionOptions = {}): () => Action => {
   return () => new Action(action, options)
 }
