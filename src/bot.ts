@@ -65,7 +65,7 @@ export default class Bot extends SelfEmitter {
   }) {
     const {user, users} = options
     assert.ok(user && users, 'You can\'t specify both user and users params.')
-    assert.ok(user || users, 'User or users param should be specified.')
+    assert.ok(user || users, 'One of user or users params should be specified.')
     const chat = this.chat(options.chat)
     const scenario = this.getScenario(options.scenario)
     const firstQuery = _.head(scenario.queries)()

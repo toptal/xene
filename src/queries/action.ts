@@ -7,18 +7,18 @@ export interface ActionOptions extends QueryOptions {
 }
 
 export class Action extends Query {
-  action: (state: Object, bot: Bot) => Promise<any>
+  action: (state: {[k: string]: any}, bot: Bot) => Promise<any>
   onError?: string
   onSuccess?: string
 
-  constructor (action: (state: Object, bot: Bot) => any | Promise<any>, options: ActionOptions) {
+  constructor (action: (state: {[k: string]: any}, bot: Bot) => any | Promise<any>, options: ActionOptions) {
     super(options)
     this.action = action
     this.onError = options.onError || null
     this.onSuccess = options.onSuccess || options.nextStep
   }
 
-  async handle (state: Object, bot: Bot, message: string): Promise<QueryReturn> {
+  async handle (state: {[k: string]: any}, bot: Bot, message: string): Promise<QueryReturn> {
     if (this.skipStep(state, bot)) {
       return this.skippingState
     }
@@ -36,6 +36,6 @@ export class Action extends Query {
   }
 }
 
-export default (action: (state: Object, bot: Bot) => any | Promise<any>, options: ActionOptions = {}): () => Action => {
+export default (action: (state: {[k: string]: any}, bot: Bot) => any | Promise<any>, options: ActionOptions = {}): () => Action => {
   return () => new Action(action, options)
 }
