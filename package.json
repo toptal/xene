@@ -1,11 +1,12 @@
 {
   "name": "xene",
-  "version": "0.0.8",
+  "version": "0.0.21",
   "description": "Conversational bot framework",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
     "start": "tsc --watch",
+    "build": "tsc",
     "test": "mocha js/test --recursive --watch"
   },
   "repository": {

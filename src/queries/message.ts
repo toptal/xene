@@ -15,7 +15,7 @@ export class Message extends Query {
     this.message = message
   }
 
-  handle (state: {[k: string]: any}, bot: Bot, message: string): QueryReturn {
+  handle (state: any, bot: Bot, message: string): QueryReturn {
     if (this.skipStep(state, bot)) {
       return this.skippingState
     }

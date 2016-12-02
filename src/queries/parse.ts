@@ -7,8 +7,8 @@ import {
   PartialQueryReturn
 } from './query'
 
-export type Parser = (message: string, state: {[k: string]: any}) => any
-export type Validator = (parsed: any, state: {[k: string]: any}) => boolean
+export type Parser = (message: string, state: any) => any
+export type Validator = (parsed: any, state: any) => boolean
 export type Validators = {
   validator: Validator
   nextStep?: string
@@ -33,7 +33,7 @@ export class Parse extends Query {
     this.errorMessage = options.errorMessage
   }
 
-  handle (state: {[k: string]: any}, bot: Bot, message: string): QueryReturn {
+  handle (state: any, bot: Bot, message: string): QueryReturn {
     if (this.skipStep(state, bot)) {
       return this.skippingState
     }
@@ -55,7 +55,7 @@ export class Parse extends Query {
     throw new Error("Parse failed and `errorMessage` isn't defined.")
   }
 
-  validate (parsed: any, state: {[k: string]: any}): PartialQueryReturn {
+  validate (parsed: any, state: any): PartialQueryReturn {
     const validated = this.validators.find(b => b.validator(parsed, state))
     if (!validated) { return null }
     const {nextStep, message} = validated
@@ -66,7 +66,7 @@ export class Parse extends Query {
   }
 }
 
-export default (parser: (message: string, state: {[k: string]: any}) => any, options: ParserOptions): () => Parse => {
+export default (parser: (message: string, state: any) => any, options: ParserOptions): () => Parse => {
   if (!options.validator && !options.validators) {
     throw new Error('Query builder `parse` called without any `validator`.')
   }

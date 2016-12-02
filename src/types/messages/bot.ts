@@ -32,7 +32,6 @@ export interface Button {
 export interface Attachment {
   title: string
   buttons: Button[]
-  callbackId?: string
 }
 
 type Message = {

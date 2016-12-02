@@ -5,6 +5,7 @@ type User = {
   fullName: string
   lastName: string
   firstName: string
+  [key: string]: any
 }
 export default User
 

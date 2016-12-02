@@ -31,11 +31,25 @@ export default class Chat {
 
   async message (message: UserMessage) {
     const performer = await this.performerByMessage(message)
-    const eventOpts = { chat: this.id, scenario: performer.scenario, message }
-    this.bot.emit('message.get', eventOpts)
+    this.bot.emit('message.get', {
+      scenario: performer.scenario,
+      users: performer.users,
+      user: performer.user,
+      text: message.text,
+      id: message.id,
+      chat: this.id
+    })
     try {
       const isDone = await performer.input(message.text)
-      if (isDone) this.removePerformer(performer)
+      if (!isDone) return
+      const {scenario, user, users} = performer
+      this.bot.emit('scenario.finish', {
+        chat: this.id,
+        scenario,
+        users,
+        user
+      })
+      this.removePerformer(performer)
     } catch (e) { throw e }
   }
 
@@ -57,16 +71,33 @@ export default class Chat {
   }
 
   setPerformer (scenario: Scenario, userOption: UserOption): Performer {
-    this.bot.emit('scenario.start', scenario.title, userOption)
+    this.bot.emit('scenario.start', {
+      scenario: scenario.title,
+      users: userOption.users,
+      user: userOption.user,
+      chat: this.id
+    })
+
     const performer = new Performer(scenario, userOption, this)
     const users = userOption.user ? [userOption.user] : _.values(userOption.users)
     users.forEach(user => this.performers.set(user.id, performer))
     return performer
   }
 
-  removePerformer (performer: Performer) {
+  stopPerformer (userId: string) {
+    const performer = this.performers.get(userId)
+    const deleted = this.performers.delete(userId)
+    if (!deleted) return false
     const {scenario, user, users} = performer
-    this.bot.emit('scenario.finish', scenario, user || users)
+    this.bot.emit('scenario.abort', {
+      chat: this.id,
+      scenario,
+      users,
+      user
+    })
+  }
+
+  private removePerformer (performer: Performer) {
     this.performers.forEach((value, userId, performers) => {
       if (value == performer) performers.delete(userId)
     })

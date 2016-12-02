@@ -1,6 +1,6 @@
-// import * as config from 'config'
-// import {post} from 'lib/utils/request'
 import * as _ from 'lodash'
+import * as uuid from 'node-uuid'
+
 import {EventEmitter} from 'events'
 import {
    RtmClient,
@@ -11,9 +11,10 @@ import {
 
 import SlackClient from 'slack-client'
 
-import { default as User, SearchUser } from '../types/user'
-import { default as BotMessage } from '../types/messages/bot'
 import { default as UserMessage } from '../types/messages/user'
+import { default as User, SearchUser } from '../types/user'
+import { default as BotMessage, Attachment } from '../types/messages/bot'
+
 import Adapter from '../types/adapter'
 
 const KNOWN_EVENTS = {
@@ -31,48 +32,70 @@ interface SlackPayload {
   subtype?: string
 }
 
+export class SlackDispatcher {
+  private adapters = new Map<string, SlackAdapter>()
+  constructor () {
+    this.interactive = this.interactive.bind(this)
+  }
+
+  add (id: string, adapter: SlackAdapter) {
+    this.adapters.set(id, adapter)
+  }
+
+  interactive (req, res) {
+    const body = JSON.parse(req.body.payload)
+    const adapter = this.adapters.get(body.callback_id)
+    const response = adapter.interactiveMessage(body)
+    res.send(response)
+  }
+}
+
 export default class SlackAdapter extends SlackClient implements Adapter {
+  id: string
   profile: any
   rtmStore: any
   rtmClient: RtmClient
-  messageChain = Promise.resolve(null)
 
-  emmiter: EventEmitter
   on: (event: string | symbol, listener: Function) => EventEmitter
   emit: (event: string | symbol, ...args: any[]) => boolean
+  emmiter: EventEmitter
 
-  constructor (token: string) {
-    super(token)
-    this.runClients(token)
+  // Default dispatcher, used when user didn't provide
+  // custom dispatcher. This is moslty used when user rans
+  // one type of bot, which is a common case
+  static dispatcher = new SlackDispatcher()
+
+  constructor (options: {token: string, id: string, dispacther?: SlackDispatcher}) {
+    super(options.token)
     this.bindEmiiter()
+    this.id = options.id
+    this.runClients(options.token)
+    if (options.dispacther) options.dispacther.add(this.id, this)
+    else SlackAdapter.dispatcher.add(this.id, this)
   }
 
   private bindEmiiter () {
     this.emmiter = new EventEmitter()
-    this.on = this.emmiter.on.bind(this.emmiter)
     this.emit = this.emmiter.emit.bind(this.emmiter)
+    this.on = this.emmiter.on.bind(this.emmiter)
   }
 
   private runClients (slackToken: string) {
     const rtmClient = new RtmClient(slackToken, {logLevel: 'error'})
     rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.profile = d.self))
-    rtmClient.on(RTM_EVENTS.MESSAGE, this.handleRtmMessage.bind(this))
+    rtmClient.on(RTM_EVENTS.MESSAGE, this.rtmMessage.bind(this))
     rtmClient.start()
     this.rtmClient = rtmClient
     this.rtmStore = rtmClient.dataStore
   }
 
-   private handleRtmMessage (payload: SlackPayload) {
-    if (!payload.user) {
-      return
-    }
+   private rtmMessage (payload: SlackPayload) {
+    if (!payload.user) return
 
     const isSelf = this.profile.id === payload.user
     const event = this.isEvent(payload.subtype)
 
-    if (isSelf && event) {
-      return this.emit(`message.${event}`, payload)
-    }
+    if (isSelf && event) return this.emit(`message.${event}`, payload)
 
     const message: UserMessage = {
       id: payload.ts,
@@ -84,9 +107,13 @@ export default class SlackAdapter extends SlackClient implements Adapter {
     const isBotMentioned = this.isBotMentioned(payload.text)
     const isPrivate = Boolean(this.rtmStore.getDMById(payload.channel))
 
-    if (!isSelf && (isPrivate || isBotMentioned)) {
-      this.emit('message', message)
-    }
+    if (!isSelf && (isPrivate || isBotMentioned)) this.emit('message', message)
+  }
+
+  interactiveMessage (payload) {
+    const {parsed, replaced} = attachment.parse(payload)
+    this.emit('message', parsed)
+    return replaced
   }
 
   private chatType (str): 'channel' | 'group' | 'direct' {
@@ -106,7 +133,9 @@ export default class SlackAdapter extends SlackClient implements Adapter {
     return idrx.test(text)
   }
 
-  public send (channel: string, message: BotMessage) {
+  send (channel: string, message: BotMessage) {
+    const predicate = a => _.set(a, 'callbackId', this.id)
+    message.attachments = message.attachments.map(predicate) as Attachment[]
     message.attachments = attachment.format(message.attachments)
     return super.send(channel, message)
   }

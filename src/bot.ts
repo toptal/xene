@@ -1,7 +1,6 @@
 import * as _ from 'lodash'
 import * as assert from 'assert'
 
-import * as uuid from 'node-uuid'
 import SelfEmitter from './helpers/self-emitter'
 
 import Chat from './chat'
@@ -22,31 +21,17 @@ export type BotOptions = {
 }
 
 export default class Bot extends SelfEmitter {
-  id: string
   adapter: Adapter
   private chats: Map<string, Chat> = new Map()
-  private declarations: {
-    scenarios: Scenario[],
-    commands: Command[]
-  }
+  private declarations: { scenarios: Scenario[], commands: Command[] }
 
-  constructor ({adapter, scenarios, commands}: BotOptions, id?: string) {
+  constructor ({adapter, scenarios, commands}: BotOptions) {
     super()
     this.adapter = adapter
-    this.id = id || uuid.v4()
     this.declarations = { scenarios, commands: commands || [] }
-    this.propogateAdapterEvents()
+    this.adapter.on('message', this.userInput.bind(this))
   }
 
-  private propogateAdapterEvents () {
-    const originalEmit = this.adapter.emit
-    this.adapter.emit = (event, ...args): boolean => {
-      originalEmit.apply(this.adapter, [event, ...args])
-      return this.emit(event, ...args)
-    }
-  }
-
-  @SelfEmitter.on('message')
   private async userInput (message: UserMessage) {
     const chat = await this.chat(message.chat)
     const isCommand = this.isCommand(message.text)
@@ -60,9 +45,7 @@ export default class Bot extends SelfEmitter {
     return chat
   }
 
-  async perform (options: {
-    chat: string, scenario: string, user?: User, users?: {[key:string]: User}
-  }) {
+  async perform (options: {chat: string, scenario: string, user?: User, users?: {[key:string]: User}}) {
     const {user, users} = options
     assert.ok(user && users, 'You can\'t specify both user and users params.')
     assert.ok(user || users, 'One of user or users params should be specified.')
@@ -99,8 +82,6 @@ export default class Bot extends SelfEmitter {
 
   send (chat: string, message: string | BotMessage) {
     if (_.isString(message)) message = {text: message, attachments: []}
-    const predicate = a => _.set<Attachment>(a, 'callbackId', this.id)
-    message.attachments = message.attachments.map(predicate)
     return this.adapter.send(chat, message)
   }
 }

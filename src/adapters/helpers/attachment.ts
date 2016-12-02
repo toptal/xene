@@ -26,10 +26,6 @@ export function format (attachments) {
 }
 
 
-
-
-
-
 function replaceAttachment (selected, attachment) {
   const selectedReplacer = ':white_check_mark: ' + selected.name
   if (_.find(attachment.actions, ['value', selected.value])) {
@@ -46,9 +42,10 @@ export function parse (payload) {
 
   return {
     parsed: {
-      message: selected.value.toLowerCase(),
-      channel: payload.channel.id,
+      id: payload.action_ts,
+      text: selected.value,
       user: payload.user.id,
+      chat: payload.channel.id,
       isAction: true
     },
     replaced: {

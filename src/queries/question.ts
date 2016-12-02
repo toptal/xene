@@ -20,7 +20,7 @@ export class Question extends Parse {
     this.errorMessage = options.errorMessage || question
   }
 
-  handle (state: Object, bot: Bot, message: string): QueryReturn {
+  handle (state: any, bot: Bot, message: string): QueryReturn {
     if (this.skipStep(state, bot)) {
       return this.skippingState
     }

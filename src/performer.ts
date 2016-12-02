@@ -35,7 +35,7 @@ export default class Performer {
       throw new QueryError(error)
     }
 
-    this.trySendMessage(result.message)
+    await this.trySendMessage(result.message)
 
     if (!result.done) return false
 
@@ -77,8 +77,15 @@ export default class Performer {
     if (this.user) formatOptions.user = this.user
     if (this.users) formatOptions.users = this.users
     const message = formatMessage(partialMessage, formatOptions)
-    const eventOpts = {chat: this.chat.id, scenario: this.scenario, message}
-    this.chat.bot.emit('message.send', eventOpts)
-    this.chat.send(message)
+    const resp = await this.chat.send(message)
+    this.chat.bot.emit('message.send', {
+      id: resp.ts,
+      chat: this.chat.id,
+      scenario: this.scenario,
+      attachments: message.attachments,
+      text: message.text,
+      users: this.users,
+      user: this.user
+    })
   }
 }

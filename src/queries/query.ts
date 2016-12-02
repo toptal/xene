@@ -26,7 +26,7 @@ export interface QueryOptions {
   storeAs?: string
   nextStep?: string
   nextTopic?: string
-  skipStep?: (state: {[k: string]: any}, bot: Bot) => boolean
+  skipStep?: (state: any, bot: Bot) => boolean
 }
 
 export type QueryReturn = {
@@ -54,7 +54,7 @@ const alwaysFalse = () => false
 abstract class Query {
   step: string
   _options: QueryOptions
-  skipStep: (state: {[k: string]: any}, bot: Bot) => boolean
+  skipStep: (state: any, bot: Bot) => boolean
 
   constructor (options: QueryOptions = {}) {
     this.step = options.step || ''
@@ -62,7 +62,7 @@ abstract class Query {
     this.skipStep = options.skipStep || alwaysFalse
   }
 
-  abstract handle (state: {[k: string]: any}, bot: Bot, message: any): Promise<QueryReturn> | QueryReturn
+  abstract handle (state: any, bot: Bot, message: any): Promise<QueryReturn> | QueryReturn
 
   returnValue (options: PartialQueryReturn = {}): QueryReturn {
     const requiredOptions = _.pick<QueryReturn, QueryOptions>(this._options, OPTIONS)
@@ -81,7 +81,7 @@ abstract class Query {
     return this.returnValue({ done: true, exit: false })
   }
 
-  formatMessage (message: PartialMessageResolver | PartialMessage | string, state: {[k: string]: any}): PartialMessage | string  {
+  formatMessage (message: PartialMessageResolver | PartialMessage | string, state: any): PartialMessage | string  {
     return _.isFunction(message) ? message(state) : message
   }
 }
