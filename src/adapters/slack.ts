@@ -65,10 +65,10 @@ export default class SlackAdapter extends SlackClient implements Adapter {
   // one type of bot, which is a common case
   static dispatcher = new SlackDispatcher()
 
-  constructor (options: {token: string, id: string, dispacther?: SlackDispatcher}) {
+  constructor (options: {token: string, id?: string, dispacther?: SlackDispatcher}) {
     super(options.token)
     this.bindEmiiter()
-    this.id = options.id
+    this.id = options.id || uuid.v4()
     this.runClients(options.token)
     if (options.dispacther) options.dispacther.add(this.id, this)
     else SlackAdapter.dispatcher.add(this.id, this)

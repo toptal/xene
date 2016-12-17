@@ -38,7 +38,7 @@ export default class Bot extends SelfEmitter {
     return await (isCommand ? chat.command(message) : chat.message(message))
   }
 
-  private chat (id: string): Chat {
+  chat (id: string): Chat {
     if (this.chats.has(id)) return this.chats.get(id)
     const chat = new Chat(id, this)
     this.chats.set(id, chat)
@@ -74,6 +74,10 @@ export default class Bot extends SelfEmitter {
 
   private isCommand (message: string): boolean {
     return _.some(this.declarations.commands, c => c.matcher(message))
+  }
+
+  user (term: string | {handler?: string, email?: string}) {
+    return this.adapter.user(term)
   }
 
   macthCommand (message: string): Command {

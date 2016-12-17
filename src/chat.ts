@@ -70,6 +70,10 @@ export default class Chat {
     return this.setPerformer(scenario, {user})
   }
 
+  performer (user: string) {
+    return this.performers.get(user)
+  }
+
   setPerformer (scenario: Scenario, userOption: UserOption): Performer {
     this.bot.emit('scenario.start', {
       scenario: scenario.title,

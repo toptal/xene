@@ -6,7 +6,7 @@ interface BoundMethod {
 }
 
 export default class SelfEmitter extends EventEmitter {
-  private _toBind: BoundMethod[]
+  private _toBind: BoundMethod[] = []
 
   constructor () {
     super()
@@ -22,7 +22,7 @@ export default class SelfEmitter extends EventEmitter {
   static on (event: string) {
     return (target, key: string, descriptor: PropertyDescriptor) => {
       const method = descriptor.value
-      target._toBind = (target._toBind || []).concat({ event, method })
+      target._toBind.push({ event, method })
       return descriptor
     }
   }

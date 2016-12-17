@@ -48,6 +48,10 @@ export default class Performer {
     return await this.input(text)
   }
 
+  setState (k: string, v: any) {
+    this.state[k] = v
+  }
+
   private setScenario (scenario: Scenario) {
     this.scenario = scenario.title
     this.queries = scenario.queries.map(q => q())
