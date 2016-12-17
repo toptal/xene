@@ -8,7 +8,8 @@ const developerParser = {
 }
 
 class SampleDialog extends Dialog {
-  static match() { return true }
+  // static match() { return true }
+  static isDefault = true
 
   async talk() {
     const {ask, message, parse} = this

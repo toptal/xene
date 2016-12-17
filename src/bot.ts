@@ -29,16 +29,16 @@ export default class Bot extends SelfEmitter {
     super()
     this.adapter = adapter
     this.declarations = { dialogs, commands: commands || [] }
-    this.adapter.on('message', this.userInput.bind(this))
+    this.adapter.on('message', this.processUserMessage.bind(this))
   }
 
-  private async userInput(message: UserMessage) {
+  private async processUserMessage(message: UserMessage) {
     const chat = await this.chat(message.chat)
     const isCommand = this.isCommand(message.text)
     chat.message(message)
   }
 
-  chat(id: string): Chat {
+  private chat(id: string): Chat {
     if (this.chats.has(id)) return this.chats.get(id)
     const chat = new Chat(id, this)
     this.chats.set(id, chat)
@@ -50,25 +50,26 @@ export default class Bot extends SelfEmitter {
     return _.find(dialogs, ['isDefault', true])
   }
 
-  matchDialog(message: string): typeof Dialog {
-    const predicate = t => t.match && t.match(message)
-    return this.declarations.dialogs.find(predicate) || this.defaultDialog()
+  private isCommand(message: string): boolean {
+    return _.some(this.declarations.commands, c => c.matcher(message))
   }
 
   resetChat(id: string) {
     this.chats.delete(id)
   }
 
-  private isCommand(message: string): boolean {
-    return _.some(this.declarations.commands, c => c.matcher(message))
+  dialog(message: string): typeof Dialog {
+    const predicate = d => d.match && d.match(message)
+    return this.declarations.dialogs.find(predicate) || this.defaultDialog()
+  }
+
+  command(message: string): Command {
+    // TODO fix command matcher
+    return this.declarations.commands.find(c => c.matcher(message))
   }
 
   user(term: string | { handler?: string, email?: string }) {
     return this.adapter.user(term)
-  }
-
-  macthCommand(message: string): Command {
-    return _.find<Command>(this.declarations.commands, c => c.matcher(message))
   }
 
   send(chat: string, message: string | BotMessage) {

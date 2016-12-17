@@ -29,7 +29,7 @@ export default class Chat {
       return this.dialogs.get(message.user)
     // either scenario based on user message or default
     const user = await this.bot.adapter.user(message.user)
-    const Dialog = this.bot.matchDialog(message.text)
+    const Dialog = this.bot.dialog(message.text)
     return this.initDialog(Dialog, user)
   }
 
