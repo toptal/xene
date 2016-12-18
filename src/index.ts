@@ -1,5 +1,7 @@
-import Bot from './bot'
 import * as Types from './types'
-import SlackAdapter from './adapters/slack'
+import Bot from './bot'
+import Dialog from './dialog'
+import Command from './command'
+import * as Adapters from './adapters'
 
-export {Bot, SlackAdapter, Types}
+export { Bot, Dialog, Command, Adapters }

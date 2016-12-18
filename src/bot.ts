@@ -1,13 +1,11 @@
 import * as _ from 'lodash'
 import * as assert from 'assert'
 
-import SelfEmitter from './ext/helpers/self-emitter'
-
 import Chat from './ext/chat'
 import Dialog from './dialog'
+import Command from './command'
 
 import Adapter from './types/adapter'
-import Command from './types/command'
 import { default as User, SearchUser } from './types/user'
 
 import { default as UserMessage } from './types/messages/user'
@@ -15,27 +13,31 @@ import { default as BotMessage, Attachment } from './types/messages/bot'
 
 export type BotOptions = {
   adapter: Adapter
-  commands?: Command[]
   dialogs: (typeof Dialog)[]
+  commands?: (typeof Command)[]
 }
 
-export default class Bot extends SelfEmitter {
+export default class Bot {
   adapter: Adapter
 
   private chats: Map<string, Chat> = new Map()
-  private declarations: { dialogs: (typeof Dialog)[], commands: Command[] }
+  private dialogs: (typeof Dialog)[] = []
+  private commands: (typeof Command)[] = []
 
   constructor({adapter, dialogs, commands}: BotOptions) {
-    super()
     this.adapter = adapter
-    this.declarations = { dialogs, commands: commands || [] }
+    if (dialogs) this.dialogs = dialogs
+    if (commands) this.commands = commands
     this.adapter.on('message', this.processUserMessage.bind(this))
   }
 
   private async processUserMessage(message: UserMessage) {
     const chat = await this.chat(message.chat)
     const isCommand = this.isCommand(message.text)
-    chat.message(message)
+    if (!isCommand) return chat.message(message)
+    const CommandClass = this.command(message.text)
+    const command = new Command(message.chat, this, message.user)
+    command.do()
   }
 
   private chat(id: string): Chat {
@@ -46,12 +48,11 @@ export default class Bot extends SelfEmitter {
   }
 
   private defaultDialog(): typeof Dialog {
-    const {dialogs} = this.declarations
-    return _.find(dialogs, ['isDefault', true])
+    return _.find(this.dialogs, ['isDefault', true])
   }
 
   private isCommand(message: string): boolean {
-    return _.some(this.declarations.commands, c => c.matcher(message))
+    return _.some(this.commands, c => c.match(message))
   }
 
   resetChat(id: string) {
@@ -60,12 +61,11 @@ export default class Bot extends SelfEmitter {
 
   dialog(message: string): typeof Dialog {
     const predicate = d => d.match && d.match(message)
-    return this.declarations.dialogs.find(predicate) || this.defaultDialog()
+    return this.dialogs.find(predicate) || this.defaultDialog()
   }
 
-  command(message: string): Command {
-    // TODO fix command matcher
-    return this.declarations.commands.find(c => c.matcher(message))
+  command(message: string): typeof Command {
+    return this.commands.find(c => c.match(message))
   }
 
   user(term: string | { handler?: string, email?: string }) {

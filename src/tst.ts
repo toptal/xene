@@ -1,6 +1,7 @@
+import * as _ from 'lodash'
 import Bot from './bot'
-import Console from './adapters/console'
 import Dialog from './dialog'
+import Console from './adapters/console'
 
 const developerParser = {
   parse: (message) => message == 'developer' ? 'DEvElOper' : false,
@@ -8,14 +9,12 @@ const developerParser = {
 }
 
 class SampleDialog extends Dialog {
-  // static match() { return true }
   static isDefault = true
-
   async talk() {
     const {ask, message, parse} = this
-    await message('hi user')
-    const parsed = await parse((message) => message.toUpperCase())
-    await ask('who are you?', (reply) => reply == 'boss' ? 'boss': null, 'you should be a boss, so who ae you?')
+    await message('hi')
+    const parsed = await parse(message => message.toUpperCase())
+    await ask('who are you?', reply => reply == 'boss' ? 'boss': null, 'you should be a boss, so who ae you?')
     console.log('>> ', parsed)
   }
 }

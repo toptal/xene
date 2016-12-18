@@ -1,4 +1,4 @@
-import { isFunction, isString, isNil } from 'lodash'
+import { isFunction, isString, isNil, template } from 'lodash'
 import DialogQueue from './ext/dialog-queue'
 
 export default class Dialog {
@@ -14,7 +14,8 @@ export default class Dialog {
   async talk(): Promise<void> { }
 
   message(message: string) {
-    return this.bot.send(this.chat, message)
+    const formatted = template(message, { imports: this })()
+    return this.bot.send(this.chat, formatted)
   }
 
   parse<T>(parserFunc: (msg: string) => T): Promise<T>
