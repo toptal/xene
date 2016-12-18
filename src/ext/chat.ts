@@ -21,7 +21,7 @@ export default class Chat {
 
   async message(message: UserMessage) {
     const dialog = await this.dialogByMessage(message)
-    dialog.queue.input(message.text)
+    if (dialog) dialog.queue.input(message.text)
   }
 
   private async dialogByMessage(message: UserMessage): Promise<Dialog> {
@@ -29,8 +29,8 @@ export default class Chat {
       return this.dialogs.get(message.user)
     // either scenario based on user message or default
     const user = await this.bot.adapter.user(message.user)
-    const Dialog = this.bot.dialog(message.text)
-    return this.initDialog(Dialog, user)
+    const DialogClass = this.bot.dialog(message.text)
+    if (DialogClass) return this.initDialog(DialogClass, user)
   }
 
   initDialog(DialogClass: typeof Dialog, user: User): Dialog {
