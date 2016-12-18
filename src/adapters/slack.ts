@@ -1,12 +1,12 @@
 import * as _ from 'lodash'
 import * as uuid from 'node-uuid'
 
-import {EventEmitter} from 'events'
+import { EventEmitter } from 'events'
 import {
-   RtmClient,
-   RTM_EVENTS,
-   CLIENT_EVENTS,
-   RTM_MESSAGE_SUBTYPES
+  RtmClient,
+  RTM_EVENTS,
+  CLIENT_EVENTS,
+  RTM_MESSAGE_SUBTYPES
 } from '@slack/client'
 
 import SlackClient from 'slack-client'
@@ -34,15 +34,15 @@ interface SlackPayload {
 
 export class SlackDispatcher {
   private adapters = new Map<string, SlackAdapter>()
-  constructor () {
+  constructor() {
     this.interactive = this.interactive.bind(this)
   }
 
-  add (id: string, adapter: SlackAdapter) {
+  add(id: string, adapter: SlackAdapter) {
     this.adapters.set(id, adapter)
   }
 
-  interactive (req, res) {
+  interactive(req, res) {
     const body = JSON.parse(req.body.payload)
     const adapter = this.adapters.get(body.callback_id)
     const response = adapter.interactiveMessage(body)
@@ -65,7 +65,7 @@ export default class SlackAdapter extends SlackClient implements Adapter {
   // one type of bot, which is a common case
   static dispatcher = new SlackDispatcher()
 
-  constructor (options: {token: string, id?: string, dispacther?: SlackDispatcher}) {
+  constructor(options: { token: string, id?: string, dispacther?: SlackDispatcher }) {
     super(options.token)
     this.bindEmiiter()
     this.id = options.id || uuid.v4()
@@ -74,14 +74,14 @@ export default class SlackAdapter extends SlackClient implements Adapter {
     else SlackAdapter.dispatcher.add(this.id, this)
   }
 
-  private bindEmiiter () {
+  private bindEmiiter() {
     this.emmiter = new EventEmitter()
     this.emit = this.emmiter.emit.bind(this.emmiter)
     this.on = this.emmiter.on.bind(this.emmiter)
   }
 
-  private runClients (slackToken: string) {
-    const rtmClient = new RtmClient(slackToken, {logLevel: 'error'})
+  private runClients(slackToken: string) {
+    const rtmClient = new RtmClient(slackToken, { logLevel: 'error' })
     rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.profile = d.self))
     rtmClient.on(RTM_EVENTS.MESSAGE, this.rtmMessage.bind(this))
     rtmClient.start()
@@ -89,7 +89,7 @@ export default class SlackAdapter extends SlackClient implements Adapter {
     this.rtmStore = rtmClient.dataStore
   }
 
-   private rtmMessage (payload: SlackPayload) {
+  private rtmMessage(payload: SlackPayload) {
     if (!payload.user) return
 
     const isSelf = this.profile.id === payload.user
@@ -110,13 +110,13 @@ export default class SlackAdapter extends SlackClient implements Adapter {
     if (!isSelf && (isPrivate || isBotMentioned)) this.emit('message', message)
   }
 
-  interactiveMessage (payload) {
+  interactiveMessage(payload) {
     const {parsed, replaced} = attachment.parse(payload)
     this.emit('message', parsed)
     return replaced
   }
 
-  private chatType (str): 'channel' | 'group' | 'direct' {
+  private chatType(str): 'channel' | 'group' | 'direct' {
     switch (str.substring(0, 1)) {
       case 'C': return 'channel'
       case 'G': return 'group'
@@ -124,16 +124,16 @@ export default class SlackAdapter extends SlackClient implements Adapter {
     }
   }
 
-  private isEvent (subtype: string): string | undefined {
+  private isEvent(subtype: string): string | undefined {
     return KNOWN_EVENTS[subtype]
   }
 
-  private isBotMentioned (text: string) {
+  private isBotMentioned(text: string) {
     const idrx = new RegExp(this.profile.id, 'i')
     return idrx.test(text)
   }
 
-  send (channel: string, message: BotMessage) {
+  send(channel: string, message: BotMessage) {
     const predicate = a => _.set(a, 'callbackId', this.id)
     message.attachments = message.attachments.map(predicate) as Attachment[]
     message.attachments = attachment.format(message.attachments)

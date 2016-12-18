@@ -1,10 +1,10 @@
 import * as _ from 'lodash'
-import Bot from './bot'
-import Dialog from './dialog'
+import Bot from '../bot'
+import Dialog from '../dialog'
 
-import Message from './types/messages/bot'
-import UserMessage from './types/messages/user'
-import { default as User, UserOption } from './types/user'
+import Message from '../types/messages/bot'
+import UserMessage from '../types/messages/user'
+import { default as User, UserOption } from '../types/user'
 
 import formatString from './helpers/format-string'
 import formatMessage from './helpers/format-message'

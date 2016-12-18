@@ -1,3 +1,3 @@
 import Slack from './slack'
 
-export {Slack}
+export { Slack }

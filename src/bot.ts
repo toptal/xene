@@ -1,9 +1,9 @@
 import * as _ from 'lodash'
 import * as assert from 'assert'
 
-import SelfEmitter from './helpers/self-emitter'
+import SelfEmitter from './ext/helpers/self-emitter'
 
-import Chat from './chat'
+import Chat from './ext/chat'
 import Dialog from './dialog'
 
 import Adapter from './types/adapter'

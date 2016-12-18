@@ -1,5 +1,5 @@
 import { isFunction, isString, isNil } from 'lodash'
-import DialogQueue from './dialog-queue'
+import DialogQueue from './ext/dialog-queue'
 
 export default class Dialog {
   queue: DialogQueue = new DialogQueue()
@@ -36,13 +36,11 @@ export default class Dialog {
     else errorCallback = error as (reply: string, parsed: T) => void
     if (isFunction(parser)) parser = { parse: parser, check: (parsed) => !isNil(parsed) }
 
-    return new Promise((resolve, reject) => {
-      this.queue.push({
-        parser: parser as { parse: (msg: string) => T, check: (parsed: T) => boolean },
-        error: errorCallback as (reply: string, parsed: T) => void,
-        done: resolve
-      })
-    })
+    return new Promise((resolve, reject) => this.queue.push({
+      parser: parser as { parse: (msg: string) => T, check: (parsed: T) => boolean },
+      error: errorCallback as (reply: string, parsed: T) => void,
+      done: resolve
+    }))
   }
 
   ask<T>(message: string, parserFunc: (msg: string) => T): Promise<T>
