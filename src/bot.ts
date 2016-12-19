@@ -4,20 +4,13 @@ import Chat from './ext/chat'
 import Dialog from './dialog'
 import Command from './command'
 
-import UserMessage from './types/user-message'
+import IAdapter from './adapters/interface'
+import IUserMessage from './types/user-message'
+import { IAttachment } from './types/bot-message'
 
-import Adapter from './adapters/adapter'
 import { Console, Slack } from './adapters'
 
-import { default as BotMessage, Attachment } from './types/messages/bot'
-
-export type BotOptions = {
-  adapter: Adapter
-  dialogs: (typeof Dialog)[]
-  commands?: (typeof Command)[]
-}
-
-export default class Bot<T extends Adapter> {
+export default class Bot<T extends IAdapter> {
   adapter: T
   private chats: Map<string, Chat> = new Map()
   private dialogs: (typeof Dialog)[] = []
@@ -29,10 +22,9 @@ export default class Bot<T extends Adapter> {
     if (dialogs) this.dialogs = dialogs
     if (commands) this.commands = commands
     this.adapter = adapter
-    this.adapter.on('message', this.onIncomingMessage.bind(this))
   }
 
-  private async onIncomingMessage(message: UserMessage) {
+  async onMessage(message: IUserMessage) {
     const chat = await this.chat(message.chat)
     const isCommand = this.isCommand(message.text)
     if (!isCommand) return chat.message(message)
@@ -66,7 +58,7 @@ export default class Bot<T extends Adapter> {
     return this.commands.find(c => c.match(message))
   }
 
-  send(chat: string, message: string | BotMessage) {
+  send(chat: string, message: string | { text: string, attachments: IAttachment[] }) {
     if (isString(message)) message = { text: message, attachments: [] }
     return this.adapter.send(chat, message)
   }

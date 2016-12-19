@@ -1,22 +1,26 @@
-import Adapter from './adapter'
-import BotMessage from '../types/messages/bot'
-import { EventEmitter } from 'events'
+import Bot from '../bot'
+import IAdapter from './interface'
+import { IAttachment } from '../types/bot-message'
 
-export default class Console extends EventEmitter implements Adapter {
+export default class Console implements IAdapter {
+  private bot: Bot<IAdapter>
 
   constructor() {
-    super()
     const stdin = process.stdin
     stdin.resume()
     stdin.setEncoding('utf8')
     stdin.on('data', (key) =>
-      this.emit('message', {
+      this.bot.onMessage({
         id: new Date().getMilliseconds(),
         text: key.trim(),
         user: 'dempfi',
         chat: 'stdin'
       })
     )
+  }
+
+  linkBot(bot) {
+    this.bot = bot
   }
 
   async user() {
@@ -30,7 +34,7 @@ export default class Console extends EventEmitter implements Adapter {
     }
   }
 
-  async send(chat: string, message: BotMessage) {
+  async send(chat: string, message: { text: string, attachments: IAttachment []}) {
     console.log('Bot says: ', message.text)
     console.log('---------------')
   }

@@ -1,31 +1,34 @@
 import Bot from '../bot'
 import Dialog from '../dialog'
+import IAdapter from '../adapters/interface'
 import Message from '../types/user-message'
 
-export default class Chat {
-  private dialogs: Map<string, Dialog> = new Map()
+type BoundDialog = Dialog<Bot<IAdapter>>
 
-  constructor(public id: string, public bot: Bot) { }
+export default class Chat {
+  private dialogs: Map<string, BoundDialog> = new Map()
+
+  constructor(public id: string, public bot: Bot<IAdapter>) { }
 
   async message(message: Message) {
     const dialog = await this.dialogByMessage(message)
     if (dialog) dialog.queue.input(message.text)
   }
 
-  private async dialogByMessage({user, text}: Message): Promise<Dialog> {
+  private async dialogByMessage({user, text}: Message): Promise<BoundDialog> {
     if (this.dialogs.has(user)) return this.dialogs.get(user)
     const DialogClass = this.bot.dialog(text)
     if (DialogClass) return this.initDialog(DialogClass, user)
   }
 
-  private initDialog(DialogClass: typeof Dialog, userId: string): Dialog {
+  private initDialog(DialogClass: typeof Dialog, userId: string): BoundDialog {
     const dialog = new DialogClass(this.id, this.bot, userId)
     this.dialogs.set(userId, dialog)
     dialog.talk().then(this.removeDialog.bind(this, dialog))
     return dialog
   }
 
-  private removeDialog(dialog: Dialog) {
+  private removeDialog(dialog: BoundDialog) {
     this.dialogs.forEach((value, userId, dialogs) => {
       if (value == dialog) dialogs.delete(userId)
     })
