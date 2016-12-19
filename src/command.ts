@@ -1,7 +1,7 @@
 import { template } from 'lodash'
 
 export default class Command {
-  constructor(public chat: string, public bot: any, public users: any) {
+  constructor(public user: any, public bot: any, public chat: string) {
     this.message = this.message.bind(this)
   }
 

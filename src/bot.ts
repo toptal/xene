@@ -4,8 +4,10 @@ import Chat from './ext/chat'
 import Dialog from './dialog'
 import Command from './command'
 
-import Adapter from './types/adapter'
 import UserMessage from './types/user-message'
+
+import Adapter from './adapters/adapter'
+import { Console, Slack } from './adapters'
 
 import { default as BotMessage, Attachment } from './types/messages/bot'
 
@@ -15,17 +17,18 @@ export type BotOptions = {
   commands?: (typeof Command)[]
 }
 
-export default class Bot {
-  adapter: Adapter
-
+export default class Bot<T extends Adapter> {
+  adapter: T
   private chats: Map<string, Chat> = new Map()
   private dialogs: (typeof Dialog)[] = []
   private commands: (typeof Command)[] = []
 
-  constructor({adapter, dialogs, commands}: BotOptions) {
-    this.adapter = adapter
+  constructor({adapter, dialogs, commands}: {
+    adapter: T, dialogs: (typeof Dialog)[], commands?: (typeof Command)[]
+  }) {
     if (dialogs) this.dialogs = dialogs
     if (commands) this.commands = commands
+    this.adapter = adapter
     this.adapter.on('message', this.onIncomingMessage.bind(this))
   }
 

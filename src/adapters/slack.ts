@@ -14,7 +14,7 @@ import SlackClient from 'slack-client'
 import UserMessage from '../types/user-message'
 import { default as BotMessage, Attachment } from '../types/messages/bot'
 
-import Adapter from '../types/adapter'
+import Adapter from './adapter'
 
 const KNOWN_EVENTS = {
   [RTM_MESSAGE_SUBTYPES.CHANNEL_JOIN]: 'slack.join',

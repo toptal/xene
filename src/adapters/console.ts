@@ -1,4 +1,4 @@
-import Adapter from '../types/adapter'
+import Adapter from './adapter'
 import BotMessage from '../types/messages/bot'
 import { EventEmitter } from 'events'
 

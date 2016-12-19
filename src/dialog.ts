@@ -4,7 +4,7 @@ import DialogQueue from './ext/dialog-queue'
 export default class Dialog {
   queue: DialogQueue = new DialogQueue()
 
-  constructor(public chat: string, public bot: any, public users: any) {
+  constructor(public user: any, public bot: any, public chat: string) {
     this.ask = this.ask.bind(this)
     this.parse = this.parse.bind(this)
     this.message = this.message.bind(this)
