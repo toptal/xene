@@ -11,8 +11,7 @@ import {
 
 import SlackClient from 'slack-client'
 
-import { default as UserMessage } from '../types/messages/user'
-import { default as User, SearchUser } from '../types/user'
+import UserMessage from '../types/user-message'
 import { default as BotMessage, Attachment } from '../types/messages/bot'
 
 import Adapter from '../types/adapter'

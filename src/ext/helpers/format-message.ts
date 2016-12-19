@@ -1,5 +1,4 @@
-import * as _ from 'lodash'
-import formatString from './format-string'
+import { isNumber, isString } from 'lodash'
 import {
   Button,
   RelaxedButton,
@@ -7,11 +6,11 @@ import {
   Attachment,
   PartialMessage,
   default as Message
-} from '../types/messages/bot'
+} from '../../types/messages/bot'
 
 export default (obj: PartialMessage | string, options: any): Message => {
   const predicate = formatAttachment.bind(null, options)
-  const partial = _.isString(obj) ? fromString(obj) : fromObject(obj)
+  const partial = isString(obj) ? fromString(obj) : fromObject(obj)
   return {
     attachments: partial.attachments.map<Attachment>(predicate),
     text: formatString(partial.text, options)
@@ -38,9 +37,9 @@ function formatAttachment (options: any, attachment: RelaxedAttachment): Attachm
 }
 
 function formatButton (button: string | RelaxedButton): Button {
-  if (_.isNumber(button)) button = button.toString()
+  if (isNumber(button)) button = button.toString()
 
-  if (_.isString(button)) return {
+  if (isString(button)) return {
     label: button,
     value: button,
     type: 'default'

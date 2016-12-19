@@ -1,14 +1,12 @@
-import * as _ from 'lodash'
-import * as assert from 'assert'
+import { isString, find, some } from 'lodash'
 
 import Chat from './ext/chat'
 import Dialog from './dialog'
 import Command from './command'
 
 import Adapter from './types/adapter'
-import { default as User, SearchUser } from './types/user'
+import UserMessage from './types/user-message'
 
-import { default as UserMessage } from './types/messages/user'
 import { default as BotMessage, Attachment } from './types/messages/bot'
 
 export type BotOptions = {
@@ -28,10 +26,10 @@ export default class Bot {
     this.adapter = adapter
     if (dialogs) this.dialogs = dialogs
     if (commands) this.commands = commands
-    this.adapter.on('message', this.processUserMessage.bind(this))
+    this.adapter.on('message', this.onIncomingMessage.bind(this))
   }
 
-  private async processUserMessage(message: UserMessage) {
+  private async onIncomingMessage(message: UserMessage) {
     const chat = await this.chat(message.chat)
     const isCommand = this.isCommand(message.text)
     if (!isCommand) return chat.message(message)
@@ -47,12 +45,8 @@ export default class Bot {
     return chat
   }
 
-  private defaultDialog(): typeof Dialog {
-    return _.find(this.dialogs, ['isDefault', true])
-  }
-
   private isCommand(message: string): boolean {
-    return _.some(this.commands, c => c.match(message))
+    return some(this.commands, c => c.match(message))
   }
 
   resetChat(id: string) {
@@ -60,20 +54,17 @@ export default class Bot {
   }
 
   dialog(message: string): typeof Dialog {
+    const dialogs = this.dialogs
     const predicate = d => d.match && d.match(message)
-    return this.dialogs.find(predicate) || this.defaultDialog()
+    return dialogs.find(predicate) || find(dialogs, ['isDefault', true])
   }
 
   command(message: string): typeof Command {
     return this.commands.find(c => c.match(message))
   }
 
-  user(term: string | { handler?: string, email?: string }) {
-    return this.adapter.user(term)
-  }
-
   send(chat: string, message: string | BotMessage) {
-    if (_.isString(message)) message = { text: message, attachments: [] }
+    if (isString(message)) message = { text: message, attachments: [] }
     return this.adapter.send(chat, message)
   }
 }
