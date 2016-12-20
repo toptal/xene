@@ -27,7 +27,7 @@ export default class Dialog<T extends Bot<IAdapter>> {
     const fmt = (t: string) => template(t, { imports: this })()
     let {text, attachments} = normalizeMessage(message)
     attachments = attachments.map(a => ({ title: fmt(a.title), body: fmt(a.body), buttons: a.buttons }))
-    return this.bot.send(this.chat, { text, attachments })
+    return this.bot.send(this.chat, { text: fmt(text), attachments })
   }
 
   parse<T>(parserFunc: (msg: string) => T): Promise<T>

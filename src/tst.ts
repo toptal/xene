@@ -13,9 +13,10 @@ class SampleDialog extends Dialog<ConsoleBot> {
   static isDefault = true
 
   async talk() {
+    console.log('GFHJGFHFGJ')
     const {ask, message, parse} = this
     const parsed = await parse(message => message.toUpperCase())
-    await ask('who are you?', reply => reply == 'boss' ? 'boss': null, 'you should be a boss, so who ae you?')
+    await ask('who are you? <% isDefault%>', reply => reply == 'boss' ? 'boss': null, 'you should be a boss, so who ae you?')
     console.log('>> ', parsed)
   }
 }

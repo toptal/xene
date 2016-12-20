@@ -20,11 +20,11 @@ export default class DialogQueue {
     this.message = null
   }
 
-  input(msg = this.message) {
+  async input(msg = this.message) {
     this.message = msg
     if (!this.queue[0] || !msg) return
     const {done, parser, error} = this.queue[0]
-    const parsed = parser.parse(msg)
+    const parsed = await parser.parse(msg)
     const isValid = parser.check(parsed)
     if (isValid) {
       done(parsed)

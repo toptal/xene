@@ -11,7 +11,7 @@ export default class Command<T extends Bot<IAdapter>> {
 
   static match(message: string): boolean { return false }
 
-  message(message: string) {
+  message(message: string | IMessage) {
     const fmt = (t: string) => template(t, { imports: this })()
     let {text, attachments} = normalizeMessage(message)
     attachments = attachments.map(a => ({ title: fmt(a.title), body: fmt(a.body), buttons: a.buttons }))

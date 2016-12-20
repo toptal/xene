@@ -22,6 +22,7 @@ export default class Bot<T extends IAdapter> {
     if (dialogs) this.dialogs = dialogs
     if (commands) this.commands = commands
     this.adapter = adapter
+    this.adapter.linkBot(this)
   }
 
   async onMessage(message: IUserMessage) {
@@ -29,7 +30,7 @@ export default class Bot<T extends IAdapter> {
     const isCommand = this.isCommand(message.text)
     if (!isCommand) return chat.message(message)
     const CommandClass = this.command(message.text)
-    const command = new Command(message.chat, this, message.user)
+    const command = new CommandClass(message.chat, this, message.user)
     command.do()
   }
 
