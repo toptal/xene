@@ -30,10 +30,10 @@ export default class Dialog<T extends Bot<IAdapter>> {
     return this.bot.send(this.chat, { text: fmt(text), attachments })
   }
 
+  // Id error handler doesn't exist don't check
   parse<T>(parserFunc: (msg: string) => T): Promise<T>
   parse<T>(parserFunc: (msg: string) => T, errorMessage: string | IMessage): Promise<T>
   parse<T>(parserFunc: (msg: string) => T, errorCallback: (reply: string, parsed: T) => void): Promise<T>
-  parse<T>(parserObject: { parse: (msg: string) => T, check: (parsed: T) => boolean }): Promise<T>
   parse<T>(
     parserObject: { parse: (msg: string) => T, check: (parsed: T) => boolean },
     errorMessage: string | IMessage): Promise<T>

@@ -26,13 +26,12 @@ export default class DialogQueue {
     const {done, parser, error} = this.queue[0]
     const parsed = await parser.parse(msg)
     const isValid = parser.check(parsed)
-    if (isValid) {
+    if (isValid || !error) {
       done(parsed)
       this.queue.shift()
       this.input(msg)
-    } else {
+    } else if(error) {
       error(msg, parsed)
     }
   }
-
 }
