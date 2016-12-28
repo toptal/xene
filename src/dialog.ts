@@ -1,15 +1,6 @@
-import {
-  isNil,
-  isString,
-  isFunction,
-  isPlainObject,
-  template
-} from 'lodash'
-// import Console from './bots/console'
-// import Slack from './bots/slack'
-import IMessage from './types/bot-message'
+import Bot from './lib/bot'
 import DialogQueue from './lib/dialog-queue'
-import normalizeMessage from './lib/normalize-message'
+import { isNil, isString, isFunction, isPlainObject } from 'lodash'
 
 export default class Dialog<B extends Bot<any, any>> {
   queue: DialogQueue = new DialogQueue()
@@ -24,10 +15,8 @@ export default class Dialog<B extends Bot<any, any>> {
   async talk(): Promise<void> { }
 
   message(message: B['IMessage']) {
-    const fmt = (t: string) => template(t, { imports: this })()
-    let {text, attachments} = normalizeMessage(message)
-    attachments = attachments.map(a => ({ title: fmt(a.title), body: fmt(a.body), buttons: a.buttons }))
-    return this.bot.send(this.chat, { text: fmt(text), attachments })
+    const formatted = this.bot.formatMessage(message, this)
+    return this.bot.send(this.chat, formatted)
   }
 
   // Id error handler doesn't exist don't check

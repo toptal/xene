@@ -1,8 +1,9 @@
+import { template } from 'lodash'
 import Bot from '../lib/bot'
 import Dialog from '../dialog'
 import Command from '../command'
 
-export default class Console extends Bot<string, { name: string }> {
+export default class Consolebot extends Bot<string, { name: string }> {
   constructor(options: { dialogs: (typeof Dialog)[], commands?: (typeof Command)[] }) {
     super(options)
     const stdin = process.stdin
@@ -28,6 +29,10 @@ export default class Console extends Bot<string, { name: string }> {
     return [{
       name: 'dempfi'
     }]
+  }
+
+  formatMessage(message: string, object: any): string {
+    return template(message, { imports: object })()
   }
 
   async send(chat: string, message: string) {

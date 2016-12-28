@@ -59,5 +59,6 @@ abstract class Bot<Message, User> {
   abstract send(chat: string, message: Message): Promise<any>
   abstract user(userIdOrFilter: string | Partial<User>): Promise<User>
   abstract users(filter: Partial<User>): Promise<User[]>
+  abstract formatMessage(message: Message, object: any): Message
 }
 export default Bot
