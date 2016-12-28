@@ -1,14 +1,13 @@
-import Bot from '../bot'
+import Bot from './bot'
 import Dialog from '../dialog'
-import IAdapter from '../adapters/interface'
 import Message from '../types/user-message'
 
-type BoundDialog = Dialog<Bot<IAdapter>>
+type BoundDialog = Dialog<Bot<any, any>>
 
 export default class Chat {
   private dialogs: Map<string, BoundDialog> = new Map()
 
-  constructor(public id: string, public bot: Bot<IAdapter>) { }
+  constructor(public id: string, public bot: Bot<any, any>) { }
 
   async message(message: Message) {
     const dialog = await this.dialogByMessage(message)
@@ -17,7 +16,7 @@ export default class Chat {
 
   private async dialogByMessage({user, text}: Message): Promise<BoundDialog> {
     if (this.dialogs.has(user)) return this.dialogs.get(user)
-    const DialogClass = this.bot.dialog(text)
+    const DialogClass = this.bot.matchDialog(text)
     if (DialogClass) return this.initDialog(DialogClass, user)
   }
 

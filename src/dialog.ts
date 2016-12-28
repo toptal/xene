@@ -5,16 +5,16 @@ import {
   isPlainObject,
   template
 } from 'lodash'
-import Bot from './bot'
-import IAdapter from './adapters/interface'
+// import Console from './bots/console'
+// import Slack from './bots/slack'
 import IMessage from './types/bot-message'
-import DialogQueue from './ext/dialog-queue'
-import normalizeMessage from './ext/normalize-message'
+import DialogQueue from './lib/dialog-queue'
+import normalizeMessage from './lib/normalize-message'
 
-export default class Dialog<T extends Bot<IAdapter>> {
+export default class Dialog<B extends Bot<any, any>> {
   queue: DialogQueue = new DialogQueue()
 
-  constructor(user: string, public bot: T, public chat: string) {
+  constructor(user: string, public bot: B, public chat: string) {
     this.ask = this.ask.bind(this)
     this.parse = this.parse.bind(this)
     this.message = this.message.bind(this)
@@ -23,7 +23,7 @@ export default class Dialog<T extends Bot<IAdapter>> {
   static match(message: string): boolean { return false }
   async talk(): Promise<void> { }
 
-  message(message: string | IMessage) {
+  message(message: B['IMessage']) {
     const fmt = (t: string) => template(t, { imports: this })()
     let {text, attachments} = normalizeMessage(message)
     attachments = attachments.map(a => ({ title: fmt(a.title), body: fmt(a.body), buttons: a.buttons }))
@@ -32,17 +32,17 @@ export default class Dialog<T extends Bot<IAdapter>> {
 
   // Id error handler doesn't exist don't check
   parse<T>(parserFunc: (msg: string) => T): Promise<T>
-  parse<T>(parserFunc: (msg: string) => T, errorMessage: string | IMessage): Promise<T>
+  parse<T>(parserFunc: (msg: string) => T, errorMessage: B['IMessage']): Promise<T>
   parse<T>(parserFunc: (msg: string) => T, errorCallback: (reply: string, parsed: T) => void): Promise<T>
   parse<T>(
     parserObject: { parse: (msg: string) => T, check: (parsed: T) => boolean },
-    errorMessage: string | IMessage): Promise<T>
+    errorMessage: B['IMessage']): Promise<T>
   parse<T>(
     parserObject: { parse: (msg: string) => T, check: (parsed: T) => boolean },
     errorCallback: (reply: string, parsed: T) => void): Promise<T>
   parse<T>(
     parser: ((msg: string) => T) | { parse: (msg: string) => T, check: (parsed: T) => boolean },
-    error?: string | IMessage | ((reply: string, parsed: T) => void)
+    error?: B['IMessage'] | ((reply: string, parsed: T) => void)
   ): Promise<T> {
     let errorCallback: (reply: string, parsed: T) => void
     if (error && (isString(error) || isPlainObject(error))) errorCallback = () => this.message(error)
@@ -56,27 +56,27 @@ export default class Dialog<T extends Bot<IAdapter>> {
     }))
   }
 
-  ask<T>(message: string | IMessage, parserFunc: (msg: string) => T): Promise<T>
-  ask<T>(message: string | IMessage, parserFunc: (msg: string) => T, errorMessage: string | IMessage): Promise<T>
+  ask<T>(message: B['IMessage'], parserFunc: (msg: string) => T): Promise<T>
+  ask<T>(message: B['IMessage'], parserFunc: (msg: string) => T, errorMessage: B['IMessage']): Promise<T>
   ask<T>(
-    message: string | IMessage,
+    message: B['IMessage'],
     parserFunc: (msg: string) => T,
     errorCallback: (reply: string, parsed: T) => void): Promise<T>
   ask<T>(
-    message: string | IMessage,
+    message: B['IMessage'],
     parserObject: { parse: (msg: string) => T, check: (parsed: T) => boolean }): Promise<T>
   ask<T>(
-    message: string | IMessage,
+    message: B['IMessage'],
     parserObject: { parse: (msg: string) => T, check: (parsed: T) => boolean },
-    errorMessage: string | IMessage): Promise<T>
+    errorMessage: B['IMessage']): Promise<T>
   ask<T>(
-    message: string | IMessage,
+    message: B['IMessage'],
     parserObject: { parse: (msg: string) => T, check: (parsed: T) => boolean },
     errorCallback: (reply: string, parsed: T) => void): Promise<T>
   async ask<T>(
-    message: string | IMessage,
+    message: B['IMessage'],
     parser: ((msg: string) => T) | { parse: (msg: string) => T, check: (parsed: T) => boolean },
-    error?: string | IMessage | ((reply: string, parsed: T) => void)
+    error?: B['IMessage'] | ((reply: string, parsed: T) => void)
   ): Promise<T> {
     await this.message(message)
     this.queue.resetMessage()

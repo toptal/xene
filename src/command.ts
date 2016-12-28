@@ -1,18 +1,18 @@
 import { template } from 'lodash'
-import Bot from './bot'
-import IAdapter from './adapters/interface'
+import Bot from './lib/bot'
 import IMessage from './types/bot-message'
-import normalizeMessage from './ext/normalize-message'
+import normalizeMessage from './lib/normalize-message'
 
-export default class Command<T extends Bot<IAdapter>> {
-  constructor(user: string, public bot: T, public chat: string) {
+export default class Command<B extends Bot<any, any>> {
+  constructor(user: string, public bot: B, public chat: string) {
     this.message = this.message.bind(this)
   }
 
   static match(message: string): boolean { return false }
 
-  message(message: string | IMessage) {
+  message(message: B['IMessage']) {
     const fmt = (t: string) => template(t, { imports: this })()
+    // TODO FIX THIS
     let {text, attachments} = normalizeMessage(message)
     attachments = attachments.map(a => ({ title: fmt(a.title), body: fmt(a.body), buttons: a.buttons }))
     return this.bot.send(this.chat, { text, attachments })

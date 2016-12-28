@@ -1,35 +1,36 @@
 import { isString, find, some } from 'lodash'
 
-import Chat from './ext/chat'
-import Dialog from './dialog'
-import Command from './command'
+import Chat from './chat'
+import Dialog from '../dialog'
+import Command from '../command'
 
-import IAdapter from './adapters/interface'
-import IUserMessage from './types/user-message'
-import { IAttachment } from './types/bot-message'
+import IUserMessage from '../types/user-message'
 
-import { Console, Slack } from './adapters'
-
-export default class Bot<T extends IAdapter> {
-  adapter: T
+abstract class Bot<Message, User> {
+  IUser: User
+  IMessage: Message
   private chats: Map<string, Chat> = new Map()
   private dialogs: (typeof Dialog)[] = []
   private commands: (typeof Command)[] = []
 
-  constructor({adapter, dialogs, commands}: {
-    adapter: T, dialogs: (typeof Dialog)[], commands?: (typeof Command)[]
+  constructor({dialogs, commands}: {
+    dialogs: (typeof Dialog)[], commands?: (typeof Command)[]
   }) {
     if (dialogs) this.dialogs = dialogs
     if (commands) this.commands = commands
-    this.adapter = adapter
-    this.adapter.linkBot(this)
+
+    // This is a workaround to bind interfaces of User and Message
+    // to Bot class so we can use them in other dependent classes
+    // with typesafty, but we don't need them in runtime
+    // delete this.IMessage
+    // delete this.IUser
   }
 
-  async onMessage(message: IUserMessage) {
+  async onMessage(message: IUserMessage): Promise<void> {
     const chat = await this.chat(message.chat)
     const isCommand = this.isCommand(message.text)
     if (!isCommand) return chat.message(message)
-    const CommandClass = this.command(message.text)
+    const CommandClass = this.matchCommand(message.text)
     const command = new CommandClass(message.chat, this, message.user)
     command.do()
   }
@@ -45,22 +46,18 @@ export default class Bot<T extends IAdapter> {
     return some(this.commands, c => c.match(message))
   }
 
-  resetChat(id: string) {
-    this.chats.delete(id)
-  }
-
-  dialog(message: string): typeof Dialog {
+  matchDialog(message: string): typeof Dialog {
     const dialogs = this.dialogs
     const predicate = d => d.match && d.match(message)
     return dialogs.find(predicate) || find(dialogs, ['isDefault', true])
   }
 
-  command(message: string): typeof Command {
+  matchCommand(message: string): typeof Command {
     return this.commands.find(c => c.match(message))
   }
 
-  send(chat: string, message: string | { text: string, attachments: IAttachment[] }) {
-    if (isString(message)) message = { text: message, attachments: [] }
-    return this.adapter.send(chat, message)
-  }
+  abstract send(chat: string, message: Message): Promise<any>
+  abstract user(userIdOrFilter: string | Partial<User>): Promise<User>
+  abstract users(filter: Partial<User>): Promise<User[]>
 }
+export default Bot
