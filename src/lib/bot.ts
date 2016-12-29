@@ -4,7 +4,7 @@ import Chat from './chat'
 import Dialog from '../dialog'
 import Command from '../command'
 
-import IUserMessage from '../types/user-message'
+import IUserMessage from './types/user-message'
 
 abstract class Bot<Message, User> {
   IUser: User

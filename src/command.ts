@@ -1,6 +1,4 @@
-import { template } from 'lodash'
 import Bot from './lib/bot'
-import normalizeMessage from './lib/normalize-message'
 
 export default class Command<B extends Bot<any, any>> {
   constructor(user: string, public bot: B, public chat: string) {

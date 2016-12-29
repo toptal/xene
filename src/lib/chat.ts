@@ -1,6 +1,6 @@
 import Bot from './bot'
 import Dialog from '../dialog'
-import Message from '../types/user-message'
+import IUserMessage from './types/user-message'
 
 type BoundDialog = Dialog<Bot<any, any>>
 
@@ -9,12 +9,12 @@ export default class Chat {
 
   constructor(public id: string, public bot: Bot<any, any>) { }
 
-  async message(message: Message) {
+  async message(message: IUserMessage) {
     const dialog = await this.dialogByMessage(message)
     if (dialog) dialog.queue.input(message.text)
   }
 
-  private async dialogByMessage({user, text}: Message): Promise<BoundDialog> {
+  private async dialogByMessage({user, text}: IUserMessage): Promise<BoundDialog> {
     if (this.dialogs.has(user)) return this.dialogs.get(user)
     const DialogClass = this.bot.matchDialog(text)
     if (DialogClass) return this.initDialog(DialogClass, user)
