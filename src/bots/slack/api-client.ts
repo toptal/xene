@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import * as request from 'request-promise-native'
-import * as converters from './converters'
+import * as converters from './helpers/converters'
 
 import Channel from './types/channel'
 import {default as User, PartialUser} from './types/user'
@@ -9,7 +9,7 @@ import {default as Message, MessageOptions} from './types/message'
 class ClientError extends Error {
   constructor (public message: string) {
     super()
-    this.name = 'SlackClientError'
+    this.name = 'SlackbotApiError'
   }
 }
 

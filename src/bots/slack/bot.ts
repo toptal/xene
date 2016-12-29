@@ -3,14 +3,16 @@ import Bot from '../../lib/bot'
 import Dialog from '../../dialog'
 import Command from '../../command'
 
+import ApiClient from './api-client'
 import Dispatcher from './dispatcher'
-import IAttachment from './attachment-type'
+import IAttachment from './types/attachment-type'
 import isMentioned from './helpers/is-mentioned'
 import isKnownEvent from './helpers/is-known-event'
 import { isPrivateChannel } from './helpers/channel-type'
 import { RtmClient, RTM_EVENTS, CLIENT_EVENTS } from '@slack/client'
 
-
+// use same attachment as slack api but camelize and with `button` shortcut and without trash
+https://api.slack.com/docs/message-buttons
 export type Message = string | {
   text?: string
   attachment?: IAttachment
@@ -21,9 +23,9 @@ export default class Slackbot extends Bot<Message, any> {
   id: string
   botId: string
   rtmClient: RtmClient
-
+  apiClient: ApiClient
   // Default dispatcher, used when user didn't provide
-  // custom dispatcher. This is moslty used when user rans
+  // custom dispatcher. This is moslty used when user has
   // one type of bot, which is a common case
   static dispatcher = new Dispatcher()
 
@@ -41,18 +43,22 @@ export default class Slackbot extends Bot<Message, any> {
     else Slackbot.dispatcher.add(this.id, this)
   }
 
-  private initClients(slackToken: string) {
-    const rtmClient = new RtmClient(slackToken, { logLevel: 'error' })
-    rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.id = d.self.id))
-    rtmClient.on(RTM_EVENTS.MESSAGE, this.onRtmMessage.bind(this))
-    rtmClient.start()
-    this.rtmClient = rtmClient
+  private initClients(token: string) {
+    this.apiClient = new ApiClient(token)
+    this.rtmClient = new RtmClient(token, { logLevel: 'error' })
+    this.rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.id = d.self.id))
+    this.rtmClient.on(RTM_EVENTS.MESSAGE, this.onRtmMessage.bind(this))
+    this.rtmClient.start()
   }
 
   // Process new incoming RTM messages
   // incoming from rtm client
   private onRtmMessage(payload: {
-    ts: string, text: string, user?: string, channel: string, subtype?: string
+    ts: string,
+    text: string,
+    user?: string,
+    channel: string,
+    subtype?: string
   }) {
     if (!payload.user) return
     const isSelf = this.botId === payload.user
@@ -88,5 +94,5 @@ export default class Slackbot extends Bot<Message, any> {
   // replace
   async user() { return { name: 'dempfi' } }
   async users() { return [{ name: 'dempfi' }] }
-  async send(chat: string, message: Message) { }
+  async send(chat: string, message: Message, options?: any) { }
 }
