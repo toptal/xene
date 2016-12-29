@@ -29,7 +29,7 @@ export default class Chat {
 
   private removeDialog(dialog: BoundDialog) {
     this.dialogs.forEach((value, userId, dialogs) => {
-      if (value == dialog) dialogs.delete(userId)
+      if (value === dialog) dialogs.delete(userId)
     })
   }
 }

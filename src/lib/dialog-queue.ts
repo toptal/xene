@@ -1,4 +1,4 @@
-export interface AddSignature {
+export interface IAddSignature {
   parser: {
     parse: (msg: string) => any
     check: (parsed: any) => boolean
@@ -8,10 +8,10 @@ export interface AddSignature {
 }
 
 export default class DialogQueue {
-  private queue: AddSignature[] = []
+  private queue: IAddSignature[] = []
   private message: string
 
-  push(obj: AddSignature) {
+  push(obj: IAddSignature) {
     this.queue.push(obj)
     this.input()
   }
@@ -30,7 +30,7 @@ export default class DialogQueue {
       done(parsed)
       this.queue.shift()
       this.input(msg)
-    } else if(error) {
+    } else if (error) {
       error(msg, parsed)
     }
   }

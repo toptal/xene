@@ -7,7 +7,8 @@
   "scripts": {
     "start": "tsc --watch",
     "build": "rm -rf ./js && tsc",
-    "test": "mocha js/test --recursive --watch"
+    "test": "mocha js/test --recursive --watch",
+    "lint": "tslint --project tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
     "@types/node": "^6.0.47",
     "chai": "^3.5.0",
     "mocha": "^3.1.2",
+    "tslint": "^4.2.0",
     "typescript": "^2.1.4"
   },
   "dependencies": {

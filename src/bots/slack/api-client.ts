@@ -27,20 +27,6 @@ class NotFound extends ClientError {
 }
 
 export default class Client {
-  constructor(private token: string) { }
-
-  private async call(method, form: any = {}): Promise<any> {
-    const uri = `https://slack.com/api/${method}?token=${this.token}`
-    form = _.mapValues(form, v => _.isObject(v) ? JSON.stringify(v) : v)
-    try {
-      const response = await request.post({ uri, json: true, form })
-      if (!response.ok) throw new APIError(response.error)
-      return response
-    } catch (e) {
-      throw e
-    }
-  }
-
 
   static async auth(options: { id: string, secret: string, code: string, redirectUri?: string }) {
     const uri = `https://slack.com/api/oauth.access`
@@ -58,6 +44,8 @@ export default class Client {
       throw e
     }
   }
+
+  constructor(private token: string) { }
 
   async user(idOrPartialUser: string | PartialUser): Promise<User> {
     if (_.isString(idOrPartialUser)) {
@@ -128,17 +116,24 @@ export default class Client {
     }
   }
 
-  async send(channel: string, message: IMessage, options?: IMessageOptions) {
-    const attachments = message.attachment ? [message.attachment] : (message.attachments || [])
-    const opts = _.merge({
-      channel,
-      asUser: true,
-      text: message.text,
-      attachments: attachments.map(formatAttachment)
-    }, options || {})
+  async send(channel: string, {text, attachments}: IMessage, options?: IMessageOptions) {
+    attachments = [].concat(attachments).map<any>(formatAttachment)
+    const opts = _.merge({attachments, text, channel, asUser: true }, options || {})
     try {
       const response = await this.call('chat.postMessage', converters.snake(opts))
       return converters.camel(response.message)
+    } catch (e) {
+      throw e
+    }
+  }
+
+  private async call(method, form: any = {}): Promise<any> {
+    const uri = `https://slack.com/api/${method}?token=${this.token}`
+    form = _.mapValues(form, v => _.isObject(v) ? JSON.stringify(v) : v)
+    try {
+      const response = await request.post({ uri, json: true, form })
+      if (!response.ok) throw new APIError(response.error)
+      return response
     } catch (e) {
       throw e
     }

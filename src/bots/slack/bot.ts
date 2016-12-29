@@ -1,4 +1,6 @@
 import * as uuid from 'uuid'
+import { isString } from 'lodash'
+
 import Bot from '../../lib/bot'
 import Dialog from '../../dialog'
 import Command from '../../command'
@@ -15,20 +17,21 @@ import { IMessage } from './types/message'
 export type Message = string | IMessage
 
 export default class Slackbot extends Bot<Message, any> {
-  id: string
-  botId: string
-  rtmClient: RtmClient
-  apiClient: ApiClient
   // Default dispatcher, used when user didn't provide
   // custom dispatcher. This is moslty used when user has
   // one type of bot, which is a common case
   static dispatcher = new Dispatcher()
 
+  id: string
+  botId: string
+  rtmClient: RtmClient
+  apiClient: ApiClient
+
   constructor(options: {
     id?: string,
     token: string,
-    dialogs: (typeof Dialog)[],
-    commands?: (typeof Command)[],
+    dialogs: Array<typeof Dialog>,
+    commands?: Array<typeof Command>,
     dispatcher?: Dispatcher
   }) {
     super(options)
@@ -38,12 +41,28 @@ export default class Slackbot extends Bot<Message, any> {
     else Slackbot.dispatcher.add(this.id, this)
   }
 
-  private initClients(token: string) {
-    this.apiClient = new ApiClient(token)
-    this.rtmClient = new RtmClient(token, { logLevel: 'error' })
-    this.rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.id = d.self.id))
-    this.rtmClient.on(RTM_EVENTS.MESSAGE, this.onRtmMessage.bind(this))
-    this.rtmClient.start()
+  formatMessage(message: Message, object: any): Message { return { text: 's' } }
+
+  // replace
+  async user() { return { name: 'dempfi' } }
+  async users() { return [{ name: 'dempfi' }] }
+  async send(chat: string, message: Message, options?: any) {
+    if (!isString(message)) {
+      let attachments = [].concat(message.attachment || message.attachments)
+      attachments = attachments.map(a => a.callbackId = this.id)
+      this.apiClient.send(chat, { text: message.text, attachments })
+    } else {
+      this.apiClient.send(chat, { text: message })
+    }
+  }
+
+  // Process incoming interactive messages
+  // like button actions from slack.
+  // Called from Dispatcher
+  onInteractiveMessage(payload) {
+    // const {parsed, replaced} = attachment.parse(payload)
+    // this.bot.onMessage(parsed)
+    // return replaced
   }
 
   // Process new incoming RTM messages
@@ -75,19 +94,11 @@ export default class Slackbot extends Bot<Message, any> {
     })
   }
 
-  // Process incoming interactive messages
-  // like button actions from slack.
-  // Called from Dispatcher
-  onInteractiveMessage(payload) {
-    // const {parsed, replaced} = attachment.parse(payload)
-    // this.bot.onMessage(parsed)
-    // return replaced
+  private initClients(token: string) {
+    this.apiClient = new ApiClient(token)
+    this.rtmClient = new RtmClient(token, { logLevel: 'error' })
+    this.rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.id = d.self.id))
+    this.rtmClient.on(RTM_EVENTS.MESSAGE, this.onRtmMessage.bind(this))
+    this.rtmClient.start()
   }
-
-  formatMessage(message: Message, object: any): Message { return { text: 's' } }
-
-  // replace
-  async user() { return { name: 'dempfi' } }
-  async users() { return [{ name: 'dempfi' }] }
-  async send(chat: string, message: Message, options?: any) { }
 }

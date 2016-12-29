@@ -4,7 +4,7 @@ import Dialog from '../dialog'
 import Command from '../command'
 
 export default class Consolebot extends Bot<string, { name: string }> {
-  constructor(options: { dialogs: (typeof Dialog)[], commands?: (typeof Command)[] }) {
+  constructor(options: { dialogs: Array<typeof Dialog>, commands?: Array<typeof Command> }) {
     super(options)
     const stdin = process.stdin
     stdin.resume()
@@ -36,7 +36,8 @@ export default class Consolebot extends Bot<string, { name: string }> {
   }
 
   async send(chat: string, message: string) {
-    console.log('Bot says: ', message)
-    console.log('---------------')
+    const c = console.info.bind(console)
+    c('Bot says: ', message)
+    c('---------------')
   }
 }

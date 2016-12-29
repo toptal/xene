@@ -10,11 +10,11 @@ abstract class Bot<Message, User> {
   IUser: User
   IMessage: Message
   private chats: Map<string, Chat> = new Map()
-  private dialogs: (typeof Dialog)[] = []
-  private commands: (typeof Command)[] = []
+  private dialogs: Array<typeof Dialog> = []
+  private commands: Array<typeof Command> = []
 
   constructor({dialogs, commands}: {
-    dialogs: (typeof Dialog)[], commands?: (typeof Command)[]
+    dialogs: Array<typeof Dialog>, commands?: Array<typeof Command>
   }) {
     if (dialogs) this.dialogs = dialogs
     if (commands) this.commands = commands
@@ -35,17 +35,6 @@ abstract class Bot<Message, User> {
     command.do()
   }
 
-  private chat(id: string): Chat {
-    if (this.chats.has(id)) return this.chats.get(id)
-    const chat = new Chat(id, this)
-    this.chats.set(id, chat)
-    return chat
-  }
-
-  private isCommand(message: string): boolean {
-    return some(this.commands, c => c.match(message))
-  }
-
   matchDialog(message: string): typeof Dialog {
     const dialogs = this.dialogs
     const predicate = d => d.match && d.match(message)
@@ -60,5 +49,16 @@ abstract class Bot<Message, User> {
   abstract user(userIdOrFilter: string | Partial<User>): Promise<User>
   abstract users(filter: Partial<User>): Promise<User[]>
   abstract formatMessage(message: Message, object: any): Message
+
+  private chat(id: string): Chat {
+    if (this.chats.has(id)) return this.chats.get(id)
+    const chat = new Chat(id, this)
+    this.chats.set(id, chat)
+    return chat
+  }
+
+  private isCommand(message: string): boolean {
+    return some(this.commands, c => c.match(message))
+  }
 }
 export default Bot

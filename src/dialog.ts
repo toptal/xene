@@ -2,7 +2,10 @@ import Bot from './lib/bot'
 import DialogQueue from './lib/dialog-queue'
 import { isNil, isString, isFunction, isPlainObject } from 'lodash'
 
-export default class Dialog<B extends Bot<any, any>> {
+abstract class Dialog<B extends Bot<any, any>> {
+  static isDefault = false
+  static match(message: string): boolean { return false }
+
   queue: DialogQueue = new DialogQueue()
 
   constructor(user: string, public bot: B, public chat: string) {
@@ -11,8 +14,7 @@ export default class Dialog<B extends Bot<any, any>> {
     this.message = this.message.bind(this)
   }
 
-  static match(message: string): boolean { return false }
-  async talk(): Promise<void> { }
+  abstract async talk(): Promise<void>
 
   message(message: B['IMessage']) {
     const formatted = this.bot.formatMessage(message, this)
@@ -73,3 +75,5 @@ export default class Dialog<B extends Bot<any, any>> {
     else return this.parse<T>(parser as (msg: string) => T, error as string)
   }
 }
+
+export default Dialog
