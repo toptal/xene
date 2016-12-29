@@ -10,9 +10,11 @@ import isKnownEvent from './helpers/is-known-event'
 import { isPrivateChannel } from './helpers/channel-type'
 import { RtmClient, RTM_EVENTS, CLIENT_EVENTS } from '@slack/client'
 
+// Message type
 import { IMessage } from './types/message'
+export type Message = string | IMessage
 
-export default class Slackbot extends Bot<IMessage, any> {
+export default class Slackbot extends Bot<Message, any> {
   id: string
   botId: string
   rtmClient: RtmClient
@@ -82,10 +84,10 @@ export default class Slackbot extends Bot<IMessage, any> {
     // return replaced
   }
 
-  formatMessage(message: IMessage, object: any): IMessage { return { text: 's' } }
+  formatMessage(message: Message, object: any): Message { return { text: 's' } }
 
   // replace
   async user() { return { name: 'dempfi' } }
   async users() { return [{ name: 'dempfi' }] }
-  async send(chat: string, message: IMessage, options?: any) { }
+  async send(chat: string, message: Message, options?: any) { }
 }

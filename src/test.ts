@@ -14,7 +14,6 @@ class SampleDialog extends Dialog<Slackbot> {
 
   async talk() {
     const {ask, message, parse} = this
-    message
     const parsed = await parse(message => message.toUpperCase())
     await ask('who are you? <% isDefault%>', reply => reply == 'boss' ? 'boss': null, 'you should be a boss, so who ae you?')
     console.log('>> ', parsed)
