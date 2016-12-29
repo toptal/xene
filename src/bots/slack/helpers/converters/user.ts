@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import User from 'types/user'
+import User from '../../types/user'
 
 function transformer (result, value, key): User {
   switch (key) {

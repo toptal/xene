@@ -5,21 +5,14 @@ import Command from '../../command'
 
 import ApiClient from './api-client'
 import Dispatcher from './dispatcher'
-import IAttachment from './types/attachment-type'
 import isMentioned from './helpers/is-mentioned'
 import isKnownEvent from './helpers/is-known-event'
 import { isPrivateChannel } from './helpers/channel-type'
 import { RtmClient, RTM_EVENTS, CLIENT_EVENTS } from '@slack/client'
 
-// use same attachment as slack api but camelize and with `button` shortcut and without trash
-https://api.slack.com/docs/message-buttons
-export type Message = string | {
-  text?: string
-  attachment?: IAttachment
-  attachments?: IAttachment[]
-}
+import { IMessage } from './types/message'
 
-export default class Slackbot extends Bot<Message, any> {
+export default class Slackbot extends Bot<IMessage, any> {
   id: string
   botId: string
   rtmClient: RtmClient
@@ -34,7 +27,7 @@ export default class Slackbot extends Bot<Message, any> {
     token: string,
     dialogs: (typeof Dialog)[],
     commands?: (typeof Command)[],
-    dispatcher: Dispatcher
+    dispatcher?: Dispatcher
   }) {
     super(options)
     this.id = options.id || uuid.v4()
@@ -89,10 +82,10 @@ export default class Slackbot extends Bot<Message, any> {
     // return replaced
   }
 
-  formatMessage(message: Message, object: any): Message { return { text: 's' } }
+  formatMessage(message: IMessage, object: any): IMessage { return { text: 's' } }
 
   // replace
   async user() { return { name: 'dempfi' } }
   async users() { return [{ name: 'dempfi' }] }
-  async send(chat: string, message: Message, options?: any) { }
+  async send(chat: string, message: IMessage, options?: any) { }
 }
