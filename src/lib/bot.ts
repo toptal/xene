@@ -10,11 +10,11 @@ abstract class Bot<Message, User> {
   IUser: User
   IMessage: Message
   private chats: Map<string, Chat> = new Map()
-  private dialogs: Array<typeof Dialog> = []
-  private commands: Array<typeof Command> = []
+  private dialogs: typeof Dialog[] = []
+  private commands: typeof Command[] = []
 
   constructor({dialogs, commands}: {
-    dialogs: Array<typeof Dialog>, commands?: Array<typeof Command>
+    dialogs: typeof Dialog[], commands?: typeof Command[]
   }) {
     if (dialogs) this.dialogs = dialogs
     if (commands) this.commands = commands
