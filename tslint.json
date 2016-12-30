@@ -13,7 +13,8 @@
         "multiline": "never",
         "singleline": "never"
       }
-    ]
-  },
-  "no-console": false
+    ],
+    "no-console": [false],
+    "array-type": [true, "array"]
+  }
 }

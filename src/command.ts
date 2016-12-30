@@ -1,6 +1,6 @@
 import Bot from './lib/bot'
 
-abstract class Command<B extends Bot<any, any>> {
+class Command<B extends Bot<any, any>> {
   static match(message: string): boolean { return false }
 
   constructor(user: string, public bot: B, public chat: string) {
@@ -12,7 +12,9 @@ abstract class Command<B extends Bot<any, any>> {
     return this.bot.send(this.chat, formatted)
   }
 
-  abstract do(): Promise<void> | void
+  do(): Promise<void> | void {
+    // implemented in a subclass
+  }
 }
 
 export default Command

@@ -2,7 +2,7 @@ import Bot from './lib/bot'
 import DialogQueue from './lib/dialog-queue'
 import { isNil, isString, isFunction, isPlainObject } from 'lodash'
 
-abstract class Dialog<B extends Bot<any, any>> {
+class Dialog<B extends Bot<any, any>> {
   static isDefault = false
   static match(message: string): boolean { return false }
 
@@ -14,7 +14,9 @@ abstract class Dialog<B extends Bot<any, any>> {
     this.message = this.message.bind(this)
   }
 
-  abstract async talk(): Promise<void>
+  async talk(): Promise<void> {
+    // implemented in a subclass
+  }
 
   message(message: B['IMessage']) {
     const formatted = this.bot.formatMessage(message, this)

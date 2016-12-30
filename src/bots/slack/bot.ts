@@ -1,5 +1,5 @@
 import * as uuid from 'uuid'
-import { isString } from 'lodash'
+import { isString, template } from 'lodash'
 
 import Bot from '../../lib/bot'
 import Dialog from '../../dialog'
@@ -41,11 +41,20 @@ export default class Slackbot extends Bot<Message, any> {
     else Slackbot.dispatcher.add(this.id, this)
   }
 
-  formatMessage(message: Message, object: any): Message { return { text: 's' } }
-
   // replace
   async user() { return { name: 'dempfi' } }
+
   async users() { return [{ name: 'dempfi' }] }
+
+  formatMessage(message: Message, object: any): Message {
+    if (isString(message)) {
+      return template(message, { imports: object })()
+    } else {
+      const text = template(message.text, { imports: object })()
+      return Object.assign({}, message, { text })
+    }
+  }
+
   async send(chat: string, message: Message, options?: any) {
     if (!isString(message)) {
       let attachments = [].concat(message.attachment || message.attachments)
