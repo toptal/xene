@@ -27,9 +27,9 @@ export default class Client {
     }
   }
 
-  constructor(private token: string) { }
+  constructor(public token: string) { }
 
-  async user(idOrPartialUser: string | Partial<User>): Promise<User> {
+  async getUser(idOrPartialUser: string | Partial<User>): Promise<User> {
     if (_.isString(idOrPartialUser)) {
       try {
         const response = await this.call('users.info', { user: idOrPartialUser })
@@ -39,7 +39,7 @@ export default class Client {
       }
     }
     try {
-      const users = await this.users()
+      const users = await this.getUsers()
       const user = _.find(users, idOrPartialUser)
       if (user) return user
       throw new Errors.NotFound('user', idOrPartialUser)
@@ -48,11 +48,11 @@ export default class Client {
     }
   }
 
-  async users(filters?: Partial<User>): Promise<User[]> {
+  async getUsers(filter?: Partial<User>): Promise<User[]> {
     try {
       const response = await this.call('users.list')
       let users = response.members.map(converters.user)
-      return filters ? _.filter(users, filters) : users
+      return filter ? _.filter(users, filter) : users
     } catch (e) {
       throw e
     }

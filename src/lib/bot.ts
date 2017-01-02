@@ -22,14 +22,14 @@ abstract class Bot<Message, User> {
     // This is a workaround to bind interfaces of User and Message
     // to Bot class so we can use them in other dependent classes
     // with typesafty, but we don't need them in runtime
-    // delete this.IMessage
-    // delete this.IUser
+    delete this.IMessage
+    delete this.IUser
   }
 
   async onMessage(message: IUserMessage): Promise<void> {
     const chat = await this.chat(message.chat)
     const isCommand = this.isCommand(message.text)
-    if (!isCommand) return chat.message(message)
+    if (!isCommand) return chat.processMessage(message)
     const CommandClass = this.matchCommand(message.text)
     const command = new CommandClass(message.chat, this, message.user)
     command.do()

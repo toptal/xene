@@ -1,13 +1,10 @@
 import { template } from 'lodash'
-import Bot from '../lib/bot'
-import Dialog from '../dialog'
-import Command from '../command'
+import Bot from '../../lib/bot'
+import Dialog from '../../dialog'
+import Command from '../../command'
 
 export default class Consolebot extends Bot<string, { name: string }> {
-  constructor(options: {
-    dialogs: typeof Dialog[],
-    commands?: typeof Command[]
-  }) {
+  constructor(options: { dialogs: typeof Dialog[], commands?: typeof Command[] }) {
     super(options)
     const stdin = process.stdin
     stdin.resume()

@@ -9,9 +9,9 @@ export default class Chat {
 
   constructor(public id: string, public bot: Bot<any, any>) { }
 
-  async message(message: IUserMessage) {
+  async processMessage(message: IUserMessage) {
     const dialog = await this.dialogByMessage(message)
-    if (dialog) dialog.queue.input(message.text)
+    if (dialog) dialog.queue.processMessage(message.text)
   }
 
   private async dialogByMessage({user, text}: IUserMessage): Promise<BoundDialog> {

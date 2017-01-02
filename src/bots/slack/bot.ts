@@ -5,18 +5,18 @@ import Bot from '../../lib/bot'
 import Dialog from '../../dialog'
 import Command from '../../command'
 
-import ApiClient from './api-client'
+import ApiClient from './client'
 import Dispatcher from './dispatcher'
 import isMentioned from './helpers/is-mentioned'
 import isKnownEvent from './helpers/is-known-event'
 import { isPrivateChannel } from './helpers/channel-type'
 import { RtmClient, RTM_EVENTS, CLIENT_EVENTS } from '@slack/client'
 
-// Message type
+import User from './types/user'
 import { IMessage } from './types/message'
 export type Message = string | IMessage
 
-export default class Slackbot extends Bot<Message, any> {
+export default class Slackbot extends Bot<Message, User> {
   // Default dispatcher, used when user didn't provide
   // custom dispatcher. This is moslty used when user has
   // one type of bot, which is a common case
@@ -41,10 +41,13 @@ export default class Slackbot extends Bot<Message, any> {
     else Slackbot.dispatcher.add(this.id, this)
   }
 
-  // replace
-  async getUser() { return { name: 'dempfi' } }
+  getUser(idOrfilter: string | Partial<User>) {
+    return this.apiClient.getUser(idOrfilter)
+  }
 
-  async getUsers() { return [{ name: 'dempfi' }] }
+  getUsers(filter: Partial<User>) {
+    return this.apiClient.getUsers(filter)
+  }
 
   formatMessage(message: Message, object: any): Message {
     if (isString(message)) {

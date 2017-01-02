@@ -13,14 +13,14 @@ export default class DialogQueue {
 
   push(obj: IAddSignature) {
     this.queue.push(obj)
-    this.input()
+    this.processMessage()
   }
 
   resetMessage() {
     this.message = null
   }
 
-  async input(msg = this.message) {
+  async processMessage(msg = this.message) {
     this.message = msg
     if (!this.queue[0] || !msg) return
     const {done, parser, error} = this.queue[0]
@@ -29,7 +29,7 @@ export default class DialogQueue {
     if (isValid || !error) {
       done(parsed)
       this.queue.shift()
-      this.input(msg)
+      this.processMessage(msg)
     } else if (error) {
       error(msg, parsed)
     }
