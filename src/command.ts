@@ -9,7 +9,7 @@ class Command<B extends Bot<any, any>> {
 
   message(message: B['IMessage']) {
     const formatted = this.bot.formatMessage(message, this)
-    return this.bot.send(this.chat, formatted)
+    return this.bot.sendMessage(this.chat, formatted)
   }
 
   do(): Promise<void> | void {

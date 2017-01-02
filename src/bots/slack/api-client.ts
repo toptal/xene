@@ -1,30 +1,12 @@
 import * as _ from 'lodash'
 import * as request from 'request-promise-native'
+import * as Errors from './errors'
 import * as converters from './helpers/converters'
 import formatAttachment from './helpers/format-attachment'
 
+import User from './types/user'
 import Channel from './types/channel'
-import { default as User, PartialUser } from './types/user'
 import { IMessage, IOptions as IMessageOptions } from './types/message'
-
-class ClientError extends Error {
-  constructor(public message: string) {
-    super()
-    this.name = 'SlackbotApiError'
-  }
-}
-
-class APIError extends ClientError {
-  constructor(message: string) {
-    super(`Slack API returned error code ${message}.`)
-  }
-}
-
-class NotFound extends ClientError {
-  constructor(type: string, args: any) {
-    super(`${_.capitalize(type)} isn't found with params: ${JSON.stringify(args)}`)
-  }
-}
 
 export default class Client {
 
@@ -38,7 +20,7 @@ export default class Client {
     }
     try {
       const response = await request.post({ uri, json: true, form })
-      if (!response.ok) throw new APIError(response.error)
+      if (!response.ok) throw new Errors.API(response.error)
       return converters.camel(response)
     } catch (e) {
       throw e
@@ -47,7 +29,7 @@ export default class Client {
 
   constructor(private token: string) { }
 
-  async user(idOrPartialUser: string | PartialUser): Promise<User> {
+  async user(idOrPartialUser: string | Partial<User>): Promise<User> {
     if (_.isString(idOrPartialUser)) {
       try {
         const response = await this.call('users.info', { user: idOrPartialUser })
@@ -60,13 +42,13 @@ export default class Client {
       const users = await this.users()
       const user = _.find(users, idOrPartialUser)
       if (user) return user
-      throw new NotFound('user', idOrPartialUser)
+      throw new Errors.NotFound('user', idOrPartialUser)
     } catch (e) {
       throw e
     }
   }
 
-  async users(filters?: PartialUser): Promise<User[]> {
+  async users(filters?: Partial<User>): Promise<User[]> {
     try {
       const response = await this.call('users.list')
       let users = response.members.map(converters.user)
@@ -132,7 +114,7 @@ export default class Client {
     form = _.mapValues(form, v => _.isObject(v) ? JSON.stringify(v) : v)
     try {
       const response = await request.post({ uri, json: true, form })
-      if (!response.ok) throw new APIError(response.error)
+      if (!response.ok) throw new Errors.API(response.error)
       return response
     } catch (e) {
       throw e

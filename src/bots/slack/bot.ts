@@ -30,8 +30,8 @@ export default class Slackbot extends Bot<Message, any> {
   constructor(options: {
     id?: string,
     token: string,
-    dialogs: Array<typeof Dialog>,
-    commands?: Array<typeof Command>,
+    dialogs: (typeof Dialog)[],
+    commands?: (typeof Command)[],
     dispatcher?: Dispatcher
   }) {
     super(options)
@@ -42,9 +42,9 @@ export default class Slackbot extends Bot<Message, any> {
   }
 
   // replace
-  async user() { return { name: 'dempfi' } }
+  async getUser() { return { name: 'dempfi' } }
 
-  async users() { return [{ name: 'dempfi' }] }
+  async getUsers() { return [{ name: 'dempfi' }] }
 
   formatMessage(message: Message, object: any): Message {
     if (isString(message)) {
@@ -55,7 +55,7 @@ export default class Slackbot extends Bot<Message, any> {
     }
   }
 
-  async send(chat: string, message: Message, options?: any) {
+  async sendMessage(chat: string, message: Message, options?: any) {
     if (!isString(message)) {
       let attachments = [].concat(message.attachment || message.attachments)
       attachments = attachments.map(a => a.callbackId = this.id)

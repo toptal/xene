@@ -20,13 +20,13 @@ export interface IAttachment {
   authorLink?: string
   authorIcon?: string
   callbackId?: string
-  buttons?: Array<string | IButton>
+  buttons?: (string | IButton)[]
   button?: string | IButton
-  fields?: Array<{
+  fields?: {
     title: string
     value: string
     short?: boolean
-  }>
+  }[]
   imageUrl?: string
   thumbUrl?: string
   footer?: string

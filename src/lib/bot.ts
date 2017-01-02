@@ -45,10 +45,10 @@ abstract class Bot<Message, User> {
     return this.commands.find(c => c.match(message))
   }
 
-  abstract send(chat: string, message: Message): Promise<any>
-  abstract user(userIdOrFilter: string | Partial<User>): Promise<User>
-  abstract users(filter: Partial<User>): Promise<User[]>
+  abstract sendMessage(chat: string, message: Message): Promise<any>
   abstract formatMessage(message: Message, object: any): Message
+  abstract getUser(idOrFilter: string | Partial<User>): Promise<User>
+  abstract getUsers(filter: Partial<User>): Promise<User[]>
 
   private chat(id: string): Chat {
     if (this.chats.has(id)) return this.chats.get(id)

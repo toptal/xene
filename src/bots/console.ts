@@ -22,13 +22,13 @@ export default class Consolebot extends Bot<string, { name: string }> {
     )
   }
 
-  async user() {
+  async getUser() {
     return {
       name: 'dempfi'
     }
   }
 
-  async users() {
+  async getUsers() {
     return [{
       name: 'dempfi'
     }]
@@ -38,7 +38,7 @@ export default class Consolebot extends Bot<string, { name: string }> {
     return template(message, { imports: object })()
   }
 
-  async send(chat: string, message: string) {
+  async sendMessage(chat: string, message: string) {
     console.log('Bot says: ', message)
     console.log('---------------')
   }
