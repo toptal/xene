@@ -1,5 +1,5 @@
 import * as uuid from 'uuid'
-import { isString, template } from 'lodash'
+import { isString, template, find } from 'lodash'
 
 import Bot from '../../lib/bot'
 import Dialog from '../../dialog'
@@ -71,10 +71,28 @@ export default class Slackbot extends Bot<Message, User> {
   // Process incoming interactive messages
   // like button actions from slack.
   // Called from Dispatcher
-  onInteractiveMessage(payload) {
-    // const {parsed, replaced} = attachment.parse(payload)
-    // this.bot.onMessage(parsed)
-    // return replaced
+  onInteractiveMessage(payload): Message {
+    const selected = payload.actions[0]
+    const text = payload.originalMessage.text
+    let attachments = payload.originalMessage.attachments
+    attachments = attachments.map(this.markActionSelected.bind(this, selected))
+    this.onMessage({
+      id: payload.ts,
+      text: selected.value,
+      chat: payload.channel.id,
+      user: payload.user.id
+    })
+    return { text, attachments }
+  }
+
+  markActionSelected(action, attachment) {
+    const selectedReplacer = ':white_check_mark: ' + action.name
+    if (find(attachment.actions, ['value', action.value])) {
+      const title = attachment.title
+      delete attachment.actions
+      attachment.title = title ? (title + '\n' + selectedReplacer) : selectedReplacer
+    }
+    return attachment
   }
 
   // Process new incoming RTM messages
