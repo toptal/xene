@@ -1,6 +1,6 @@
 {
   "name": "xene",
-  "version": "0.0.29",
+  "version": "0.1.0",
   "description": "Conversational bot framework",
   "main": "index.js",
   "types": "index.d.ts",
