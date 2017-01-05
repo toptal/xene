@@ -68,35 +68,44 @@ message(msg: Message) => Promise<void>
 [Link to formatting spec]
 
 ### `parse`
-Метод `parse` определен служит, как следует из названия, для того чтобы парсить сообщения пользователя. Когда вы визываете `parse` он создает Promise для вас который будет отрезолвен только с распарсенным значением. Чтобы было проще понять как оно работает, давайте посмотрим на тип первого варианта визова:
-
-```ts
-parse<T>(parserFunc: (msg: string) => T) => Promise<T>
-```
-
-и пример его использования
+Метод `parse` определен служит, как следует из названия, для того чтобы парсить сообщения пользователя. Когда вы визываете `parse` он создает Promise для вас который будет отрезолвен только с распарсенным значением. Чтобы было проще понять как оно работает, давайте посмотрим на пример:
 
 ```ts
 class Weather extends Dialog<Consolebot>{
   // some weather logic . . .
   async talk() {
     const {message, parse} = this
-    const speciedLocation = await parse<string>(tryParseLocation)
+    message('Give me a second, connecting WeatherChannel...')
+    const speciedLocation = await parse<string>(locationParser)
     const location = speciedLocation || this.currentUserLocation()
     message(`Weather in ${location} is a ${this.weatherInLocation(location)}`)
   }
 }
 ```
 
-
-
+Нас тут инетесует только вызов метода `parse` которому мы передали парсер `locationParser`. Про то как выглядят сами парсеры читайте в [link]. Что же он парсит? На самом деле у каждого `Dialog` есть очередь из парсеров, который запускаются на последнее сообщение пользователя и `Dialog` берет следующий парсер и парсит им сообщение до тех пор пока очередь не опустеет или сообщение не получилось распарсить. В нашем примере наш парсер запуститься на первом и единственном сообщении пользователя. Потому что мы игнорируем неудачные попытка парсинга.
 
 
 ```ts
-// +4 overloads
-parse<T>(parserFunc: (msg: string) => T, errorMessage: Message) => Promise<T>
-parse<T>(parserFunc: (msg: string) => T, errorCallback: (reply: string, parsed: T) => void) => Promise<T>
+parse<T>(parserFunc: (msg: string) => T) => Promise<T>
+```
+ошибки в процессе парсинга(falsy return value) будут проигнорирована и парсер будет исключен из очереди так как будто он вернул
 
+
+```ts
+parse<T>(parserFunc: (msg: string) => T, errorMessage: Message) => Promise<T>
+```
+если в процессе парсинга произошла ошибка(falsy return value) то будет отправлено сообщение `errorMessage` пользователю и парсер будет ждать в очереди до следующего сообщения пользователя
+
+```ts
+parse<T>(parserFunc: (msg: string) => T, errorCallback: (reply: string, parsed: T) => void) => Promise<T>
+```
+
+
+
+
+
+```
 parse<T>(
   parserObject: { 
     parse: (msg: string) => T, 
