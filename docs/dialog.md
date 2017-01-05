@@ -1,3 +1,5 @@
+# Dialogs
+
 Xene использует диалоги для общения с ползователями, львиную долю логики разговора вы будете описывать в диалогах. И это очень просто сделать: Вам потребуется subclass от базового класса `Dialog` и определить метод `talk` и либо `match`, либо свойсвто `isDefault`.
 
 
@@ -60,12 +62,13 @@ talk() => Promise<void>
 ### `Dialog#message`
 ```ts
 message(msg: Message) => Promise<void>
-// Message is a message type defined in bot class
 ```
 
 Метод `message` отправит отформатированное сообщение пользователю и верент promise с результатом отправки сообщения. 
 
 [Link to formatting spec]
+
+**NOTE: `Message` is a message type defined in bot class**
 
 ### `Dialog#parse`
 Метод `parse` определен служит, как следует из названия, для того чтобы парсить сообщения пользователя. Когда вы визываете `parse` он создает Promise для вас который будет отрезолвен только с распарсенным значением. Чтобы было проще понять как оно работает, давайте посмотрим на пример:
@@ -173,13 +176,13 @@ ask<T>(
   }
 ) => Promise<T>
 ```
-то же самое что и в `1.` только будет проверяться что return value of check is not `false` instead of check for falsy return value on `parse` fucntion
+то же самое что и в [1.](#1) только будет проверяться что return value of check is not `false` instead of check for falsy return value on `parse` fucntion
 
 #### 3.
 ```ts
 ask<T>(message: Message, parserFunc: (msg: string) => T, errorMessage: Message) => Promise<T>
 ```
-то же самое что и в `1.` то же самое только если после первого парсинга `parserFunc` вернет falsy value, то `errorMessage` будет отправлен
+то же самое что и в [1.](#1) то же самое только если после первого парсинга `parserFunc` вернет falsy value, то `errorMessage` будет отправлен
 
 #### 4.
 ```ts
@@ -192,7 +195,7 @@ ask<T>(
   errorMessage: Message
 ) => Promise<T>
 ```
-то же самое что и в `3.` только будет проверяться что return value of check is not `false` instead of check for falsy return value on `parse` fucntion
+то же самое что и в [3.](#3) только будет проверяться что return value of check is not `false` instead of check for falsy return value on `parse` fucntion
 
 #### 5.
 ```ts
@@ -202,7 +205,7 @@ ask<T>(
   errorCallback: (reply: string, parsed: T) => void
 ) => Promise<T>
 ```
-то же самое что и в `3.` только вместо отправки сообщения в случае ошибок управление будет передано `errorCallback`
+то же самое что и в [3.](#3) только вместо отправки сообщения в случае ошибок управление будет передано `errorCallback`
 
 #### 6.
 ```ts
@@ -215,4 +218,4 @@ ask<T>(
   errorCallback: (reply: string, parsed: T) => void
 ) => Promise<T>
 ```
-то же самое что и в `5.` только будет проверяться что return value of check is not `false` instead of check for falsy return value on `parse` fucntion
+то же самое что и в [5.](#5) только будет проверяться что return value of check is not `false` instead of check for falsy return value on `parse` fucntion
