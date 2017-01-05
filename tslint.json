@@ -1,0 +1,20 @@
+{
+  "extends": "tslint:latest",
+  "rules": {
+    "curly": false,
+    "member-access": false,
+    "ordered-imports": false,
+    "semicolon": [true, "never"],
+    "object-literal-sort-keys": false,
+    "quotemark": [true, "single", "avoid-escape"],
+    "arrow-parens": [false, "avoid-on-single-parameter"],
+    "trailing-comma": [true,
+      {
+        "multiline": "never",
+        "singleline": "never"
+      }
+    ],
+    "no-console": [false],
+    "array-type": [true, "array"]
+  }
+}
