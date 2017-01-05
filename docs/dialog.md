@@ -127,4 +127,92 @@ parse<T>(
 
 
 ### `Dialog#ask`
-. . . aks description
+`ask` это метод который поможет вам получить от пользователя то что вам нужно. Он в своей сути есть комбинацию из `message` и `parse`. Если бы вы хотели реализовать ваш собственный метод `ask` то он выглядел бы примерно так:
+
+```ts
+class Dialog {
+  async ask<T>(msg, parser, errorCallback?) {
+    await this.message(msg)
+    return this.parse<T>(parser, errorCallback)
+  }
+}
+```
+
+Не сложно правдва ли, но с помощью `ask` вы можете строить очень сложные диалогы. Давайте улучшим наш пример с погодным диалогом использую `ask`:
+
+
+```ts
+class Weather extends Dialog<Consolebot>{
+  // some weather logic . . .
+  async talk() {
+    const {message, parse, ask} = this
+    message('Give me a second, connecting WeatherChannel...')
+    const speciedLocation = await parse<string>(locationParser)
+    const daysForecast = await ask<number>('For how many days you need forecast?', dateNumberParser) 
+    const location = speciedLocation || this.currentUserLocation()
+    message(`Weather in ${location} for ${daysForecast} is a ${this.weatherInLocation(location)}`)
+  }
+}
+```
+
+как видите добавив простой метод мы смогли получить очень много информации от пользователя.
+
+#### 1. 
+```ts
+ask<T>(message: Message, parserFunc: (msg: string) => T) => Promise<T>
+```
+если `parserFunc` вернет falsy value, то `message` будет отправлен еще раз до тех пор пока `parserFunc` не вернет не falsy value
+
+#### 2.
+```ts
+ask<T>(
+  message: Message,
+  parserObject: { 
+    parse: (msg: string) => T
+    check: (parsed: T) => boolean 
+  }
+) => Promise<T>
+```
+то же самое что и в `1.` только будет проверяться что return value of check is not `false` instead of check for falsy return value on `parse` fucntion
+
+#### 3.
+```ts
+ask<T>(message: Message, parserFunc: (msg: string) => T, errorMessage: Message) => Promise<T>
+```
+то же самое что и в `1.` то же самое только если после первого парсинга `parserFunc` вернет falsy value, то `errorMessage` будет отправлен
+
+#### 4.
+```ts
+ask<T>(
+  message: Message,
+  parserObject: { 
+    parse: (msg: string) => T
+    check: (parsed: T) => boolean 
+  },
+  errorMessage: Message
+) => Promise<T>
+```
+то же самое что и в `3.` только будет проверяться что return value of check is not `false` instead of check for falsy return value on `parse` fucntion
+
+#### 5.
+```ts
+ask<T>(
+  message: Message,
+  parserFunc: (msg: string) => T,
+  errorCallback: (reply: string, parsed: T) => void
+) => Promise<T>
+```
+то же самое что и в `3.` только вместо отправки сообщения в случае ошибок управление будет передано `errorCallback`
+
+#### 6.
+```ts
+ask<T>(
+  message: Message,
+  parserObject: { 
+    parse: (msg: string) => T
+    check: (parsed: T) => boolean 
+  },
+  errorCallback: (reply: string, parsed: T) => void
+) => Promise<T>
+```
+то же самое что и в `5.` только будет проверяться что return value of check is not `false` instead of check for falsy return value on `parse` fucntion
