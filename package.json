@@ -5,8 +5,8 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "start": "tsc --watch",
     "build": "rm -rf ./js && tsc",
+    "watch": "rm -rf ./js && tsc --watch",
     "test": "mocha js/test --recursive --watch",
     "lint": "tslint --project tsconfig.json"
   },
