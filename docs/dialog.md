@@ -98,14 +98,6 @@ parse<T>(parserFunc: (msg: string) => T, errorMessage: Message) => Promise<T>
 если в процессе парсинга произошла ошибка(falsy return value) то будет отправлено сообщение `errorMessage` пользователю и парсер будет ждать в очереди до следующего сообщения пользователя
 
 ```ts
-parse<T>(parserFunc: (msg: string) => T, errorCallback: (reply: string, parsed: T) => void) => Promise<T>
-```
-
-
-
-
-
-```
 parse<T>(
   parserObject: { 
     parse: (msg: string) => T, 
@@ -113,13 +105,22 @@ parse<T>(
   },
   errorMessage: Message
 ) => Promise<T>
+```
+то же что и выше только парсинг будет считаться невалидным только если `check` вернет `false`
 
+
+```ts
+parse<T>(parserFunc: (msg: string) => T, errorCallback: (msg: string, parsed: T) => void) => Promise<T>
+```
+то же что и чуть выше только вместо отправки сообщения будет вызван ващ callback с сообщением пользователя и результатом парсинга
+
+```ts
 parse<T>(
   parserObject: { 
     parse: (msg: string) => T, 
     check: (parsed: T) => boolean 
   },
-  errorCallback: (reply: string, parsed: T) => void
+  errorCallback: (msg: string, parsed: T) => void
 ) => Promise<T>
-// Message is a message type defined in bot class
 ```
+тоже самое только парсер не функция о объект с валидатором
