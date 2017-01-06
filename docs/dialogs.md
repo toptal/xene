@@ -23,7 +23,7 @@ const bot = new Consolebot({ dialogs: [ Greeting ] })
 
 Here we implemented static method `match` which will be called by `Bot` to check if a user message is suitable for this dialog. And method `talk` which will be called once `match` returned `true`.
 
-Now we send a **Hi** message to our bot and bot will reply with a **Hi master!** prase. That's great, our bot is alive now. But what will happen if we send some message like **What's up?** or anything else? Nothing, that's sad but our bot will just stay quiet because he doesn't know how to engage in dialogs starting with such messages.
+Now we send a **"Hi"** message to our bot and bot will reply with a **"Hi master!"** prase. That's great, our bot is alive now. But what will happen if we send some message like **"What's up?"** or anything else? Nothing, that's sad but our bot will just stay quiet because he doesn't know how to engage in dialogs starting with such messages.
 
 But we can teach him to say something instead of silence.
 
@@ -41,7 +41,7 @@ class Default extends Dialog<Consolebot> {
 const bot = new Consolebot({ dialogs: [ Greeting, Default ] })
 ```
 
-Here we created just another dialog which will be used when all other dialog's `match` methods return `false`. And if it happens our bot will say **I didn't understand you :(**. To archive this we set static property `isDefault` to `true` to emphasize that this dialog is a default dialog.
+Here we created just another dialog which will be used when all other dialog's `match` methods return `false`. And if it happens our bot will say **"I didn't understand you :("**. To archive this we set static property `isDefault` to `true` to emphasize that this dialog is a default dialog.
 
 _Note: In real project, it's better to add some valuable information to default dialog, like `help`, so user will know how to interact with your bot._
 
