@@ -37,10 +37,13 @@ class Help extends Command<Consolebot> {
 This is a pretty big example, but let's analyze what's going on. `Fibonacci` dialog will get a number and calculate Fibonacci element of that index, since for big indexes computation may take a while, actual `calc` function is implemented as an asynchronous function. Let's see how this may work.
 
 **User**: **fibonacci for 5714320**
+
 **Bot**: **Caclulating 5714320th element, please wait...**
 
 **User**: *after a while, when user got bored* **help**
-**Bot**: **Ask me "fibonacci for <n>" to get n-th fibonacci element**
+
+**Bot**: **Ask me "fibonacci for \<n\>" to get n-th fibonacci element**
+
 **Bot**: **5714320th fibonacci element is a 7.99 * 10^1194221.**
 
 As you can see, the dialog wasn't closed and **help** message from user didn't reach active `Fibonacci` dialog because `Help` command is higher in priority. Commands are always higher in priority and don't matter if there any active dialogs, control will be transferred to matching command.
