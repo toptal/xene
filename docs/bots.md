@@ -36,7 +36,7 @@ Except the common methods we described a bit earlier each concrete bot may defin
 
 ## What else we can do with bot
 
-The good part of the bot class is that its instance is available in every `Dialog` and `Command`. When bot instantiates your `Dialog` class, it also assigns himself to its `bot` property. And inside of `Dialog` class, you can call methods of your bot (this is exactly how `Dialog#message` is implemented, it calls bot's `sendMessage` and `formatMessage` methods).
+The good part of the bot class is that its instance is available in every `Dialog` and `Command`. When bot instantiates your `Dialog` class, it also assigns himself to its `bot` property. And inside of `Dialog` class, you can call methods of your bot (this is exactly how [`Dialog#message`](dialogs.md#dialogmessage) is implemented, it calls bot's `sendMessage` and `formatMessage` methods).
 
 But this availability of `Bot` classes instances is more powerful and a good place to define your own specific methods and properties. Let's take a look at the example to understand this concept:
 
