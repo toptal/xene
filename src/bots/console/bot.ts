@@ -1,22 +1,23 @@
 import { template } from 'lodash'
+import * as readline from 'readline'
 import Bot from '../../lib/bot'
 import Dialog from '../../dialog'
 import Command from '../../command'
 
 export default class Consolebot extends Bot<string, { name: string }> {
+  private line: readline.ReadLine
   constructor(options: { dialogs: typeof Dialog[], commands?: typeof Command[] }) {
     super(options)
-    const stdin = process.stdin
-    stdin.resume()
-    stdin.setEncoding('utf8')
-    stdin.on('data', (key) =>
-      this.onMessage({
-        id: new Date().getMilliseconds(),
-        text: key.trim(),
-        user: 'dempfi',
-        chat: 'stdin'
-      })
-    )
+    this.line = readline.createInterface({ input: process.stdin, output: process.stdout })
+    this.line.setPrompt('> ')
+    this.line.prompt()
+    this.line.on('line', this.onText.bind(this))
+  }
+
+  onText(text: string) {
+    if (!text) return this.line.prompt()
+    const id = new Date().getUTCMilliseconds()
+    this.onMessage({ id, text, chat: 'line', user: 'dempfi' })
   }
 
   async getUser() {
@@ -32,11 +33,15 @@ export default class Consolebot extends Bot<string, { name: string }> {
   }
 
   formatMessage(message: string, object: any): string {
-    return template(message, { imports: object })()
+    try {
+      return template(message, { imports: object })()
+    } catch (e) {
+      throw new Error(`Failed to format message ${message} because ${e}.`)
+    }
   }
 
   async sendMessage(chat: string, message: string) {
-    console.log('Bot says: ', message)
-    console.log('---------------')
+    console.log('Consolebot: ' + message)
+    this.line.prompt()
   }
 }
