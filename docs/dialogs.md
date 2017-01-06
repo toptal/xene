@@ -1,6 +1,6 @@
 # Dialogs
 
-Xene uses dialogs as basic component for describing communications with users, most of the talking logic you will write in dialogs. And it's pretty easy to do: you just subclass from base `Dialog` class and implement method to talk(`talk`) and either `match` or `isDefault` property.
+Xene uses dialogs as a basic component for describing communications with users, most of the talking logic you will write in dialogs. And it's pretty easy to do: you just subclass from base `Dialog` class and implement method to talk(`talk`) and either `match` or `isDefault` property.
 
 ## First steps
 Let's create simple dialog class and teach our bot to reply to greetings.
@@ -21,13 +21,13 @@ class Greeting extends Dialog<Consolebot> {
 const bot = new Consolebot({ dialogs: [ Greeting ] })
 ```
 
-Here we implemented static method `match` which will be called by `Bot` to check if user message is suitable for this dialog. And method `talk` which will be called once `match` returned `true`.
+Here we implemented static method `match` which will be called by `Bot` to check if a user message is suitable for this dialog. And method `talk` which will be called once `match` returned `true`.
 
-Now we send **Hi** message to our bot and bot will reply with **Hi master!** prase. That's great 🎉, our bot is alive now. But what will happen if we send some message like **What's up?** or anything else? Nothing, that's sad but our bot will just stay quiet because he doesn't know how to engage in dialogs starting with such messages.
+Now we send a **Hi** message to our bot and bot will reply with a **Hi master!** prase. That's great, our bot is alive now. But what will happen if we send some message like **What's up?** or anything else? Nothing, that's sad but our bot will just stay quiet because he doesn't know how to engage in dialogs starting with such messages.
 
 But we can teach him to say something instead of silence.
 
-Let's add simple dialog class for cases when bot didn't undesrand the user.
+Let's add simple dialog class for cases when bot didn't understand the user.
 
 ```ts
 // ...
@@ -41,13 +41,13 @@ class Default extends Dialog<Consolebot> {
 const bot = new Consolebot({ dialogs: [ Greeting, Default ] })
 ```
 
-Here we created just another dialog which will be used when all other dialog's `match` methods return `false`. And if it happens our bot will say **I didn't understand you :(**. To archive this we set static property `isDefault` to `true` to empesize that this dialog is a default dialog.
+Here we created just another dialog which will be used when all other dialog's `match` methods return `false`. And if it happens our bot will say **I didn't understand you :(**. To archive this we set static property `isDefault` to `true` to emphasize that this dialog is a default dialog.
 
-_Note: In real project it's better to add some valuable information to default dialog, like `help`, so user will know how to interact with your bot._
+_Note: In real project, it's better to add some valuable information to default dialog, like `help`, so user will know how to interact with your bot._
 
 ## Few words about type-safety
 
-Let's take a look to our dialogs one more time, to the `Dialog<Consolebot>` part. Here we pass class of our bot as generic type argument. It's important becuase different type of bots(`Consolebot`, `Slackbot`, `Reactbot` etc) can send different type of message. `Consolebot` for example can send only `string`s but `Slackbot` can send files and rich attachments and to have typechecking for all this cool things we should know what type of bot is running our dialogs. That's it.
+Let's take a look to our dialogs one more time, to the `Dialog<Consolebot>` part. Here we pass class of our bot as the generic type argument. It's important because different types of bots(`Consolebot`, `Slackbot`, `Reactbot` etc) can send different types of message. `Consolebot` for example can send only `string`s but `Slackbot` can send files and rich attachments and have type checking for all these cool things we should know what type of bot is running our dialogs. That's it.
 
 ## `Dialog` class methods
 
@@ -55,7 +55,7 @@ Let's take a look to our dialogs one more time, to the `Dialog<Consolebot>` part
 ```ts
 talk() => Promise<void>
 ```
-All communication logic(send message, parse, ask something) during dialog lifecycle are located here. This method is called by `Bot` if user's message is a start for this dialog. When `Promise` returned by `talk` is resolved, `Bot` counts that as end of the dialog and will not send next messages to this dialog, but run `match` on dialogs and try to find next suitable dialog.
+All communication logic(send a message, parse, ask something) during dialog lifecycle are located here. This method is called by `Bot` if user's message is a start for this dialog. When `Promise` returned by `talk` is resolved, `Bot` counts that as the end of the dialog and will not send next messages to this dialog, but run `match` on dialogs and try to find next suitable dialog.
 
 ### `Dialog#message`
 ```ts
@@ -68,7 +68,7 @@ To learn more about message formatting, check [formatting spec](PASTE THE LINK).
 **NOTE: `Message` is a message type defined in bot class**
 
 ### `Dialog#parse`
-`parse` as it states in the name is obviously to parse user's messages. When you call `parse` with parser, it will create a `Promise` for you whihc will be resolved with result of parsing the user message. To undersatnd this better let's take a look at example:
+`parse` as it states in the name is obviously to parse user's messages. When you call `parse` with a parser, it will create a `Promise` which will be resolved with the result of parsing a user message. To understand this better let's take a look at the example:
 
 ```ts
 class Weather extends Dialog<Consolebot>{
@@ -83,9 +83,9 @@ class Weather extends Dialog<Consolebot>{
 }
 ```
 
-Only call of `parse` method is important in this example which we call with some parser `locationParser` function([read more about parsers](PASTE LINK HERE)). What it parses you may ask? Under the hood each `Dialog` has queue of parsers and `Dialog` takes parsers from that queue and applies to last user message untill queue is empty or parser failed to parse. In our example `locationParser` will run on initial user message.
+The only call of `parse` method is important in this example which we call with some parser `locationParser` function([read more about parsers](PASTE LINK HERE)). What it parses you may ask? Under the hood, each `Dialog` has a queue of parsers and `Dialog` takes parsers from that queue and applies to last user message until the queue is empty or parser failed to parse. In our example `locationParser` will run on initial user message.
 
-Method `parse` is overloaded and even tho is generic, and the behaviour of function is slighly different depending on arguments. But don't worry, it's still very easy to understand.
+Method `parse` is overloaded and even tho is generic, and the behavior of the function is slightly different depending on arguments. But don't worry, it's still very easy to understand.
 
 #### 1.
 ```ts
@@ -131,7 +131,7 @@ mix of [3.](#3) and [4.](#4)
 
 
 ### `Dialog#ask`
-`ask` is a you helper to get some missing information from user and build great dialog flows. It is in essence a combination of `message` and` parse`. If you want to implement your own method `ask` it would look something like this:
+`ask` is a helper to get some missing information from a user and build great dialog flows. It is, in essence, a combination of `message` and` parse`. If you want to implement your own method `ask` it would look something like this:
 
 ```ts
 class Dialog {
@@ -160,7 +160,7 @@ class Weather extends Dialog<Consolebot>{
 
 as you see with one line of code we got additional info and made our bot more talkative and human-like.
 
-Since `ask` is a combination of `message` and `parse`, its argumants are also combination of them.
+Since `ask` is a combination of `message` and `parse`, its arguments are also a combination of them.
 
 #### 1.
 ```ts
