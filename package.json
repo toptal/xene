@@ -8,7 +8,8 @@
     "build": "rm -rf ./js && tsc",
     "watch": "rm -rf ./js && tsc --watch",
     "test": "mocha js/test --recursive --watch",
-    "lint": "tslint --project tsconfig.json"
+    "lint": "tslint --project tsconfig.json",
+    "docs": "typedoc --json docs/types.json --mode file"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "@types/request-promise-native": "^1.0.2",
     "@types/uuid": "^2.0.29",
     "tslint": "^4.2.0",
+    "typedoc": "^0.5.3",
     "typescript": "^2.1.4"
   },
   "dependencies": {

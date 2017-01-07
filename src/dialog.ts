@@ -14,16 +14,31 @@ class Dialog<B extends Bot<any, any>> {
     this.message = this.message.bind(this)
   }
 
+  /**
+   * All communication logic(send a message, parse, ask something) during dialog
+   * lifecycle are located here. This method is called by `Bot` if user's message
+   * is a start for this dialog. When `Promise` returned by `talk` is resolved,
+   * `Bot` counts that as the end of the dialog and will not send next messages
+   * to this dialog, but run `match` on dialogs and try to find next suitable
+   * dialog.
+   */
   async talk(): Promise<void> {
     // implemented in a subclass
   }
 
+  /**
+   * Format and send message to user.
+   * To learn more about formatting, check [[formatting spec]]
+   */
   message(message: B['IMessage']) {
     const formatted = this.bot.formatMessage(message, this)
     return this.bot.sendMessage(this.chat, formatted)
   }
 
   // Id error handler doesn't exist don't check
+  /**
+   * Queue parse for user messages
+   */
   parse<T>(parserFunc: (msg: string) => T): Promise<T>
   parse<T>(parserFunc: (msg: string) => T, errorMessage: B['IMessage']): Promise<T>
   parse<T>(parserFunc: (msg: string) => T, errorCallback: (reply: string, parsed: T) => void): Promise<T>
