@@ -21,6 +21,7 @@ export default class Slackbot extends Bot<Message, User> {
   // custom dispatcher. This is moslty used when user has
   // one type of bot, which is a common case
   static dispatcher = new Dispatcher()
+  static auth = ApiClient.auth
 
   id: string
   botId: string
