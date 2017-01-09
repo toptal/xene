@@ -14,22 +14,24 @@ export default class Chat {
     if (dialog) dialog.queue.processMessage(message.text)
   }
 
-  private async dialogByMessage({user, text}: IUserMessage): Promise<BoundDialog> {
-    if (this.dialogs.has(user)) return this.dialogs.get(user)
-    const DialogClass = this.bot.matchDialog(text)
-    if (DialogClass) return this.initDialog(DialogClass, user)
-  }
-
-  private initDialog(DialogClass: typeof Dialog, userId: string): BoundDialog {
-    const dialog = new DialogClass(this.id, this.bot, userId)
+  async startDialog(DialogClass: typeof Dialog, userId: string): Promise<Dialog<Bot<any, any>>> {
+    const dialog = new DialogClass(this.bot, this.id)
     this.dialogs.set(userId, dialog)
+    const user = await this.bot.getUser(userId)
+    dialog.user = user
     dialog.talk().then(this.removeDialog.bind(this, dialog))
     return dialog
   }
 
+  private async dialogByMessage({user, text}: IUserMessage): Promise<BoundDialog> {
+    if (this.dialogs.has(user)) return this.dialogs.get(user)
+    const DialogClass = this.bot.matchDialog(text)
+    if (DialogClass) return this.startDialog(DialogClass, user)
+  }
+
   private removeDialog(dialog: BoundDialog) {
-    this.dialogs.forEach((value, userId, dialogs) => {
-      if (value === dialog) dialogs.delete(userId)
+    this.dialogs.forEach((value, user, dialogs) => {
+      if (value === dialog) dialogs.delete(user)
     })
   }
 }

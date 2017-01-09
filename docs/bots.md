@@ -11,7 +11,7 @@ Currently implemented bot:
 All xene bots are subclasses of generic abstract `Bot` class and all they have common methods:
 
 ```ts
-abstract class Bot<Message, User> {
+abstract class Bot<Message, User extends {id: string}> {
   abstract sendMessage(chat: string, message: Message): Promise<any>
   abstract formatMessage(message: Message, object: any): Message
   abstract getUser(idOrFilter: string | Partial<User>): Promise<User>

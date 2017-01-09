@@ -4,7 +4,9 @@ import Bot from '../../lib/bot'
 import Dialog from '../../dialog'
 import Command from '../../command'
 
-export default class Consolebot extends Bot<string, { name: string }> {
+const user: string = process.env['USER'] || 'anonymus'
+
+export default class Consolebot extends Bot<string, { id: string; name: string }> {
   private line: readline.ReadLine
   constructor(options: { dialogs: typeof Dialog[], commands?: typeof Command[] }) {
     super(options)
@@ -21,15 +23,11 @@ export default class Consolebot extends Bot<string, { name: string }> {
   }
 
   async getUser() {
-    return {
-      name: 'dempfi'
-    }
+    return { id: user, name: user }
   }
 
   async getUsers() {
-    return [{
-      name: 'dempfi'
-    }]
+    return [{ id: user, name: user }]
   }
 
   formatMessage(message: string, object: any): string {

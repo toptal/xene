@@ -2,13 +2,14 @@ import Bot from './lib/bot'
 import DialogQueue from './lib/dialog-queue'
 import { isNil, isString, isFunction, isPlainObject } from 'lodash'
 
-class Dialog<B extends Bot<any, any>> {
+class Dialog<B extends Bot<any, {id: string}>> {
   static isDefault = false
   static match(message: string): boolean { return false }
 
+  user: B['IUser']
   queue: DialogQueue = new DialogQueue()
 
-  constructor(user: string, public bot: B, public chat: string) {
+  constructor(public bot: B, public chat: string) {
     this.ask = this.ask.bind(this)
     this.parse = this.parse.bind(this)
     this.message = this.message.bind(this)
@@ -35,7 +36,6 @@ class Dialog<B extends Bot<any, any>> {
     return this.bot.sendMessage(this.chat, formatted)
   }
 
-  // Id error handler doesn't exist don't check
   /**
    * Queue parse for user messages
    */
@@ -90,6 +90,10 @@ class Dialog<B extends Bot<any, any>> {
     this.queue.resetMessage()
     if (!error) return this.parse<T>(parser as (msg: string) => T)
     else return this.parse<T>(parser as (msg: string) => T, error as string)
+  }
+
+  startDialog(DialogClass: typeof Dialog) {
+    this.bot.startDialog(DialogClass, this.chat, this.user.id)
   }
 }
 

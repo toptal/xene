@@ -15,7 +15,7 @@ class SampleDialog extends Dialog<Consolebot> {
     const {ask, message, parse} = this
     const parsed = await parse(msg => msg.toUpperCase())
     await ask('who are you?', reply =>
-      reply === 'boss' ? 'boss' : null, 'you should be a boss, so who ae you?'
+      reply === 'boss' ? 'boss' : null, 'you should be a boss, ${user.name}, so who ae you?'
     )
     message('Hi boss!')
   }

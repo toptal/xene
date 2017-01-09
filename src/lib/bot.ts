@@ -6,7 +6,7 @@ import Command from '../command'
 
 import IUserMessage from './types/user-message'
 
-abstract class Bot<Message, User> {
+abstract class Bot<Message, User extends { id: string }> {
   IUser: User
   IMessage: Message
   private chats: Map<string, Chat> = new Map()
@@ -43,6 +43,10 @@ abstract class Bot<Message, User> {
 
   matchCommand(message: string): typeof Command {
     return this.commands.find(c => c.match(message))
+  }
+
+  startDialog(DialogClass: typeof Dialog, chat: string, user: string) {
+    this.chat(chat).startDialog(DialogClass, user)
   }
 
   abstract sendMessage(chat: string, message: Message): Promise<any>
