@@ -61,8 +61,8 @@ export default class Slackbot extends Bot<Message, User> {
 
   async sendMessage(chat: string, message: Message, options?: any) {
     if (!isString(message)) {
-      let attachments = [].concat(message.attachment || message.attachments || [])
-      attachments = attachments.map(a => a.callbackId = this.id)
+      const attachments = [].concat(message.attachment || message.attachments || [])
+      attachments.forEach(a => a.callbackId = this.id)
       this.apiClient.send(chat, { text: message.text, attachments })
     } else {
       this.apiClient.send(chat, { text: message })

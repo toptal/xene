@@ -1,11 +1,15 @@
 import { isString, isNumber } from 'lodash'
 import { IAttachment, IButton } from '../types/message'
 
-export default function(attach: IAttachment): any {
-  const actions = [].concat(attach.button || attach.buttons)
-  delete attach.button
-  delete attach.buttons
-  Object.assign(attach, { actions: actions.map(formatAction) })
+export default function(attachment: IAttachment): IAttachment {
+  const actions = [].concat(attachment.button || attachment.buttons)
+  delete attachment.button
+  delete attachment.buttons
+  return Object.assign(
+    { text: '' },
+    attachment,
+    { actions: actions.map(formatAction) }
+  )
 }
 
 function formatAction(button: string | IButton) {
@@ -15,10 +19,12 @@ function formatAction(button: string | IButton) {
     name: button,
     text: button,
     value: button,
-    type: 'default'
+    type: 'button',
+    style: 'default'
   }
 
   return {
+    type: 'button',
     name: button.label,
     text: button.label,
     value: button.value,
