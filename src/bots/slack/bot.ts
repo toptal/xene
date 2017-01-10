@@ -128,7 +128,7 @@ export default class Slackbot extends Bot<Message, User> {
   private initClients(token: string) {
     this.apiClient = new ApiClient(token)
     this.rtmClient = new RtmClient(token, { logLevel: 'error' })
-    this.rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.id = d.self.id))
+    this.rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.botId = d.self.id))
     this.rtmClient.on(RTM_EVENTS.MESSAGE, this.onRtmMessage.bind(this))
     this.rtmClient.start()
   }
