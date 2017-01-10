@@ -99,7 +99,7 @@ export default class Client {
   }
 
   async send(channel: string, {text, attachments}: IMessage, options?: IMessageOptions) {
-    attachments = [].concat(attachments).map<any>(formatAttachment)
+    attachments = [].concat(attachments || []).map<any>(formatAttachment)
     const opts = _.merge({attachments, text, channel, asUser: true }, options || {})
     try {
       const response = await this.call('chat.postMessage', converters.snake(opts))
