@@ -88,7 +88,7 @@ class Dialog<B extends Bot<any, {id: string}>> {
   ): Promise<T> {
     await this.message(message)
     this.queue.resetMessage()
-    if (!error) return this.parse<T>(parser as (msg: string) => T)
+    if (!error) return this.parse<T>(parser as (msg: string) => T, () => this.message(message))
     else return this.parse<T>(parser as (msg: string) => T, error as string)
   }
 
