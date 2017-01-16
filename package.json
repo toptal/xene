@@ -22,17 +22,17 @@
   },
   "homepage": "https://github.com/dempfi/zruyts#readme",
   "devDependencies": {
-    "@types/lodash": "^4.14.38",
+    "@types/lodash": "^4.14.50",
     "@types/node": "^6.0.47",
     "@types/request-promise-native": "^1.0.2",
     "@types/uuid": "^2.0.29",
     "tslint": "^4.2.0",
     "typedoc": "^0.5.3",
-    "typescript": "^2.1.4"
+    "typescript": "^2.1.5"
   },
   "dependencies": {
     "@slack/client": "git+https://git@github.com/dempfi/node-slack-sdk.git#add-types",
-    "lodash": "^4.16.6",
+    "lodash": "^4.17.4",
     "request-promise-native": "^1.0.3",
     "uuid": "^3.0.1"
   }

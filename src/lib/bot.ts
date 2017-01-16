@@ -27,7 +27,7 @@ abstract class Bot<Message, User extends { id: string }> {
   }
 
   async onMessage(message: IUserMessage): Promise<void> {
-    const chat = await this.chat(message.chat)
+    const chat = await this.getChat(message.chat)
     const isCommand = this.isCommand(message.text)
     if (!isCommand) return chat.processMessage(message)
     const CommandClass = this.matchCommand(message.text)
@@ -46,15 +46,14 @@ abstract class Bot<Message, User extends { id: string }> {
   }
 
   startDialog(DialogClass: typeof Dialog, chat: string, user: string) {
-    this.chat(chat).startDialog(DialogClass, user)
+    this.getChat(chat).startDialog(DialogClass, user)
   }
 
+  abstract getUser(id: string): Promise<User>
   abstract sendMessage(chat: string, message: Message): Promise<any>
   abstract formatMessage(message: Message, object: any): Message
-  abstract getUser(idOrFilter: string | Partial<User>): Promise<User>
-  abstract getUsers(filter: Partial<User>): Promise<User[]>
 
-  private chat(id: string): Chat {
+  private getChat(id: string): Chat {
     if (this.chats.has(id)) return this.chats.get(id)
     const chat = new Chat(id, this)
     this.chats.set(id, chat)

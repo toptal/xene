@@ -5,28 +5,42 @@ import Bot from '../../lib/bot'
 import Dialog from '../../dialog'
 import Command from '../../command'
 
-import ApiClient from './client'
 import Dispatcher from './dispatcher'
+
+import concat from './helpers/concat-values'
 import isMentioned from './helpers/is-mentioned'
 import isKnownEvent from './helpers/is-known-event'
 import { isPrivateChannel } from './helpers/channel-type'
 import { RtmClient, RTM_EVENTS, CLIENT_EVENTS } from '@slack/client'
 
-import User from './types/user'
-import { IMessage } from './types/message'
+import IUser from './api/types/user'
+import { IMessage } from './api/types/message'
 export type Message = string | IMessage
 
-export default class Slackbot extends Bot<Message, User> {
+// API Modules
+import Auth from './api/auth'
+import Chat from './api/chat'
+import Users from './api/users'
+import Groups from './api/groups'
+import Channels from './api/channels'
+
+export default class Slackbot extends Bot<Message, IUser> {
   // Default dispatcher, used when user didn't provide
   // custom dispatcher. This is moslty used when user has
   // one type of bot, which is a common case
   static dispatcher = new Dispatcher()
-  static auth = ApiClient.auth
+  static oauthAccess = Auth.access
 
   id: string
   botId: string
   rtmClient: RtmClient
-  apiClient: ApiClient
+
+  // API Modules
+  auth: Auth
+  chat: Chat
+  users: Users
+  groups: Groups
+  channels: Channels
 
   constructor(options: {
     id?: string,
@@ -42,31 +56,21 @@ export default class Slackbot extends Bot<Message, User> {
     else Slackbot.dispatcher.add(this.id, this)
   }
 
-  getUser(idOrfilter: string | Partial<User>) {
-    return this.apiClient.getUser(idOrfilter)
-  }
-
-  getUsers(filter: Partial<User>) {
-    return this.apiClient.getUsers(filter)
-  }
+  getUser(id: string) { return this.users.info(id) }
 
   formatMessage(message: Message, object: any): Message {
     if (isString(message)) {
       return template(message, { imports: object })()
-    } else {
-      const text = template(message.text, { imports: object })()
-      return Object.assign({}, message, { text })
     }
+    const text = template(message.text, { imports: object })()
+    return { ...message, text }
   }
 
   async sendMessage(chat: string, message: Message, options?: any) {
-    if (!isString(message)) {
-      const attachments = [].concat(message.attachment || message.attachments || [])
-      attachments.forEach(a => a.callbackId = this.id)
-      this.apiClient.send(chat, { text: message.text, attachments })
-    } else {
-      this.apiClient.send(chat, { text: message })
-    }
+    if (isString(message)) message = { text: message, attachments: [] }
+    message.attachments = concat(message.attachment, message.attachments)
+    message.attachments.forEach(a => a.callbackId = this.id)
+    return this.chat.postMessage(chat, message)
   }
 
   // Process incoming interactive messages
@@ -126,10 +130,14 @@ export default class Slackbot extends Bot<Message, User> {
   }
 
   private initClients(token: string) {
-    this.apiClient = new ApiClient(token)
     this.rtmClient = new RtmClient(token, { logLevel: 'error' })
     this.rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.botId = d.self.id))
     this.rtmClient.on(RTM_EVENTS.MESSAGE, this.onRtmMessage.bind(this))
+    this.auth = new Auth(token)
+    this.chat = new Chat(token)
+    this.users = new Users(token)
+    this.groups = new Groups(token)
+    this.channels = new Channels(token)
     this.rtmClient.start()
   }
 }

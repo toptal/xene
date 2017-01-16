@@ -1,4 +1,4 @@
-interface Channel {
+interface IChannel {
   id: string
   name: string
   isChannel: boolean
@@ -21,4 +21,4 @@ interface Channel {
   numMembers?: number
 }
 
-export default Channel
+export default IChannel

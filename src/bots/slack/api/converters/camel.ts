@@ -8,5 +8,6 @@ function transformer (result, value, key) {
 }
 
 export default function camelObject (object) {
-  return _.reduce(object, transformer, {})
+  if (_.isPlainObject(object)) return _.reduce(object, transformer, {})
+  return object
 }

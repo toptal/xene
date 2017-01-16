@@ -1,8 +1,9 @@
 import { isString, isNumber } from 'lodash'
-import { IAttachment, IButton } from '../types/message'
+import concat from './concat-values'
+import { IAttachment, IButton } from '../api/types/message'
 
 export default function(attachment: IAttachment): IAttachment {
-  const actions = [].concat(attachment.button || attachment.buttons)
+  const actions = concat(attachment.button, attachment.buttons)
   delete attachment.button
   delete attachment.buttons
   return Object.assign(

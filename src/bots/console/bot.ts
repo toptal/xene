@@ -26,10 +26,6 @@ export default class Consolebot extends Bot<string, { id: string; name: string }
     return { id: user, name: user }
   }
 
-  async getUsers() {
-    return [{ id: user, name: user }]
-  }
-
   formatMessage(message: string, object: any): string {
     try {
       return template(message, { imports: object })()
