@@ -12,10 +12,9 @@ All xene bots are subclasses of generic abstract `Bot` class and all they have c
 
 ```ts
 abstract class Bot<Message, User extends {id: string}> {
+  abstract getUser(id: string): Promise<User>
   abstract sendMessage(chat: string, message: Message): Promise<any>
   abstract formatMessage(message: Message, object: any): Message
-  abstract getUser(idOrFilter: string | Partial<User>): Promise<User>
-  abstract getUsers(filter: Partial<User>): Promise<User[]>
 }
 ```
 
