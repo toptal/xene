@@ -92,8 +92,8 @@ class Dialog<B extends Bot<any, {id: string}>> {
     else return this.parse<T>(parser as (msg: string) => T, error as string)
   }
 
-  startDialog(DialogClass: typeof Dialog) {
-    this.bot.startDialog(DialogClass, this.chat, this.user.id)
+  startDialog(DialogClass: typeof Dialog, options: {[key: string]: any} = {}) {
+    this.bot.startDialog(DialogClass, this.chat, this.user.id, options)
   }
 }
 

@@ -14,11 +14,15 @@ export default class Chat {
     if (dialog) dialog.queue.processMessage(message.text)
   }
 
-  async startDialog(DialogClass: typeof Dialog, userId: string): Promise<Dialog<Bot<any, any>>> {
+  async startDialog(
+    DialogClass: typeof Dialog,
+    userId: string,
+    options: {[key: string]: any} = {}
+  ): Promise<Dialog<Bot<any, any>>> {
     const dialog = new DialogClass(this.bot, this.id)
     this.dialogs.set(userId, dialog)
     const user = await this.bot.getUser(userId)
-    dialog.user = user
+    Object.assign(dialog, {user, ...options})
     dialog.talk().then(this.removeDialog.bind(this, dialog))
     return dialog
   }

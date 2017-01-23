@@ -45,8 +45,8 @@ abstract class Bot<Message, User extends { id: string }> {
     return this.commands.find(c => c.match(message))
   }
 
-  startDialog(DialogClass: typeof Dialog, chat: string, user: string) {
-    this.getChat(chat).startDialog(DialogClass, user)
+  startDialog(DialogClass: typeof Dialog, chat: string, user: string, options: { [key: string]: any } = {}) {
+    this.getChat(chat).startDialog(DialogClass, user, options)
   }
 
   abstract getUser(id: string): Promise<User>
