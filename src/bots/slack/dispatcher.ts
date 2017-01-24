@@ -1,4 +1,5 @@
 import Slackbot from './bot'
+import camelize from './api/converters/camel'
 
 export default class SlackBotDispatcher {
   private bots = new Map<string, Slackbot>()
@@ -11,8 +12,8 @@ export default class SlackBotDispatcher {
   }
 
   interactive(req, res) {
-    const body = JSON.parse(req.body.payload)
-    const bot = this.bots.get(body.callback_id)
+    const body = camelize(JSON.parse(req.body.payload))
+    const bot = this.bots.get(body.callbackId)
     const response = bot.onInteractiveMessage(body)
     res.send(response)
   }
