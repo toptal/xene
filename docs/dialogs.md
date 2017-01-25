@@ -87,19 +87,17 @@ The only call of `parse` method is important in this example which we call with 
 
 Method `parse` is overloaded and even tho is generic, and the behavior of the function is slightly different depending on arguments. But don't worry, it's still very easy to understand.
 
-#### 1.
+<types>
 ```ts
 parse<T>(parserFunc: (msg: string) => T) => Promise<T>
 ```
 if you call parse with only parser function, it will just apply it to last message and return any value `parserFunc` returned
-
-#### 2.
+===
 ```ts
 parse<T>(parserFunc: (msg: string) => T, errorMessage: Message) => Promise<T>
 ```
 if you apply `parse` with `errorMessage` message then it will send it to user if `parserFunc` returns falsy value(null, undefined) and parser will stay in queue and wait for `parserFunc` to return some non-falsy value
-
-#### 3.
+===
 ```ts
 parse<T>(
   parserObject: {
@@ -110,14 +108,12 @@ parse<T>(
 ) => Promise<T>
 ```
 this is the same as in [3.](#3) but with parser's return value will be counted as falsy only if `check` returns false. [Read more about parser](PASTE LINK HERE)
-
-#### 4.
+===
 ```ts
 parse<T>(parserFunc: (msg: string) => T, errorCallback: (msg: string, parsed: T) => void) => Promise<T>
 ```
 same as [2.](#2) but bot will not send message to user but return control to user defined `errorCallback` function
-
-#### 5.
+===
 ```ts
 parse<T>(
   parserObject: {
@@ -128,7 +124,7 @@ parse<T>(
 ) => Promise<T>
 ```
 mix of [3.](#3) and [4.](#4)
-
+</types>
 
 ### `Dialog#ask`
 `ask` is a helper to get some missing information from a user and build great dialog flows. It is, in essence, a combination of `message` and` parse`. If you want to implement your own method `ask` it would look something like this:

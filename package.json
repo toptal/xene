@@ -9,7 +9,7 @@
     "watch": "rm -rf ./js && tsc --watch",
     "test": "mocha js/test --recursive --watch",
     "lint": "tslint --project tsconfig.json",
-    "docs": "typedoc --json docs/types.json --mode file"
+    "docs": "typedoc --out docs/types.json --mode file"
   },
   "repository": {
     "type": "git",
