@@ -1,3 +1,4 @@
+import Dialog from '../dialog'
 export interface IAddSignature {
   parser: {
     parse: (msg: string) => any

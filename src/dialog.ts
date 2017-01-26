@@ -27,12 +27,18 @@ class Dialog<B extends Bot<any, {id: string}>> {
     // implemented in a subclass
   }
 
+  onIncomingMessage(message: string): void | Promise<void> { /* implemented in a subclass */ }
+  onOutgoingMessage(message: B['IMessage']): void | Promise<void> { /* implemented in a subclass */ }
+  onDialogStarts(): void | Promise<void> { /* implemented in a subclass */ }
+  onDialogEnds(): void | Promise<void> { /* implemented in a subclass */ }
+
   /**
    * Format and send message to user.
    * To learn more about formatting, check [[formatting spec]]
    */
   message(message: B['IMessage']) {
     const formatted = this.bot.formatMessage(message, this)
+    this.onOutgoingMessage(formatted)
     return this.bot.sendMessage(this.chat, formatted)
   }
 
