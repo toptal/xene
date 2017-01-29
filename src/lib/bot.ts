@@ -31,7 +31,9 @@ abstract class Bot<Message, User extends { id: string }> {
     const isCommand = this.isCommand(message.text)
     if (!isCommand) return chat.processMessage(message)
     const CommandClass = this.matchCommand(message.text)
-    const command = new CommandClass(message.chat, this, message.user)
+    const user = await this.getUser(message.user)
+    const command = new CommandClass(this, message.chat)
+    command.user = user
     command.do()
   }
 
@@ -47,6 +49,10 @@ abstract class Bot<Message, User extends { id: string }> {
 
   startDialog(DialogClass: typeof Dialog, chat: string, user: string, options: { [key: string]: any } = {}) {
     this.getChat(chat).startDialog(DialogClass, user, options)
+  }
+
+  stopDialog(chat: string, user: string) {
+    this.getChat(chat).stopDialog(user)
   }
 
   abstract getUser(id: string): Promise<User>

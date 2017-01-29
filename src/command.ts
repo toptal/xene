@@ -1,15 +1,20 @@
 import Bot from './lib/bot'
 
-class Command<B extends Bot<any, any>> {
+class Command<B extends Bot<any, { id: string }>> {
   static match(message: string): boolean { return false }
+  user: B['IUser']
 
-  constructor(user: string, public bot: B, public chat: string) {
+  constructor(public bot: B, public chat: string) {
     this.message = this.message.bind(this)
   }
 
   message(message: B['IMessage']) {
     const formatted = this.bot.formatMessage(message, this)
     return this.bot.sendMessage(this.chat, formatted)
+  }
+
+  stopDialog() {
+    this.bot.stopDialog(this.chat, this.user.id)
   }
 
   do(): Promise<void> | void {

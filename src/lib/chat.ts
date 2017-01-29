@@ -25,11 +25,16 @@ export default class Chat {
     this.dialogs.set(userId, dialog)
     const user = await this.bot.getUser(userId)
     Object.assign(dialog, {user, ...options})
-    dialog.onDialogStarts()
+    dialog.onStart()
     dialog.talk()
-      .then(() => dialog.onDialogEnds())
+      .then(() => dialog.onEnd())
       .then(this.removeDialog.bind(this, dialog))
     return dialog
+  }
+
+  async stopDialog(userId: string) {
+    this.dialogs.get(userId).onAbort()
+    this.dialogs.delete(userId)
   }
 
   private async dialogByMessage({user, text}: IUserMessage): Promise<BoundDialog> {
