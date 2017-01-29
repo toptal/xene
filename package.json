@@ -1,6 +1,6 @@
 {
   "name": "xene",
-  "version": "0.2.14",
+  "version": "0.2.15",
   "description": "Conversational bot framework",
   "main": "index.js",
   "types": "index.d.ts",
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dempfi/zruyts.git"
+    "url": "git+https://github.com/dempfi/xene.git"
   },
   "author": "Ike Ku <dempfi@yahoo.com>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/dempfi/zruyts/issues"
+    "url": "https://github.com/dempfi/xene/issues"
   },
-  "homepage": "https://github.com/dempfi/zruyts#readme",
+  "homepage": "https://github.com/dempfi/xene#readme",
   "devDependencies": {
     "@types/lodash": "^4.14.50",
     "@types/node": "^6.0.47",
