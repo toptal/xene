@@ -33,7 +33,9 @@ export default class Chat {
   }
 
   async stopDialog(userId: string) {
-    this.dialogs.get(userId).onAbort()
+    const dialog = this.dialogs.get(userId)
+    if (!dialog) return
+    dialog.onAbort()
     this.dialogs.delete(userId)
   }
 

@@ -34,7 +34,7 @@ abstract class Bot<Message, User extends { id: string }> {
     const user = await this.getUser(message.user)
     const command = new CommandClass(this, message.chat)
     command.user = user
-    command.do()
+    command.perform()
   }
 
   matchDialog(message: string): typeof Dialog {

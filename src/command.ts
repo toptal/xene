@@ -17,7 +17,7 @@ class Command<B extends Bot<any, { id: string }>> {
     this.bot.stopDialog(this.chat, this.user.id)
   }
 
-  do(): Promise<void> | void {
+  perform(): Promise<void> | void {
     // implemented in a subclass
   }
 }
