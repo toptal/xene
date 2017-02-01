@@ -10,10 +10,9 @@ export default class Chat {
   constructor(public id: string, public bot: Bot<any, any>) { }
 
   async processMessage(message: IUserMessage) {
-    const dialog = await this.dialogByMessage(message)
-    if (!dialog) return
-    dialog.onIncomingMessage(message.text)
-    dialog.queue.processMessage(message.text)
+    const dialog = await this.dialogs.get(message.user)
+    if (!dialog) return this.startFromMessage(message)
+    this.forwardMessageToDialog(dialog, message.text)
   }
 
   async startDialog(
@@ -21,14 +20,9 @@ export default class Chat {
     userId: string,
     options: {[key: string]: any} = {}
   ): Promise<Dialog<Bot<any, any>>> {
-    const dialog = new DialogClass(this.bot, this.id)
-    this.dialogs.set(userId, dialog)
-    const user = await this.bot.getUser(userId)
-    Object.assign(dialog, {user, ...options})
+    const dialog = await this.instantiateDialog(DialogClass, userId, options)
     dialog.onStart()
-    dialog.talk()
-      .then(() => dialog.onEnd())
-      .then(this.removeDialog.bind(this, dialog))
+    this.runDialog(dialog)
     return dialog
   }
 
@@ -39,10 +33,36 @@ export default class Chat {
     this.dialogs.delete(userId)
   }
 
-  private async dialogByMessage({user, text}: IUserMessage): Promise<BoundDialog> {
-    if (this.dialogs.has(user)) return this.dialogs.get(user)
+  private async startFromMessage({user, text}: IUserMessage) {
     const DialogClass = this.bot.matchDialog(text)
-    if (DialogClass) return this.startDialog(DialogClass, user)
+    if (!DialogClass) return
+    const dialog = await this.instantiateDialog(DialogClass, user)
+    dialog.onStart()
+    this.forwardMessageToDialog(dialog, text)
+    this.runDialog(dialog)
+  }
+
+  private forwardMessageToDialog(dialog: BoundDialog, message: string) {
+    dialog.onIncomingMessage(message)
+    dialog.queue.processMessage(message)
+  }
+
+  private runDialog(dialog: BoundDialog) {
+    dialog.talk()
+      .then(() => dialog.onEnd())
+      .then(this.removeDialog.bind(this, dialog))
+  }
+
+  private async instantiateDialog(
+    DialogClass: typeof Dialog,
+    userId: string,
+    options: { [key: string]: any } = {}
+  ) {
+    const dialog = new DialogClass(this.bot, this.id)
+    this.dialogs.set(userId, dialog)
+    const user = await this.bot.getUser(userId)
+    Object.assign(dialog, { user, ...options })
+    return dialog
   }
 
   private removeDialog(dialog: BoundDialog) {

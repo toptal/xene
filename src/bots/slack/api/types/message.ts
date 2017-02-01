@@ -20,6 +20,7 @@ export interface IAttachment {
   authorLink?: string
   authorIcon?: string
   callbackId?: string
+  mrkdwnIn?: string[]
   buttons?: (string | IButton)[]
   button?: string | IButton
   fields?: {
