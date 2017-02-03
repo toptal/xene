@@ -1,5 +1,5 @@
-import Bot from './lib/bot'
-import DialogQueue from './lib/dialog-queue'
+import Bot from '../lib/bot'
+import Queue from './queue'
 import { isNil, isString, isFunction, isPlainObject } from 'lodash'
 
 class Dialog<B extends Bot<any, {id: string}>> {
@@ -7,7 +7,7 @@ class Dialog<B extends Bot<any, {id: string}>> {
   static match(message: string): boolean { return false }
 
   user: B['IUser']
-  queue: DialogQueue = new DialogQueue()
+  queue: Queue = new Queue()
 
   constructor(public bot: B, public chat: string) {
     this.ask = this.ask.bind(this)

@@ -6,10 +6,28 @@
   "types": "index.d.ts",
   "scripts": {
     "build": "rm -rf ./js && tsc",
-    "watch": "rm -rf ./js && tsc --watch",
-    "test": "mocha js/test --recursive --watch",
     "lint": "tslint --project tsconfig.json",
-    "docs": "typedoc --json docs/types.json --mode file"
+    "test": "nyc ava",
+    "dev": "./scripts/dev.sh"
+  },
+  "ava": {
+    "files": [
+      "js/test/**/*.js"
+    ]
+  },
+  "nyc": {
+    "include": [
+      "js/**/*.js"
+    ],
+    "exclude": [
+      "js/test/**/*.js"
+    ],
+    "reporter": [
+      "html",
+      "lcov"
+    ],
+    "check-coverage": true,
+    "sourceMap": true
   },
   "repository": {
     "type": "git",
@@ -25,9 +43,13 @@
     "@types/lodash": "^4.14.50",
     "@types/node": "^6.0.47",
     "@types/request-promise-native": "^1.0.2",
+    "@types/sinon": "^1.16.34",
     "@types/uuid": "^2.0.29",
+    "ava": "^0.18.0",
+    "nyc": "^10.1.2",
+    "onchange": "^3.2.1",
+    "sinon": "^1.17.7",
     "tslint": "^4.2.0",
-    "typedoc": "^0.5.3",
     "typescript": "^2.1.5"
   },
   "dependencies": {

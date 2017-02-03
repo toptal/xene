@@ -1,20 +1,20 @@
-import Dialog from '../dialog'
+import Dialog from './dialog'
 export interface IAddSignature {
   parser: {
     parse: (msg: string) => any
     check: (parsed: any) => boolean
   }
   done: (msg: string) => void
-  error: (reply: string, parsed: any) => void // TODO better to return Promise<>
+  error?: (reply: string, parsed: any) => void // TODO better to return Promise<>
 }
 
-export default class DialogQueue {
+export default class Queue {
   private queue: IAddSignature[] = []
   private message: string
 
   push(obj: IAddSignature) {
     this.queue.push(obj)
-    this.processMessage()
+    return this.processMessage()
   }
 
   resetMessage() {
@@ -31,7 +31,7 @@ export default class DialogQueue {
       done(parsed)
       this.queue.shift()
       this.processMessage(msg)
-    } else if (error) {
+    } else {
       error(msg, parsed)
     }
   }
