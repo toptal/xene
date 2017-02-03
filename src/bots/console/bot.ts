@@ -4,7 +4,7 @@ import Bot from '../../lib/bot'
 import Dialog from '../../dialog'
 import Command from '../../command'
 
-const user: string = process.env['USER'] || 'anonymus'
+const user: string = process.env.USER || 'anonymus'
 
 export default class Consolebot extends Bot<string, { id: string; name: string }> {
   private line: readline.ReadLine

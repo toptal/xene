@@ -13,19 +13,27 @@ test('doesn\'t parse without a message', (t) => {
     done: sinon.stub
   }
   const process = sinon.spy(queue, 'processMessage')
-  const internalQueue = sinon.spy(queue['queue'], 'push')
   queue.push(obj)
 
   t.true(process.called)
-  t.true(internalQueue.calledWithExactly(obj))
   t.true(obj.parser.parse.notCalled)
 })
 
 test('reset message', (t) => {
   const queue = new Queue()
+  const obj = {
+    parser: {
+      parse: sinon.stub().returns('message'),
+      check: (msg) => !!msg
+    },
+    done: sinon.stub
+  }
   queue.processMessage('some message')
   queue.resetMessage()
-  t.is(queue['message'], null)
+  const process = sinon.spy(queue, 'processMessage')
+  queue.push(obj)
+  t.true(process.called)
+  t.true(obj.parser.parse.notCalled)
 })
 
 test('calls `done` if `check` fails but `error` is missing', async (t) => {
@@ -44,7 +52,6 @@ test('calls `done` if `check` fails but `error` is missing', async (t) => {
   t.true(obj.parser.parse.calledWithExactly(message))
   t.true(obj.parser.check.calledWithExactly('parsed'))
   t.true(obj.done.calledWithExactly('parsed'))
-  t.is(queue['queue'].length, 0)
 })
 
 test('calls `error` if `check` fails and `error` is present', async (t) => {
