@@ -11,8 +11,13 @@ export default class Channels extends Module {
     return super.list<IChannel>(converter, filter)
   }
 
-  async join(channelId: string): Promise<IChannel> {
-    const response = await this.call('join', { name: channelId })
+  async join(channelName: string): Promise<IChannel> {
+    const response = await this.call('join', { name: channelName })
+    return converter(response.channel)
+  }
+
+  async invite(channel: string, user: string) {
+    const response = await this.call('invite', { channel, user })
     return converter(response.channel)
   }
 }

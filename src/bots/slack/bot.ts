@@ -132,6 +132,7 @@ export default class Slackbot extends Bot<Message, IUser> {
   }
 
   private initBot(token: string) {
+    this.chat = new Chat(token)
     this.rtmClient = new RtmClient(token, { logLevel: 'error' })
     this.rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.botId = d.self.id))
     this.rtmClient.on(RTM_EVENTS.MESSAGE, this.onRtmMessage.bind(this))
@@ -140,7 +141,6 @@ export default class Slackbot extends Bot<Message, IUser> {
 
   private initApi(token: string) {
     this.auth = new Auth(token)
-    this.chat = new Chat(token)
     this.users = new Users(token)
     this.groups = new Groups(token)
     this.channels = new Channels(token)
