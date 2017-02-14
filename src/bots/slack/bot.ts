@@ -44,14 +44,16 @@ export default class Slackbot extends Bot<Message, IUser> {
 
   constructor(options: {
     id?: string,
-    token: string,
+    botToken: string,
+    appToken?: string,
     dialogs: (typeof Dialog)[],
     commands?: (typeof Command)[],
     dispatcher?: Dispatcher
   }) {
     super(options)
     this.id = options.id || uuid.v4()
-    this.initClients(options.token)
+    this.initBot(options.botToken)
+    this.initApi(options.appToken || options.botToken)
     if (options.dispatcher) options.dispatcher.add(this.id, this)
     else Slackbot.dispatcher.add(this.id, this)
   }
@@ -129,15 +131,18 @@ export default class Slackbot extends Bot<Message, IUser> {
     })
   }
 
-  private initClients(token: string) {
+  private initBot(token: string) {
     this.rtmClient = new RtmClient(token, { logLevel: 'error' })
     this.rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.botId = d.self.id))
     this.rtmClient.on(RTM_EVENTS.MESSAGE, this.onRtmMessage.bind(this))
+    this.rtmClient.start()
+  }
+
+  private initApi(token: string) {
     this.auth = new Auth(token)
     this.chat = new Chat(token)
     this.users = new Users(token)
     this.groups = new Groups(token)
     this.channels = new Channels(token)
-    this.rtmClient.start()
   }
 }

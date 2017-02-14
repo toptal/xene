@@ -10,4 +10,9 @@ export default class Channels extends Module {
   list(filter?: Partial<IChannel>) {
     return super.list<IChannel>(converter, filter)
   }
+
+  async join(channelId: string): Promise<IChannel> {
+    const response = await this.call('join', { name: channelId })
+    return converter(response.channel)
+  }
 }
