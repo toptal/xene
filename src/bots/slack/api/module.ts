@@ -2,23 +2,21 @@ import { mapValues, isObject, isString, find, filter, trimEnd } from 'lodash'
 import * as Errors from '../errors'
 import * as request from 'request-promise-native'
 
+const RATE = 2000
+
 abstract class ApiModule {
   namespace: string
+
+  private cache: Map<string, { time: number, value: any}> = new Map()
 
   constructor(private token: string) {
     this.namespace = this.constructor.name.toLowerCase()
   }
 
-  protected async call(method, form: any = {}): Promise<any> {
+  protected async call(method, form: any = {}, force: boolean = false): Promise<any> {
     const uri = `https://slack.com/api/${this.namespace}.${method}?token=${this.token}`
     form = mapValues(form, v => isObject(v) ? JSON.stringify(v) : v)
-    try {
-      const response = await request.post({ uri, json: true, form })
-      if (!response.ok) throw new Errors.API(response.error)
-      return response
-    } catch (e) {
-      throw e
-    }
+    return force ? this.forceCall(uri, form) : this.callFromCache(uri, form)
   }
 
   protected info<T>(
@@ -48,6 +46,26 @@ abstract class ApiModule {
         const allItems = response[responseKey].map(converter)
         return partial ? filter(allItems, partial) : allItems
       })
+  }
+
+  private callFromCache(uri: string, form: any) {
+    const now = new Date().valueOf()
+    const key = uri + JSON.stringify(form)
+    const cached = this.cache.get(key)
+    if (cached && cached.time > (now - RATE)) return cached.value
+    const result = this.forceCall(uri, form)
+    this.cache.set(key, { time: now, value: result })
+    return result
+  }
+
+  private async forceCall(uri: string, form: any) {
+    try {
+      const response = await request.post({ uri, json: true, form })
+      if (!response.ok) throw new Errors.API(response.error)
+      return response
+    } catch (e) {
+      throw e
+    }
   }
 }
 

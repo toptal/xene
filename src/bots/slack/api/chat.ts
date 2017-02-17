@@ -13,7 +13,7 @@ export default class Chat extends Module {
         ...message,
         ...{ channel, asUser: true },
         ...options
-      }))
+      }), true)
     .then(response => converters.camel(response.message))
   }
 }
