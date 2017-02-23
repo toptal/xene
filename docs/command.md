@@ -1,6 +1,13 @@
-# Commands
+---
+id:       command
+prev:     dialog
+category: reference
 
-Commands are the way to define commands, they have higher priority over [dialogs](dialogs.md) but unlike dialogs, they don't provide `parse` and `ask` methods as dialogs and there aren't any default dialogs.
+---
+
+# Command
+
+Command are the way to define commands, command is higher in priority than [dialogs](dialog.md) but unlike dialogs, they don't provide `parse` and `ask` methods as dialogs and there aren't any default commands.
 
 To understand how you can use them, let's take a look at the next example:
 

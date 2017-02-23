@@ -1,11 +1,8 @@
 ---
-id:       /hello-demo
-next:     /parsing-queue
-prev:     /installation
-category: quick start
+id:       hello-demo
+prev:     installation
+category: guide
 
 ---
 
 # Hello Demo
-<!-- What is a demo -->
-<!-- how to use demo -->

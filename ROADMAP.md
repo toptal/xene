@@ -8,18 +8,19 @@
   - [ ] Design
 
 - [ ] Docs writeup
-  - [ ] Quick Start
+  - [ ] Guide
     - [ ] Installation
     - [ ] Hello Demo
-    - [ ] Parsing Queue
+    - [ ] Parse Queue
+    - [ ] Parsers
+    - [ ] Bots
 
   - [ ] Reference
-    - [ ] Consolebot
+    - [ ] Dialog
+    - [ ] Command
     - [ ] Slackbot
+    - [ ] Consolebot
     - [ ] Testbot
-    - [ ] Dialogs
-    - [ ] Parsers
-    - [ ] Commands
 
 - [ ] Tests
   - [ ] Unit

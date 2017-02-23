@@ -1,3 +1,10 @@
+---
+id:       bots
+prev:     parsers
+category: guide
+
+---
+
 # Bots
 
 Xene is ultimate bot framework which means that it provides ways to use to create different bots(for Slack, for Skype or even for your SPA react app) with same techs. To give you that freedom, xene provides bot classes for different classes.

@@ -1,8 +1,6 @@
 ---
-id:       /installation
-next:     /hello-demo
-prev:     /
-category: quick start
+id:       installation
+category: guide
 
 ---
 
