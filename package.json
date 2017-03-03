@@ -49,8 +49,8 @@
     "nyc": "^10.1.2",
     "onchange": "^3.2.1",
     "sinon": "^1.17.7",
-    "tslint": "^4.2.0",
-    "typescript": "^2.1.5"
+    "tslint": "^4.5.1",
+    "typescript": "^2.2.1"
   },
   "dependencies": {
     "@slack/client": "git+https://git@github.com/dempfi/node-slack-sdk.git#add-types",

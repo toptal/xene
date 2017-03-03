@@ -7,6 +7,7 @@
     "unified-signatures": false,
     "semicolon": [true, "never"],
     "object-literal-sort-keys": false,
+    "interface-over-type-literal": false,
     "adjacent-overload-signatures": true,
     "quotemark": [true, "single", "avoid-escape"],
     "arrow-parens": [false, "avoid-on-single-parameter"],
