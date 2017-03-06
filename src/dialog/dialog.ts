@@ -82,9 +82,14 @@ class Dialog<B extends Bot<any, {id: string}>> {
     return this.parse<T>(parser as ParseFunc<T>, error)
   }
 
-  startDialog(DialogClass: typeof Dialog, options: {[key: string]: any} = {}) {
-    return this.bot.startDialog(DialogClass, this.chat, this.user.id, options)
+  runDialog(DialogClass: typeof Dialog, state: {[key: string]: any} = {}) {
+    return this.bot.runDialog(DialogClass, this.chat, this.user.id, state)
   }
 }
 
 export default Dialog
+export type Constructor<T extends Dialog<Bot<any, {id: string}>>> = {
+  new (bot: Bot<any, {id: string}>, chat: string): T
+  match(message: string): boolean
+  isDefault: boolean
+}

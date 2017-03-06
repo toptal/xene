@@ -4,6 +4,7 @@ import Chat from './chat'
 import Dialog from '../dialog'
 import Command from '../command'
 
+import { Constructor as DialogConstructor } from '../dialog'
 import IUserMessage from './types/user-message'
 
 abstract class Bot<Message, User extends { id: string }> {
@@ -47,8 +48,8 @@ abstract class Bot<Message, User extends { id: string }> {
     return this.commands.find(c => c.match(message))
   }
 
-  startDialog(DialogClass: typeof Dialog, chat: string, user: string, options: { [key: string]: any } = {}) {
-    this.getChat(chat).startDialog(DialogClass, user, options)
+  runDialog<T extends Dialog<Bot<any, any>>>(DialogClass: DialogConstructor<T>, chat: string, user: string, state: { [key: string]: any } = {}): Promise<T> {
+    return this.getChat(chat).startDialog(DialogClass, user, state)
   }
 
   stopDialog(chat: string, user: string) {

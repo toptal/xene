@@ -15,12 +15,8 @@ export default class Chat {
     this.forwardMessageToDialog(dialog, message.text)
   }
 
-  async startDialog(
-    DialogClass: typeof Dialog,
-    userId: string,
-    options: {[key: string]: any} = {}
-  ): Promise<Dialog<Bot<any, any>>> {
-    const dialog = await this.instantiateDialog(DialogClass, userId, options)
+  async startDialog(DialogClass: typeof Dialog, userId: string, state: {[key: string]: any} = {}) {
+    const dialog = await this.instantiateDialog(DialogClass, userId, state)
     dialog.onStart()
     this.runDialog(dialog)
     return dialog
