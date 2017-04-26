@@ -9,5 +9,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "rm -rf ./dist && tsc"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

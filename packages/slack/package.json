@@ -10,12 +10,15 @@
   "scripts": {
     "build": "rm -rf ./dist && tsc"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@slack/client": "git+https://git@github.com/dempfi/node-slack-sdk.git#add-types",
-    "request-promise-native": "^1.0.3",
+    "@xene/core": "^0.0.1",
     "lodash": "^4.17.4",
-    "uuid": "^3.0.1",
-    "@xene/core": "*"
+    "request-promise-native": "^1.0.3",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.62",
