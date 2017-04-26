@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "lerna": "^2.0.0-rc.3",
+    "typescript": "^2.2.1",
+    "tslint": "^4.5.1",
+    "ava": "^0.18.0",
+    "nyc": "^10.1.2"
+  }
+}

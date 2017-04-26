@@ -1,0 +1,26 @@
+{
+  "name": "@xene/slack",
+  "version": "0.0.1",
+  "description": "Slack bot client for xene framework",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": "https://github.com/dempfi/xene",
+  "author": "Ike Ku <dempfi@yahoo.com>",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "rm -rf ./dist && tsc"
+  },
+  "dependencies": {
+    "@slack/client": "git+https://git@github.com/dempfi/node-slack-sdk.git#add-types",
+    "request-promise-native": "^1.0.3",
+    "lodash": "^4.17.4",
+    "uuid": "^3.0.1",
+    "@xene/core": "*"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.62",
+    "@types/node": "^6.0.47",
+    "@types/request-promise-native": "^1.0.2",
+    "@types/uuid": "^2.0.29"
+  }
+}

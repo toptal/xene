@@ -1,0 +1,13 @@
+{
+  "name": "@xene/core",
+  "version": "0.0.1",
+  "description": "Core of the xene framework",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": "https://github.com/dempfi/xene",
+  "author": "Ike Ku <dempfi@yahoo.com>",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "rm -rf ./dist && tsc"
+  }
+}
