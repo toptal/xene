@@ -27,8 +27,17 @@ export class SlackRequestContext implements IContext {
     this.user = payload.user.id
   }
 
-  sendStatus(status) {
-    this.res.status(status).end()
+  sendStatus(status: number) {
+    this.res.status(200).end()
+  }
+
+  sendError(text: string) {
+    this.res.setHeader('Content-Type', 'application/json')
+    this.res.status(200).end(JSON.stringify({
+      response_type: "ephemeral",
+      replace_original: false,
+      text
+    }))
   }
 
   replaceMessage(message: IMessage) {

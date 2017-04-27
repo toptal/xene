@@ -9,6 +9,7 @@ interface IContext {
   token: string
   user: string
 
+  sendError(text: string): void
   sendStatus(status: number): void
   replaceMessage(message: IMessage): void
   updateMessage(partial: Partial<IMessage>): void
