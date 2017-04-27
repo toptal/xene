@@ -8,7 +8,8 @@
   "author": "Ike Ku <dempfi@yahoo.com>",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "rm -rf ./dist && tsc"
+    "build": "rm -rf ./dist && tsc",
+    "watch": "tsc -w --pretty"
   },
   "publishConfig": {
     "access": "public"
