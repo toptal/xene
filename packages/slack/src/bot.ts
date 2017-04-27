@@ -5,7 +5,6 @@ import { Bot, Dialog, Command } from '@xene/core'
 
 import Dispatcher from './dispatcher'
 
-import concat from './helpers/concat-values'
 import isMentioned from './helpers/is-mentioned'
 import isKnownEvent from './helpers/is-known-event'
 import { isPrivateChannel } from './helpers/channel-type'
@@ -66,8 +65,8 @@ export default class Slackbot extends Bot<Message, IUser> {
   }
 
   async sendMessage(chat: string, message: Message, options?: any) {
-    if (_.isString(message)) message = { text: message, attachments: [] }
-    message.attachments = concat(message.attachment, message.attachments)
+    const init = { text: '', attachments: [] }
+    message = _.isString(message) ? {...init, text: message} : {...init, ...message}
     message.attachments.forEach(a => a.callbackId = a.callbackId || this.id)
     return this.chat.postMessage(chat, message)
   }

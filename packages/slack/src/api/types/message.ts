@@ -1,6 +1,7 @@
 export interface IAction {
   confirm?: { title: string, text: string, okText: string, dismissText: string }
   label: string
+  id: string
 }
 
 export interface IButton extends IAction {
@@ -8,7 +9,7 @@ export interface IButton extends IAction {
   value: string
 }
 
-export interface ISelect extends IAction {
+export interface IMenu extends IAction {
   options: 'users' | 'channels' | { label: string, value: string }[]
 }
 
@@ -23,9 +24,8 @@ export interface IAttachment {
   authorIcon?: string
   callbackId?: string
   mrkdwnIn?: string[]
-  buttons?: (string | IButton)[]
-  button?: string | IButton
-  select?: ISelect
+  buttons?: IButton[]
+  menus?: IMenu[]
   fields?: {
     title: string
     value: string
@@ -38,9 +38,8 @@ export interface IAttachment {
 }
 
 export interface IMessage {
-  text?: string
-  attachment?: IAttachment
   attachments?: IAttachment[]
+  text?: string
 }
 
 export interface IOptions {

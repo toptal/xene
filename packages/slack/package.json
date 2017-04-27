@@ -8,7 +8,8 @@
   "author": "Ike Ku <dempfi@yahoo.com>",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "rm -rf ./dist && tsc"
+    "build": "rm -rf ./dist && tsc",
+    "watch": "tsc -w --pretty"
   },
   "publishConfig": {
     "access": "public"
@@ -21,6 +22,7 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
+    "@types/express": "^4.0.35",
     "@types/lodash": "^4.14.62",
     "@types/node": "^6.0.47",
     "@types/request-promise-native": "^1.0.2",
