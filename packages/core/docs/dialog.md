@@ -8,7 +8,7 @@ category: reference
 # Dialog
 
 <!--intro-->
-It’s like React.Component but for conversations.
+React.Component for conversations.
 <!--/intro-->
 
 The dialog is an abstract base class and core concept of xene. It allows you to define conversational flow with ES2017’s async/await and split complex conversational logic to small pieces. You will typically subclass it, and define `talk()` and static `match()` methods, like in the example below.
@@ -24,7 +24,7 @@ class Greeting extends Dialog {
 }
 ```
 
-## The Dialog Lifecycle
+## Dialog's Lifecycle
 
 Each dialog has lifecycle methods that you can override to run code at particular times in the conversations. Each dialog lives as long as `talk()` method is active. Once it resolves, a dialog is complete and garbage collected.
 
@@ -76,9 +76,9 @@ static match(message) -> Boolean
 
 **Returns**
 
-| Type    | Description                                       |
-|:--------|:--------------------------------------------------|
-| Boolean | indicates if the `message` a start for the dialog |
+| Type    | Description                                         |
+|:--------|:----------------------------------------------------|
+| Boolean | indicates if the `message` is a start of the Dialog |
 <!--/type-->
 
 Method `match()` is used by xene to match user's messages with defined dialogs. It's called when there aren't any active dialogs in the [chat](chat) with a user. If you'll not override it and define matcher for your dialog, xene will use the default one, which always evaluates to `false`.
@@ -220,10 +220,10 @@ parse(parser, [onError]) -> Promise{parsedValue}
 
 **Arguments**
 
-| Argument | Type                               | Description                                                                                                                                                                                                                                                                                       |
-|:---------|:-----------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| parser   | Parser                             | the parser that will be used to parse a user's message. It can be a function that accepts user's message and returns either parsed value or falsy value, or an object with `parse()` and `check()` functions to parse the message and check if parse did succeed. [Read more here](PUT LINK HERE) |
-| onError  | Message or (reply, parsed) -> void | error handler to use if the parsing failed. If `onError` is a `Message`, then it will be just sent to the user. If it's an error handler, then it will be called with user's message and result of `parser` call                                                                                     |
+| Argument | Type                                 | Description                                                                                                                                                                                                                                                                                                                                                                                        |
+|:---------|:-------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| parser   | Parser                               | the parser that will be used to parse a user's message. It can be a function that accepts user's message and returns either parsed value or falsy value, or an object with `parse()` and `check()` methods. `parse()` is same and `check()` is called with result of the call to `parse()` and expected to return `true` or `false` to check if parse did succeed. [Read more here](PUT LINK HERE) |
+| onError  | Bot Message or (msg, parsed) -> void | error handler to use if the parsing failed. If `onError` is a `Bot Message`, then it will be just sent to the user. If it's an error handler, then it will be called with user's message and result of `parser` call                                                                                                                                                                               |
 
 **Returns**
 
@@ -252,7 +252,7 @@ If `onError` argument isn't provided, then xene will return a result of parsing 
 ```ts
 // Somewhere in the talk method . . .
 const numbersParser = {
-  parse: msg => /\d*?/g.mathc(msg),
+  parse: msg => /\d*?/g.match(msg),
   check: arr => arr.length > 0
 }
 
@@ -276,21 +276,33 @@ ask(message, parser, [onError]) -> Promise{parsed}
 
 **Arguments**
 
-| Argument | Type                               | Description                                                                                                                                                                                                                                                                                       |
-|:---------|:-----------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| message  | Bot Message                        | bot message                                                                                                                                                                                                                                                                                       |
-| parser   | Parser                             | the parser that will be used to parse a user's message. It can be a function that accepts user's message and returns either parsed value or falsy value, or an object with `parse()` and `check()` functions to parse the message and check if parse did succeed. [Read more here](PUT LINK HERE) |
-| onError  | Message or (reply, parsed) -> void | error handler to use if the parsing failed. If `onError` is a `Message`, then it will be just sent to the user. If it's an error handler, then it will be called with user's message and result of `parser` call                                                                                  |
-
+| Argument | Type                    | Description |
+|:---------|:------------------------|:------------|
+| message  | Bot Message             | a question which will be send to the user. It should have compatible type with message of derived bot |
+|parser    | Parser                  | a parser that will be used to parse a user's reply. It can be a function that accepts user's message and returns either parsed value or falsy value, or an object with `parse()` and `check()` methods. `parse()` is the same and `check()` is called with result of the call to `parse()` and expected to return `true` or `false` to check if parse did succeed. [Read more here](PUT LINK HERE) |
+| onError    | Bot Message or (reply, parsed) -> void | error handler to use if the parsing fails. If `onError` is a `Bot Message`, then it will be just sent to the user. If it's an error handler, then it will be called with user's message and result of `parse()` call |
 
 **Returns**
 
 | Type    | Description                            |
 |:--------|:---------------------------------------|
 | Promise | result of call to the successful parse |
-
 <!--/type-->
 
 `.ask()` method is to ask questions to a user and parse response in place. Basically, it's a combination of `.message()` and `.parse()` with minor change — `Parser` passed to `.ask()` will be executed with reply message from the user, not with the most recent message as in `.parse()`.
+
+```ts
+import { Dialog } from '@xene/core'
+
+class Greeting extends Dialog {
+  static mathc(msg) { return msg }
+  async talk() {
+    await this.message('Hi ${user.name}')
+    const reply = await this.ask('How is your day, ${user.name}?', rawParser)
+  }
+}
+```
+
+as you see with one line of code we got additional info and made our bot more talkative and human-like.
 
 If `onError` handler provided and an error occures during parsing of the user's reply `.ask()` will use `onError`. Just like in `.parse()`. But unlike `.parse()` `.ask()` is strict. Which measn if `onError` isn't provided `.ask()` will not return failed parsing result but will repeat the question until it gets a suitable answer.

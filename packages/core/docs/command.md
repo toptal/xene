@@ -7,50 +7,106 @@ category: reference
 
 # Command
 
-Command are the way to define commands, command is higher in priority than [dialogs](dialog.md) but unlike dialogs, they don't provide `parse` and `ask` methods as dialogs and there aren't any default commands.
+<!--intro-->
+One Commnd to rule them all...
+<!--/intro-->
 
-To understand how you can use them, let's take a look at the next example:
+Command are the way to define higher in priority operations than [Dialogs](/dialog.md) that can even interupt Dialogs. For example to show a help message during an active dialog or even stop an active dialog. 
+
+Let's take a look at the example that illustrates how Commands can be used to stop active Dialog.
 
 ```ts
-class Fibonacci extends Dialog<Consolebot> {
-  static match(message: string) {
-    return /fibonacci/i.test(message)
-  }
+class Fibonacci extends Dialog {
+  static match(message) { return /fibonacci/i.test(message) }
 
-  async calc(index: number): Promise<number> {
-    // some fibonacci calculation...
-  }
+  async calc(index) { /* some fibonacci calculation logic */ }
 
   async talk() {
     const { parse, message, calc } = this
-    const nthElement = await parse<number>(numberParser, 'Please provide number of fibonacci element')
+    const nthElement = await parse(numberParser, 'Please provide number of fibonacci element')
     message(`Caclulating ${nthElement}th element, please wait...`)
     const fibonacciNumber = await calc(nthElement)
     message(`${nthElement}th fibonacci element is a ${fibonacciNumber}.`)
   }
 }
 
-class Help extends Command<Consolebot> {
-  static match(message: string) {
-    return message.trim().toLowerCase() === 'help'
-  }
+class Stop extends Command {
+  static match(message) { return message.toLowerCase() === 'stop' }
 
-  do() {
-    this.message('Ask me "fibonacci for <n>" to get n-th fibonacci element')
+  async perform() {
+    this.stopDialog()
+    await this.message('OK boss!')
   }
 }
 ```
 
-This is a pretty big example, but let's analyze what's going on. `Fibonacci` dialog will get a number and calculate Fibonacci element of that index, since for big indexes computation may take a while, actual `calc` function is implemented as an asynchronous function. Let's see how this may work.
+<!-- TODO -->
 
-**User**: **fibonacci for 5714320**
+## Command's Lifecycle
 
-**Bot**: **Caclulating 5714320th element, please wait...**
+Command's lifecycle can be split to three parts: when it matches, when it's created and when it's active.
 
-**User**: *after a while, when user got bored* **help**
+- [`static match()`](#static-match) is called every time bot recieves new message from user even if user has active dialog with the bot.
+- [`constructor()`](#constructor)
+- [`perform()`](#constructor)
 
-**Bot**: **Ask me "fibonacci for \<n\>" to get n-th fibonacci element**
+## Reference
 
-**Bot**: **5714320th fibonacci element is a 7.99 * 10^1194221.**
+### static match()
+<!--type-->
+```ts
+static match(message) -> Boolean
+```
 
-As you can see, the dialog wasn't closed and **help** message from user didn't reach active `Fibonacci` dialog because `Help` command is higher in priority. Commands are always higher in priority and don't matter if there any active dialogs, control will be transferred to matching command.
+**Arguments**
+
+| Argument | Type   | Description    |
+|:---------|:-------|:---------------|
+| message  | String | a user message |
+
+**Returns**
+
+| Type    | Description                                       |
+|:--------|:--------------------------------------------------|
+| Boolean | indicates if the `message` a start of the Command |
+<!--/type-->
+
+Method `match()` is used by xene to match user's messages with predefined Commands. It's called no matter what — user does or doesn't have active dialog with the bot.
+
+### .constructor()
+<!--type-->
+```ts
+constructor(bot, chat) -> Command
+```
+
+**Arguments**
+
+| Argument | Type   | Description                                              |
+|:---------|:-------|:---------------------------------------------------------|
+| bot      | Bot    | instance of the xene bot to which the Command belongs to |
+| chat     | String | a chat id                                                |
+
+**Returns**
+
+| Type    | Description                |
+|:--------|:---------------------------|
+| Command | an instance of the Command |
+<!--/type-->
+
+Very rarely you'll have to override constructor since both `bot` and `chat` are available as properties of the dialog.
+
+### .perform()
+<!--type-->
+```ts
+perform() -> Promise{void}
+```
+
+**Returns**
+
+| Type    | Description             |
+|:--------|:------------------------|
+| Promise | empty awaitable promise |
+<!--/type-->
+
+All business logic of the Commads are located here.
+<!-- TODO -->
