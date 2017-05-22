@@ -1,5 +1,6 @@
 ---
 id:       dialog
+prev:     bot
 category: reference
 
 ---
