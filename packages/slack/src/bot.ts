@@ -115,7 +115,7 @@ export default class Slackbot extends Bot<Message, IUser> {
     if (isSelf && isEvent) return
     if (isSelf) return
 
-    const isBotMentioned = isMentioned(this.id, payload.text)
+    const isBotMentioned = isMentioned(this.botId, payload.text)
     const isPrivate = isPrivateChannel(payload.channel)
     if (!isPrivate && !isBotMentioned) return
 

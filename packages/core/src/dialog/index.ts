@@ -8,7 +8,7 @@ export type ParserObject<T> = { parse: ParseFunc<T>, check: CheckFunc<T> }
 export type Parser<T> = ParseFunc<T> | ParserObject<T>
 
 const isNil = v => v == null
-const isFunction = (v): v is Function => typeof v === "function"
+const isFunction = (v): v is Function => typeof v === 'function'
 
 export default class Dialog<B extends Bot<any, { id: string }>> {
   static isDefault = false
@@ -54,18 +54,17 @@ export default class Dialog<B extends Bot<any, { id: string }>> {
   /**
    * Queue parse for user messages
    */
-  parse<T>(parserFunc: ParseFunc<T>)
+  parse<T>(parserFunc: ParseFunc<T>): Promise<T>
   parse<T>(parserFunc: ParseFunc<T>, errorMessage: B['IMessage']): Promise<T>
   parse<T>(parserFunc: ParseFunc<T>, errorCallback: ErrorFunc<T>): Promise<T>
   parse<T>(parserObject: ParserObject<T>, errorMessage: B['IMessage']): Promise<T>
   parse<T>(parserObject: ParserObject<T>, errorCallback: ErrorFunc<T>): Promise<T>
   parse<T>(parser: Parser<T>, error?: B['IMessage'] | ErrorFunc<T>): Promise<T> {
-
-    if (!isNil(error) && !isFunction(error)) error = () => this.message(error)
+    const onError = (!isNil(error) && !isFunction(error)) ? () => this.message(error) : error
     if (isFunction(parser)) parser = { parse: parser, check: parsed => !isNil(parsed) }
     return new Promise((resolve, reject) => this.queue.push({
       parser: parser as ParserObject<T>,
-      error: error as ErrorFunc<T>,
+      error: onError,
       done: resolve
     }))
   }
@@ -77,7 +76,6 @@ export default class Dialog<B extends Bot<any, { id: string }>> {
   ask<T>(message: B['IMessage'], parserObject: ParserObject<T>, errorMessage: B['IMessage']): Promise<T>
   ask<T>(message: B['IMessage'], parserObject: ParserObject<T>, errorCallback: ErrorFunc<T>): Promise<T>
   async ask<T>(message: B['IMessage'], parser: Parser<T>, error?: B['IMessage'] | ErrorFunc<T>): Promise<T> {
-
     await this.message(message)
     this.queue.resetMessage()
     if (!error) error = () => this.message(message)
