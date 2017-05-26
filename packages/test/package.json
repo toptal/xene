@@ -15,7 +15,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@xene/core": "^0.0.4",
+    "@xene/core": "^0.0.5",
     "lodash.isequal": "^4.5.0"
   },
   "devDependencies": {
