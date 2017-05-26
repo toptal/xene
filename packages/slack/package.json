@@ -1,6 +1,6 @@
 {
   "name": "@xene/slack",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Slack bot client for xene framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@slack/client": "git+https://git@github.com/dempfi/node-slack-sdk.git#add-types",
-    "@xene/core": "^0.0.5",
+    "@xene/core": "^0.0.6",
     "lodash": "^4.17.4",
     "request-promise-native": "^1.0.3",
     "uuid": "^3.0.1"
