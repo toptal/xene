@@ -13,7 +13,7 @@ export class Testbot extends Bot<any, any>{
   getUser(id: string) { return this.user }
 
   async sendMessage(chat: string, message: any) {
-    await this.tester.response(message)
+    this.tester.response(message)
     return Promise.resolve()
   }
 }
