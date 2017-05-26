@@ -1,0 +1,24 @@
+{
+  "name": "@xene/test",
+  "version": "0.0.1",
+  "description": "Xene framework test utilities",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": "https://github.com/dempfi/xene",
+  "author": "Ike Ku <dempfi@yahoo.com>",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "rm -rf ./dist && tsc",
+    "watch": "tsc -w --pretty"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@xene/core": "^0.0.4",
+    "lodash.isequal": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/lodash.isequal": "^4.5.1"
+  }
+}
