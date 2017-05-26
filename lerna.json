@@ -3,6 +3,12 @@
   "packages": [
     "packages/*"
   ],
+  "publish": {
+    "ignore": [
+      "tslint.json",
+      "*.md"
+    ]
+  },
   "npmClient": "yarn",
   "version": "independent"
 }
