@@ -42,7 +42,7 @@ export class Expectation {
     const canCompare = this.expectedMessages.length === this.botMessages.length
     if (!canCompare) return false
     if (isEqual(this.expectedMessages, this.botMessages)) this.resolve()
-    else this.reject('Dialog\'s messages don\'t match with messages send')
+    else this.reject(`Messages don't match:\n Expected: ${this.expectedMessages}\nGot: ${JSON.stringify(this.botMessages)}`)
     return true
   }
 }
