@@ -5,12 +5,11 @@ import { Bot, Dialog } from '@xene/core'
 import { isEqual } from 'lodash'
 
 export class Testbot extends Bot<any, any>{
-  constructor(dialog: typeof Dialog, private user: any, private tester: Tester) {
+  constructor(dialog: typeof Dialog, private tester: Tester) {
     super({ dialogs: [dialog] })
   }
 
   formatMessage(message: any, object: any) { return message }
-  getUser(id: string) { return this.user }
 
   async sendMessage(chat: string, message: any) {
     this.tester.response(message)
@@ -51,7 +50,7 @@ export class Tester {
   private testbot: Testbot
   private expectations: Expectation[] = []
   constructor(dialogClass: typeof Dialog, private user: any) {
-    this.testbot = new Testbot(dialogClass, user, this)
+    this.testbot = new Testbot(dialogClass, this)
   }
 
   on(message: string) {
@@ -71,7 +70,7 @@ export class Tester {
   }
 
   private sendMessage(text: string) {
-    this.testbot.onMessage({ id: '', text, user: '', chat: '' })
+    this.testbot.onMessage({ id: '', text, user: this.user, chat: '' })
   }
 }
 

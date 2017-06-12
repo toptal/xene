@@ -2,13 +2,13 @@ import Bot from './bot'
 
 class Command<B extends Bot<any, { id: string }>> {
   static match(message: string): boolean { return false }
-  user: B['IUser']
+  user: B['_']['User']
 
   constructor(public bot: B, public chat: string) {
     this.message = this.message.bind(this)
   }
 
-  message(message: B['IMessage']) {
+  message(message: B['_']['Message']) {
     const formatted = this.bot.formatMessage(message, this)
     return this.bot.sendMessage(this.chat, formatted)
   }
@@ -18,7 +18,7 @@ class Command<B extends Bot<any, { id: string }>> {
   }
 
   perform(): Promise<void> | void {
-    // implemented in a subclass
+    throw new Error('Method perform is not defined')
   }
 }
 

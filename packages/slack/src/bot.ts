@@ -55,8 +55,6 @@ export default class Slackbot extends Bot<Message, IUser> {
     else Slackbot.dispatcher.add(this.id, this)
   }
 
-  getUser(id: string) { return this.users.info(id) }
-
   formatMessage(message: Message, object: any): Message {
     if (_.isPlainObject(message)) return _.mapValues(message, v => this.formatMessage(v, object))
     if (_.isArray(message)) return message.map(v => this.formatMessage(v, object))
@@ -74,7 +72,7 @@ export default class Slackbot extends Bot<Message, IUser> {
   // Process incoming interactive messages
   // like button actions from slack.
   // Called from Dispatcher
-  onInteractiveMessage(payload): Message {
+  async onInteractiveMessage(payload): Promise<Message> {
     const selected = payload.actions[0]
     const text = payload.originalMessage.text
     let attachments = payload.originalMessage.attachments
@@ -83,7 +81,7 @@ export default class Slackbot extends Bot<Message, IUser> {
       id: payload.ts,
       text: selected.value,
       chat: payload.channel.id,
-      user: payload.user.id
+      user: await this.users.info(payload.user.id)
     })
     return { text, attachments }
   }
@@ -100,7 +98,7 @@ export default class Slackbot extends Bot<Message, IUser> {
 
   // Process new incoming RTM messages
   // incoming from rtm client
-  private onRtmMessage(payload: {
+  private async onRtmMessage(payload: {
     ts: string,
     text: string,
     user?: string,
@@ -122,7 +120,7 @@ export default class Slackbot extends Bot<Message, IUser> {
     this.onMessage({
       id: payload.ts,
       text: payload.text,
-      user: payload.user,
+      user: await this.users.info(payload.user),
       chat: payload.channel
     })
   }
