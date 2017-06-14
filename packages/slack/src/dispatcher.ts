@@ -8,10 +8,10 @@ export default class SlackbotDispatcher {
     this.bots.set(id, bot)
   }
 
-  interactive = (req, res) => {
-    const body = camelize(JSON.parse(req.body.payload))
+  interactive = (ctx, next: Function) => {
+    const body = camelize(JSON.parse(ctx.request.body.payload))
     const bot = this.bots.get(body.callbackId)
     const response = bot.onInteractiveMessage(body)
-    res.send(response)
+    ctx.body = response
   }
 }
