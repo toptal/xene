@@ -87,7 +87,7 @@ export default class Slackbot extends Bot<Message, IUser> {
   }
 
   markActionSelected(action, attachment) {
-    const selectedReplacer = ':white_check_mark: ' + action.name
+    const selectedReplacer = ':white_check_mark: ' + action.text
     if (_.find(attachment.actions, ['value', action.value])) {
       const title = attachment.title
       delete attachment.actions
