@@ -14,6 +14,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@xene/core": "^0.0.7",
     "lodash": "^4.17.4"
