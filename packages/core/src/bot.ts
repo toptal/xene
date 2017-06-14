@@ -8,7 +8,6 @@ abstract class Bot<Message, User extends BaseUser> {
   // This is a workaround to bind interfaces of User and Message
   // to Bot class so we can use them in other dependent classes
   // with typesafty, but we don't need them in runtime
-  // @internal
   _: {
     User: User
     Message: Message
