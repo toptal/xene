@@ -1,6 +1,6 @@
 {
   "name": "@xene/test",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Xene framework test utilities",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +18,7 @@
     "dist"
   ],
   "dependencies": {
-    "@xene/core": "^0.0.9",
+    "@xene/core": "^0.0.10",
     "lodash": "^4.17.4"
   },
   "devDependencies": {
