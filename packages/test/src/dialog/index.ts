@@ -1,79 +1,103 @@
 // const tester = test.dialog(Dialog, {})
-// tester.on('Some message').says('')
+// await tester.userSays('Some message')
+// await tester.botSays('Some message')
 // tester.on('Some message').says('')
 import { Bot, Dialog } from '@xene/core'
 import { isEqual } from 'lodash'
 
-export class Testbot extends Bot<any, any>{
-  constructor(dialog: typeof Dialog, private tester: Tester) {
-    super({ dialogs: [dialog] })
-  }
+const testbot = (dialog: typeof Dialog, bot: typeof Bot, tester ) => {
+  class Testbot extends bot<any, any>{
+    constructor(dialog: typeof Dialog, private tester: Tester) {
+      super({ dialogs: [dialog] })
+    }
 
-  formatMessage(message: any, object: any) { return message }
+    formatMessage(message: any, object: any) { return message }
 
-  async sendMessage(chat: string, message: any) {
-    this.tester.response(message)
-    return Promise.resolve()
+    async sendMessage(chat: string, message: any) {
+      this.tester.onResponse(message)
+      return Promise.resolve()
+    }
   }
+  return new Testbot(dialog, tester)
 }
 
-export class Expectation {
-  /** @internal */
-  resolve: () => void
-  /** @internal */
-  reject: (err:any) => void
-  /** @internal */
-  botMessages: any[] = []
-  /** @internal */
-  expectedMessages: any[]
-  /** @internal */
-  userMessage: string
-  constructor(userMessage) { this.userMessage = userMessage }
-  expect<T extends any>(message: T | T[]) {
-    this.expectedMessages = [].concat(message)
-    return new Promise((resolve, reject) => {
+class Pointer {
+  resolve: Function
+  reject: Function
+  promise: Promise<any>
+  constructor() {
+    this.promise = new Promise((resolve, reject) => {
       this.resolve = resolve
       this.reject = reject
     })
   }
-  check(botMessage: any) {
-    this.botMessages.push(botMessage)
-    const canCompare = this.expectedMessages.length === this.botMessages.length
-    if (!canCompare) return false
-    if (isEqual(this.expectedMessages, this.botMessages)) this.resolve()
-    else this.reject(`Messages don't match:\n Expected: ${this.expectedMessages}\nGot: ${JSON.stringify(this.botMessages)}`)
-    return true
+}
+
+class MessageExpectation extends Pointer {
+  constructor(public message: any) { super() }
+  verify(message) {
+    if (isEqual(this.message, message)) this.resolve()
+    else this.reject(`Messages don't match:\nExpected: ${this.message}\nGot: ${JSON.stringify(message)}`)
   }
 }
 
 export class Tester {
-  private testbot: Testbot
-  private expectations: Expectation[] = []
-  constructor(dialogClass: typeof Dialog, private user: any) {
-    this.testbot = new Testbot(dialogClass, this)
+  private testbot: Bot<any, any>
+  private userPointer: Pointer
+  private botMessages: any[] = []
+  private botExpectations: MessageExpectation[] = []
+  user: { says: (message: string) => Promise<void> }
+  bot: { says: (message: any) => Promise<void> }
+
+  constructor(dialogClass: typeof Dialog, bot: typeof Bot, private dialogUser: any) {
+    const dialog = this.bind(dialogClass)
+    this.testbot = testbot(dialog as any, bot, this)
+    this.user = { says: this.userSays.bind(this) }
+    this.bot = { says: this.botSays.bind(this) }
   }
 
-  on(message: string) {
-    const expectation = new Expectation(message)
-    this.expectations.push(expectation)
-    if (this.expectations.length === 1) this.sendMessage(message)
-    return expectation
+  private userSays(message: string) {
+    this.sendMessage(message)
+    this.userPointer = new Pointer()
+    return this.userPointer.promise
+  }
+
+  private botSays(message: any) {
+    const expected = new MessageExpectation(message)
+    const lastMessage = this.botMessages.shift()
+    if (!lastMessage) this.botExpectations.push(expected)
+    else expected.verify(lastMessage)
+    return expected.promise
   }
 
   /** @internal */
-  async response(message: any) {
-    const expectation = this.expectations[0]
-    if (!await expectation.check(message)) return
-    this.expectations.shift()
-    if (this.expectations.length > 0)
-      this.sendMessage(this.expectations[0].userMessage)
+  async onResponse(message: any) {
+    this.userPointer && this.userPointer.resolve()
+    const expected = this.botExpectations.shift()
+    if (!expected) return this.botMessages.push(message)
+    else expected.verify(message)
+  }
+
+  private async onEnd(error?: any) {
+    if (this.userPointer) return error ? this.userPointer.resolve() : this.userPointer.reject(error)
+    const expectation = this.botExpectations.shift()
+    if (expectation && error) expectation.reject(error)
   }
 
   private sendMessage(text: string) {
-    this.testbot.onMessage({ id: '', text, user: this.user, chat: '' })
+    this.testbot.onMessage({ id: '', text, user: this.dialogUser, chat: '' })
+  }
+
+  private bind(dialogClass: typeof Dialog) {
+    const onEnd = this.onEnd.bind(this)
+    class TesterDialog extends dialogClass<any> {
+      onEnd() { super.onEnd(); onEnd() }
+      onAbort(e) { onEnd(e); super.onAbort(e) }
+    }
+    return TesterDialog
   }
 }
 
-export default function dialog(dialogClass: typeof Dialog, user: any) {
-  return new Tester(dialogClass, user)
+export default function dialog(dialogClass: typeof Dialog, bot: typeof Bot, user: any) {
+  return new Tester(dialogClass, bot, user)
 }

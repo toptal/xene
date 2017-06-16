@@ -48,6 +48,7 @@ export default class Chat<B extends Bot<any, BaseUser>> {
   private runDialog(dialog: Dialog<B>) {
     dialog.talk()
       .then(() => dialog.onEnd())
+      .catch(error => dialog.onAbort(error))
       .then(this.removeDialog.bind(this, dialog))
   }
 

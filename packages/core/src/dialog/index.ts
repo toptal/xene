@@ -36,7 +36,7 @@ export default class Dialog<B extends Bot<any, { id: string }>> {
   onIncomingMessage(message: string): void | Promise<void> { /* implemented in a subclass */ }
   onOutgoingMessage(message: B['_']['Message']): void | Promise<void> { /* implemented in a subclass */ }
   onStart(): void | Promise<void> { /* implemented in a subclass */ }
-  onAbort(): void | Promise<void> { /* implemented in a subclass */ }
+  onAbort(error?: any): void | Promise<void> { /* implemented in a subclass */ }
   onEnd(): void | Promise<void> { /* implemented in a subclass */ }
 
   /**
