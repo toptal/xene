@@ -57,8 +57,8 @@ export class Tester {
   }
 
   private userSays(message: string) {
-    this.sendMessage(message)
     this.userPointer = new Pointer()
+    this.sendMessage(message)
     return this.userPointer.promise
   }
 
