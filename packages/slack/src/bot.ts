@@ -6,9 +6,7 @@ import { Bot, Dialog, Command } from '@xene/core'
 import Dispatcher from './dispatcher'
 
 import isMentioned from './helpers/is-mentioned'
-import isKnownEvent from './helpers/is-known-event'
 import { isPrivateChannel } from './helpers/channel-type'
-import { RtmClient, RTM_EVENTS, CLIENT_EVENTS } from '@slack/client'
 
 import IUser from './api/types/user'
 import { IMessage } from './api/types/message'
@@ -16,6 +14,7 @@ export type Message = string | IMessage
 
 // API Modules
 import Auth from './api/auth'
+import RTM from './api/rtm'
 import Chat from './api/chat'
 import Users from './api/users'
 import Groups from './api/groups'
@@ -30,9 +29,9 @@ export default class Slackbot extends Bot<Message, IUser> {
 
   id: string
   botId: string
-  rtmClient: RtmClient
 
   // API Modules
+  rtm: RTM
   auth: Auth
   chat: Chat
   users: Users
@@ -70,7 +69,7 @@ export default class Slackbot extends Bot<Message, IUser> {
   }
 
   // Process incoming interactive messages
-  // like button actions from slack.
+  // like button actions from slack
   // Called from Dispatcher
   async onInteractiveMessage(payload): Promise<Message> {
     const selected = payload.actions[0]
@@ -106,12 +105,7 @@ export default class Slackbot extends Bot<Message, IUser> {
     subtype?: string
   }) {
     if (!payload.user) return
-    const isSelf = this.botId === payload.user
-    const isEvent = isKnownEvent(payload.subtype)
-
-    // TODO process known events and call specific callbacks
-    if (isSelf && isEvent) return
-    if (isSelf) return
+    if (this.botId === payload.user) return
 
     const isBotMentioned = isMentioned(this.botId, payload.text)
     const isPrivate = isPrivateChannel(payload.channel)
@@ -127,10 +121,12 @@ export default class Slackbot extends Bot<Message, IUser> {
 
   private initBot(token: string) {
     this.chat = new Chat(token)
-    this.rtmClient = new RtmClient(token, { logLevel: 'error' })
-    this.rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.botId = d.self.id))
-    this.rtmClient.on(RTM_EVENTS.MESSAGE, this.onRtmMessage.bind(this))
-    this.rtmClient.start()
+    this.rtm = new RTM(token)
+    this.rtm.connect().then(a => console.log('opened', a))
+    // this.rtmClient = new RtmClient(token, { logLevel: 'error' })
+    // this.rtmClient.on(CLIENT_EVENTS.RTM.AUTHENTICATED, d => (this.botId = d.self.id))
+    // this.rtmClient.on(RTM_EVENTS.MESSAGE, this.onRtmMessage.bind(this))
+    // this.rtmClient.start()
   }
 
   private initApi(token: string) {

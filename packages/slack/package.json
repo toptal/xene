@@ -18,17 +18,19 @@
     "dist"
   ],
   "dependencies": {
-    "@slack/client": "git+https://git@github.com/dempfi/node-slack-sdk.git#add-types",
     "@xene/core": "^0.0.10",
     "lodash": "^4.17.4",
-    "request-promise-native": "^1.0.3",
-    "uuid": "^3.0.1"
+    "request": "^2.81.0",
+    "request-promise-native": "^1.0.4",
+    "uuid": "^3.0.1",
+    "ws": "^3.0.0"
   },
   "devDependencies": {
     "@types/express": "^4.0.35",
     "@types/lodash": "^4.14.62",
     "@types/node": "^6.0.47",
     "@types/request-promise-native": "^1.0.2",
-    "@types/uuid": "^2.0.29"
+    "@types/uuid": "^2.0.29",
+    "@types/ws": "^3.0.0"
   }
 }
