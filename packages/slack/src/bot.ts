@@ -53,9 +53,8 @@ export default class Slackbot extends Bot<Message, IUser> {
     this.rtm.on('message', this.onRtmMessage.bind(this))
     this.rtm.connect().then(i => this.bot = i.self)
 
-    // Init API scopes with app token if specified
-    // since it's more powerfull and those API scopes
-    // can benefit from app token
+    // Some of these API scopes' methods require additional
+    // scopes which are defined only for apps and app tokens respectively
     this.auth = new Auth(options.appToken || options.botToken)
     this.users = new Users(options.appToken || options.botToken)
     this.groups = new Groups(options.appToken || options.botToken)

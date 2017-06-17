@@ -15,10 +15,11 @@ const boundPromise = (): { resolve: (a?: any) => void, reject: () => void, promi
 }
 
 export default class RTM extends Module {
-  private ws: WebSocket
-  private ee = new EventEmitter()
   on: On
   off: Off
+  private inc: number = 1
+  private ws: WebSocket
+  private ee = new EventEmitter()
 
   constructor(token) {
     super(token)
@@ -31,14 +32,23 @@ export default class RTM extends Module {
     const response = await this.call('connect', {}, true)
     this.ws = new WebSocket(response.url)
     // handle autorecconnections on errors
-    // this.ws.on('error', promise.reject)
+    this.ws.on('error', promise.reject)
     this.ws.on('open', () => promise.resolve(response))
     this.ws.on('message', this.emit.bind(this))
     return promise.promise
   }
 
+  typeing(channel: string) {
+    this.wsSend({ type: 'typing', channel })
+  }
+
   private emit(msgString: any) {
     const msg = JSON.parse(msgString)
     this.ee.emit(msg.subtype ? `${msg.type}.${msg.subtype}` : msg.type, msg)
+  }
+
+  private wsSend(message) {
+    this.ws.send(JSON.stringify({ ...message, id: this.inc }))
+    this.inc += 1
   }
 }
