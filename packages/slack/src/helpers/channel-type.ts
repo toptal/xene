@@ -8,5 +8,5 @@ export default (str): 'channel' | 'group' | 'direct' => {
 }
 
 export function isPrivateChannel (id: string): boolean {
-  return id.substring(0, 1).toLowerCase() === 'd'
+  return id.length && id[0].toLowerCase() === 'd'
 }
