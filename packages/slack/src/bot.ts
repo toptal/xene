@@ -3,6 +3,7 @@ import * as _ from 'lodash'
 import { Bot, Dialog, Command } from '@xene/core'
 
 import Dispatcher from './dispatcher'
+import middleware from './middleware'
 
 import isMentioned from './helpers/is-mentioned'
 import { isPrivateChannel } from './helpers/channel-type'
@@ -24,6 +25,7 @@ export default class Slackbot extends Bot<Message, IUser> {
   // custom dispatcher. This is moslty used when user has
   // one type of bot, which is a common case
   static dispatcher = new Dispatcher()
+  static middleware = middleware
   static oauthAccess = Auth.access
 
   id: string

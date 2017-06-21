@@ -1,15 +1,14 @@
 import { IMessage } from '../api/types/message'
 
 export type Handler = (context: MiddlewareContext) => void | Promise<void>
-export abstract class MiddlewareContext {
-  _: any
+export type MiddlewareContext = {
   /**
    * Slack verification token
    */
   readonly token: string
   readonly callbackId: string
-  readonly team: { id: string, name: string }
   readonly user: { id: string, name: string }
+  readonly team: { id: string, domain: string }
   readonly channel: { id: string, name: string }
   readonly action: { value: string, type: 'select' | 'button', id: string }
 
@@ -25,5 +24,5 @@ export abstract class MiddlewareContext {
    * Ephemeral message that will be seen only by user
    * @type {string}
    */
-  ephemeral: string = undefined
+  ephemeral: string
 }
