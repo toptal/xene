@@ -169,11 +169,11 @@ onEnd() -> void
 ### .onAbort()
 <!--type-->
 ```ts
-onAbort() -> void
+onAbort([error]) -> void
 ```
 <!--/type-->
 
-`onAbort()` is called when conversation is aborted via [`Bot#stopDialog()`] method call.
+`onAbort()` is called when conversation is aborted via [`Bot#stopDialog()`] method call or when error occures in `talk()` method. In second case `onAbort()` will be called with the error.
 
 ### .message()
 <!--type-->
@@ -200,6 +200,7 @@ Xene always formats message you pass to the `message()` function and this is not
 
 ```ts
 class Greeting extends Dialog {
+  static isDefault = true
   randomGreeting() {
     return randomElement(['Good day', 'Hi', 'Hello'])
   }
