@@ -1,15 +1,15 @@
-import { IAttachment } from '../../api/types/message'
+import { Attachment } from '../../api/types/message'
 import * as buttonFormat from './button'
 import * as menuFormat from './menu'
 
-export function toSlack(attachment: IAttachment) {
+export function toSlack(attachment: Attachment) {
   const { buttons, menus, ...rest } = attachment
   const slackButtons: any = (buttons || []).map(buttonFormat.toSlack)
   const slackMenus: any = (menus || []).map(menuFormat.toSlack)
   return { actions: slackButtons.concat(slackMenus), text: '', ...rest }
 }
 
-export function fromSlack(attachment): IAttachment {
+export function fromSlack(attachment): Attachment {
   const { actions, ...rest } = attachment
   return {
     buttons: actions.filter(a => a.type === 'button').map(buttonFormat.fromSlack),

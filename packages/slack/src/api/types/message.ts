@@ -13,7 +13,7 @@ export interface IMenu extends IAction {
   options: 'users' | 'channels' | { label: string, value: string }[]
 }
 
-export interface IAttachment {
+export type Attachment = {
   text?: string
   title?: string
   color?: string
@@ -37,12 +37,12 @@ export interface IAttachment {
   footerIcon?: string
 }
 
-export interface IMessage {
-  attachments?: IAttachment[]
+export type Message = {
+  attachments?: Attachment[]
   text?: string
 }
 
-export interface IOptions {
+export type MessageOptions = {
   parse?: 'full' | 'none'
   asUser?: boolean
   iconUrl?: string
