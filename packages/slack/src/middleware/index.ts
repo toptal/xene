@@ -1,7 +1,6 @@
 import * as http from 'http'
 import { Handler } from './types'
-import express from './express'
-import koa from './koa'
+import { express, koa } from './middlewares'
 
 const check = (a, b, c) =>
   a instanceof http['IncomingMessage'] && // tslint:disable-line

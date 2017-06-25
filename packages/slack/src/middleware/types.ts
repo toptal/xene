@@ -1,4 +1,4 @@
-import { IMessage } from '../api/types/message'
+import { Message } from '../api/types/message'
 
 export type Handler = (context: MiddlewareContext) => void | Promise<void>
 export type MiddlewareContext = {
@@ -18,11 +18,11 @@ export type MiddlewareContext = {
    * to this property will delete message in Slack
    * @type {IMessage}
    */
-  message: IMessage
+  message: Message
 
   /**
    * Ephemeral message that will be seen only by user
    * @type {string}
    */
-  ephemeral: string
+  ephemeral: string | Message
 }

@@ -9,8 +9,8 @@ import isMentioned from './helpers/is-mentioned'
 import { isPrivateChannel } from './helpers/channel-type'
 
 import IUser from './api/types/user'
-import { IMessage } from './api/types/message'
-export type Message = string | IMessage
+import { Message } from './api/types/message'
+export type Message = string | Message
 
 // API Modules
 import Auth from './api/auth'
