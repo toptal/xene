@@ -19,6 +19,7 @@
   ],
   "dependencies": {
     "@xene/core": "^0.0.11",
+    "eventemitter3": "^2.0.3",
     "lodash": "^4.17.4",
     "raw-body": "^2.2.0",
     "request": "^2.81.0",
