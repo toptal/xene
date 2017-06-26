@@ -38,7 +38,7 @@ export default class RTM extends Module {
     return promise.promise
   }
 
-  typeing(channel: string) {
+  typing(channel: string) {
     this.wsSend({ type: 'typing', channel })
   }
 
