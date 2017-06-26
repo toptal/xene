@@ -32,7 +32,7 @@ export default class RTM extends Module {
     const response = await this.call('connect', {}, true)
     this.ws = new WebSocket(response.url)
     // handle autorecconnections on errors
-    this.ws.on('error', promise.reject)
+    this.ws.on('error', err => console.log(err))
     this.ws.on('open', () => promise.resolve(response))
     this.ws.on('message', this.emit.bind(this))
     return promise.promise
