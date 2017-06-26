@@ -34,6 +34,10 @@
     "@types/raw-body": "^2.1.4",
     "@types/request-promise-native": "^1.0.2",
     "@types/uuid": "^2.0.29",
-    "@types/ws": "^3.0.0"
+    "@types/ws": "^3.0.0",
+    "ava": "^0.19.1",
+    "nyc": "^11.0.3",
+    "tslint": "^5.4.3",
+    "typescript": "^2.3.4"
   }
 }

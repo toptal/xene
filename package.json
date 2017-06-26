@@ -1,9 +1,5 @@
 {
   "devDependencies": {
-    "ava": "^0.18.0",
-    "lerna": "v2.0.0-rc.5",
-    "nyc": "^10.1.2",
-    "tslint": "^4.5.1",
-    "typescript": "^2.2.1"
+    "lerna": "v2.0.0-rc.5"
   }
 }

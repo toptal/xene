@@ -16,5 +16,11 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "devDependencies": {
+    "ava": "^0.19.1",
+    "nyc": "^11.0.3",
+    "tslint": "^5.4.3",
+    "typescript": "^2.3.4"
+  }
 }
