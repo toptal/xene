@@ -92,7 +92,7 @@ export class Tester {
     const onEnd = this.onEnd.bind(this)
     class TesterDialog extends dialogClass<any> {
       onEnd() { super.onEnd(); onEnd() }
-      onAbort(e) { onEnd(e); super.onAbort(e) }
+      onAbort(e) { super.onAbort(e); onEnd(e) }
     }
     return TesterDialog
   }
