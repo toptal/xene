@@ -9,6 +9,6 @@ export default class Users extends Base {
   }
 
   list(filter?: Partial<IUser>) {
-    return super.list<IUser>(converter, filter, 'members')
+    return this.request('list')
   }
 }
