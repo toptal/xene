@@ -2,10 +2,8 @@ import * as _ from 'lodash'
 import request from './request'
 import * as Errors from '../../errors'
 
-const RATE = 2000
-
 abstract class ApiModule {
-  namespace: string
+  protected namespace: string
 
   constructor(private token: string) {
     this.namespace = this.constructor.name.toLowerCase()

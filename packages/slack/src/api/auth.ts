@@ -1,7 +1,7 @@
 import Base from './base'
+import request from './base/request'
 import converter from './converters/camel'
 import * as Errors from '../errors'
-import * as request from 'request-promise-native'
 
 export default class Auth extends Base {
   static async access(options: { id: string, secret: string, code: string, redirectUri?: string }) {
@@ -13,7 +13,7 @@ export default class Auth extends Base {
       redirect_uri: options.redirectUri
     }
     try {
-      const response = await request.post({ uri, json: true, form })
+      const response = await request(uri, form)
       if (!response.ok) throw new Errors.API(response.error)
       return converter(response)
     } catch (e) {

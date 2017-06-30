@@ -1,23 +1,23 @@
+import { get, map, filter, find } from 'lodash/fp'
 import Base from './base'
 import IChannel from './types/channel'
 import converter from './converters/camel'
 
 export default class Channels extends Base {
-  info(idOrPartial: string | Partial<IChannel>) {
-    return super.info<IChannel>(idOrPartial, converter)
+  info(channel: string | Partial<IChannel>) {
+    if (typeof channel === 'string') return this.request('info', { channel }).then(get('channel'))
+    return this.list().then(find(channel)) as any
   }
 
-  list(filter?: Partial<IChannel>) {
-    return super.list<IChannel>(converter, filter)
+  list() {
+    return this.request('list').then(get('channels')).then(map(converter))
   }
 
-  async join(channelName: string): Promise<IChannel> {
-    const response = await this.call('join', { name: channelName }, true)
-    return converter(response.channel)
+  join(channel: string): Promise<IChannel> {
+    return this.request('join', { name: channel }).then(get('channel')).then(converter)
   }
 
-  async invite(channel: string, user: string) {
-    const response = await this.call('invite', { channel, user }, true)
-    return converter(response.channel)
+  invite(channel: string, user: string): Promise<IChannel> {
+    return this.request('invite', { channel, user }).then(get('channel')).then(converter)
   }
 }

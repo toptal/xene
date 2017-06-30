@@ -5,18 +5,16 @@ import * as messageFormat from '../helpers/formatters/message'
 import { Message, MessageOptions } from './types/message'
 
 export default class Chat extends Base {
-
-  async postMessage(channel: string, message: Message, options: MessageOptions = {}) {
+  postMessage(channel: string, message: Message, options: MessageOptions = {}) {
     return this.request('postMessage',
       converters.snake({
         ...messageFormat.toSlack(message),
         ...{ channel, asUser: true },
-        ...options
-      }))
+        ...options }))
       .then(converters.camel)
   }
 
-  // async del(channel: string, ts: string, options: { asUser?: boolean } = {}) {
-  //   return this.request('delete', converters.snake({ channel, ts, ...options }), true)
-  // }
+  del(channel: string, ts: string, options: { asUser?: boolean } = {}) {
+    return this.request('delete', converters.snake({ channel, ts, ...options }))
+  }
 }

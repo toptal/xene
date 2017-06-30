@@ -29,7 +29,7 @@ export default class RTM extends Base {
 
   connect = async () => {
     const promise = boundPromise()
-    const response = await this.call('connect', {}, true)
+    const response = await this.request('connect')
     this.ws = new WebSocket(response.url)
     // handle autorecconnections on errors
     this.ws.on('error', promise.reject)
