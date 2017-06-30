@@ -9,8 +9,8 @@ import isMentioned from './helpers/is-mentioned'
 import { isPrivateChannel } from './helpers/channel-type'
 
 import IUser from './api/types/user'
-import { Message } from './api/types/message'
-export type Message = string | Message
+import { Message as APIMessage } from './api/types/message'
+export type Message = string | APIMessage
 
 // API Modules
 import Auth from './api/auth'
@@ -68,7 +68,7 @@ export default class Slackbot extends Bot<Message, IUser> {
 
   formatMessage(message: Message, object: any): Message {
     if (_.isPlainObject(message)) return _.mapValues(message, v => this.formatMessage(v, object))
-    if (_.isArray(message)) return message.map(v => this.formatMessage(v, object))
+    if (_.isArray(message)) return (message as any).map(v => this.formatMessage(v, object))
     if (_.isString(message)) return _.template(message)(object)
     return message
   }

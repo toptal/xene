@@ -1,9 +1,9 @@
-import Module from './module'
+import Base from './base'
 import converter from './converters/camel'
 import * as Errors from '../errors'
 import * as request from 'request-promise-native'
 
-export default class Auth extends Module {
+export default class Auth extends Base {
   static async access(options: { id: string, secret: string, code: string, redirectUri?: string }) {
     const uri = `https://slack.com/api/oauth.access`
     const form = {

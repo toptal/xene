@@ -1,8 +1,8 @@
-import Module from './module'
+import Base from './base'
 import IChannel from './types/channel'
 import converter from './converters/camel'
 
-export default class Channels extends Module {
+export default class Channels extends Base {
   info(idOrPartial: string | Partial<IChannel>) {
     return super.info<IChannel>(idOrPartial, converter)
   }

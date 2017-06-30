@@ -1,7 +1,7 @@
 import * as WebSocket from 'ws'
 import { EventEmitter } from 'eventemitter3'
 
-import Module from '../module'
+import Base from '../base'
 import { On, Off } from './types'
 import * as converters from '../converters'
 
@@ -14,7 +14,7 @@ const boundPromise = (): { resolve: (a?: any) => void, reject: () => void, promi
   return result
 }
 
-export default class RTM extends Module {
+export default class RTM extends Base {
   on: On
   off: Off
   private inc: number = 1

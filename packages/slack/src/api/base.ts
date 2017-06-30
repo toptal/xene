@@ -24,10 +24,7 @@ abstract class ApiModule {
     converter: (a: any) => T,
     keys: { arg?: string, response?: string} = {}
   ): Promise<T> {
-    keys = Object.assign({
-      arg: trimEnd(this.namespace, 's'),
-      response: trimEnd(this.namespace, 's')
-    }, keys)
+    keys = { arg: trimEnd(this.namespace, 's'), response: trimEnd(this.namespace, 's'), ...keys }
     if (isString(idOrFilter)) {
       return this.call('info', { [keys.arg]: idOrFilter })
         .then(response => converter(response[keys.response]))
