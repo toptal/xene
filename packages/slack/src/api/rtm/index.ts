@@ -1,7 +1,7 @@
 import * as WebSocket from 'ws'
 import { EventEmitter } from 'eventemitter3'
 
-import Module from '../module'
+import Base from '../base'
 import { On, Off } from './types'
 import * as converters from '../converters'
 
@@ -14,7 +14,7 @@ const boundPromise = (): { resolve: (a?: any) => void, reject: () => void, promi
   return result
 }
 
-export default class RTM extends Module {
+export default class RTM extends Base {
   on: On
   off: Off
   private inc: number = 1
@@ -29,7 +29,7 @@ export default class RTM extends Module {
 
   connect = async () => {
     const promise = boundPromise()
-    const response = await this.call('connect', {}, true)
+    const response = await this.request('connect')
     this.ws = new WebSocket(response.url)
     // handle autorecconnections on errors
     this.ws.on('error', promise.reject)

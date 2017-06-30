@@ -1,14 +1,15 @@
-import Module from './module'
+import { get, map, filter, find } from 'lodash/fp'
+import Base from './base'
 import IUser from './types/user'
 import converter from './converters/user'
 
-export default class Users extends Module {
-
-  info(idOrPartialUser: string | Partial<IUser>) {
-    return super.info<IUser>(idOrPartialUser, converter)
+export default class Users extends Base {
+  info(user: string | Partial<IUser>): Promise<IUser> {
+    if (typeof user === 'string') return this.request('info', { user }).then(get('user'))
+    return this.list().then(find(user)) as any
   }
 
-  list(filter?: Partial<IUser>) {
-    return super.list<IUser>(converter, filter, 'members')
+  list(): Promise<IUser[]> {
+    return this.request('list').then(get('members')).then(map(converter))
   }
 }
