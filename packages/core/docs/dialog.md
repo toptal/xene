@@ -1,6 +1,5 @@
 ---
 id:       dialog
-prev:     bot
 category: reference
 
 ---
@@ -234,7 +233,7 @@ parse(parser, [onError]) -> Promise{parsedValue}
 <!--/type-->
 
 
-`parse()` method invokes parser on the most recent message from the user. If the dialog was initiated from the user's message then it will be immediately invoked. But if the dialog was initiated from the [`Bot#startDialog()`](PUT LINK HERE) then `parse()` will register new parser in [parsing queue](LINK), await for new user message and invoke parser with that new message. Let's examine an example for clarity.
+`parse()` method invokes parser on the most recent message from the user. If the dialog was initiated from the user's message then it will be immediately invoked. But if the dialog was initiated from the [`Bot#startDialog()`](/bot.md#startdialog) then `parse()` will register new parser in [parsing queue](LINK), await for new user message and invoke parser with that new message. Let's examine an example for clarity.
 
 ```ts
 class Sum extends Dialog {

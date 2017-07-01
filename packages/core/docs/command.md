@@ -8,7 +8,7 @@ category: reference
 # Command
 
 <!--intro-->
-One Commnd to rule them all...
+Key to control conversations.
 <!--/intro-->
 
 Command are the way to define higher in priority operations than [Dialogs](/dialog.md) that can even interupt Dialogs. For example to show a help message during an active dialog or stop an active dialog.
