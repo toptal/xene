@@ -16,7 +16,7 @@ export default class Chat extends Base {
 
   update(channel: string, ts: string, message: Message) {
     return this.request('update', converters.snake({
-      channel, asUser: true, parse: 'none',
+      channel, ts, asUser: true, parse: 'none',
       ...messageFormat.toSlack(message)
     })).then(converters.camel)
   }
