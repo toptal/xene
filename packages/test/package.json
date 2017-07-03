@@ -1,6 +1,6 @@
 {
   "name": "@xene/test",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Xene framework test utilities",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
