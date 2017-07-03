@@ -5,7 +5,7 @@ import converter from './converters/camel'
 
 export default class Groups extends Base {
   info(group: string | Partial<IGroup>): Promise<IGroup> {
-    if (typeof group === 'string') return this.request('info', { group }).then(get('channel'))
+    if (typeof group === 'string') return this.request('info', { group }).then(get('channel')).then(converter)
     return this.list().then(find(group)) as any
   }
 

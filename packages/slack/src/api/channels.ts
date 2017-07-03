@@ -5,7 +5,7 @@ import converter from './converters/camel'
 
 export default class Channels extends Base {
   info(channel: string | Partial<IChannel>) {
-    if (typeof channel === 'string') return this.request('info', { channel }).then(get('channel'))
+    if (typeof channel === 'string') return this.request('info', { channel }).then(get('channel')).then(converter)
     return this.list().then(find(channel)) as any
   }
 

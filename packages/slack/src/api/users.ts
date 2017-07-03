@@ -5,7 +5,7 @@ import converter from './converters/user'
 
 export default class Users extends Base {
   info(user: string | Partial<IUser>): Promise<IUser> {
-    if (typeof user === 'string') return this.request('info', { user }).then(get('user'))
+    if (typeof user === 'string') return this.request('info', { user }).then(get('user')).then(converter)
     return this.list().then(find(user)) as any
   }
 
