@@ -54,6 +54,7 @@ export default class RTM extends Base {
   }
 
   private handleHello() {
+    this.lastPong = Date.now()
     if (this.pingTimer) clearInterval(this.pingTimer)
     this.pingTimer = setInterval(this.pingServer.bind(this), PING_INTERVAL)
   }
