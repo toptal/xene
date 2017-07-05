@@ -10,9 +10,11 @@ import interpolate from './helpers/interpolate'
 import { isPrivateChannel } from './helpers/channel-type'
 
 import { User, Message as APIMessage } from './types'
-export type Message = string | APIMessage
-
 import { Auth, RTM, Chat, Users, Groups, Channels } from './api'
+
+export type Message = string | APIMessage
+export type DialogType<B extends Bot<any, any>> = new (a: B, s: string) => Dialog<B>
+export type CommandType<B extends Bot<any, any>> = new (a: B, s: string) => Command<B>
 
 export class Slackbot extends Bot<Message, User> {
   // Default dispatcher, used when user didn't provide
@@ -37,11 +39,11 @@ export class Slackbot extends Bot<Message, User> {
     id?: string,
     botToken: string,
     appToken?: string,
-    dialogs: (typeof Dialog)[],
-    commands?: (typeof Command)[],
+    dialogs: DialogType<Slackbot>[],
+    commands?: CommandType<Slackbot>[],
     dispatcher?: Dispatcher
   }) {
-    super(options)
+    super(options as any)
     this.id = options.id || uuid.v4()
 
     this.chat = new Chat(options.botToken)
