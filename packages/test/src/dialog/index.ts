@@ -90,11 +90,11 @@ export class Tester {
 
   private bind(dialogClass: typeof Dialog) {
     const onEnd = this.onEnd.bind(this)
-    class TesterDialog extends dialogClass<any> {
-      onEnd() { super.onEnd(); onEnd() }
-      onAbort(e) { super.onAbort(e); onEnd(e) }
-    }
-    return TesterDialog
+    const originalOnEnd = dialogClass.prototype.onEnd
+    const originalOnAbort = dialogClass.prototype.onAbort
+    dialogClass.prototype.onEnd = function() { originalOnEnd.call(this); onEnd() }
+    dialogClass.prototype.onAbort = function(e) { originalOnAbort.call(this, e); onEnd(e) }
+    return dialogClass
   }
 }
 
