@@ -6,54 +6,39 @@ category: quick-start
 
 # Introduction
 
-Nowadays we (developers) have access to hell lot of APIs of different messengers. From Slack to iMessage. This gives us amazing ability to create really simple, human-like interfaces for our users in the way that is very personal, funny, efficient and sometimes cute 🤖. But this area is still not really explored...
+<!--intro-->
+...to simple, modern bot framework.
+<!--/intro-->
 
-## The Problem
+xene is a **modular**, **modern**, **simple** to use and **easy to extend** bot framework. It allows developers conversational bots that work with different messengers in the same way and in the same time doesn't limit any API of messengers.
 
-I have been working with APIs of Slack and Skype simultaniously to create bot interfaces for our users. It was great experience to play with all the ML and nlp techs but unfortunatly I had hard time integrating both APIs in one app, with all the different concepts of both messengers. And this is the problems I had in my project:
+**Modular** xene provides two main packages `@xene/core` and `@xene/tester`. `@xene/core` provides core classes such as `Dialog` to describe conversations, `Command` to control the conversation with higher priority over `Dialog` and `Bot` that is consumed by other messenger specific packages to bind their APIs. `@xene/tester` is helper package that you can use to write highly efficient tests for your `Dialog`s and `Command`s;
 
-- **Each service provides different API for same things.** There are nothing like TC39 to standratize basic common things — format, send and recieve messages. So we either write layers of abstractions by ourselfes or use some library with support for all messengers. Which leads us to the next problems.
+**Modern** xene utilizes power of modern JavaScript using ES2015 classes to describe basic blocks, promises and async/await to describe conversational flow in the most clear way;
 
-- **Existing libraries don't utilize power of each API.** Right now there are two major libraries with support for different messengers and both trying hard to be the bridge and they both suck at basics. For example take a look at this example from [Botkit's docs](https://github.com/howdyai/botkit/blob/master/docs/readme.md#receiving-messages).
+**Simple** xene takes care under the hood of most common patterns such as handling simultaneous conversation with different users in one group(channel), or handling parse errors when bot didn't understand user and many other common things all handled by xene's core and configurable in place with simple API;
 
-```ts
-// reply to a direct mention - @bot hello
-controller.on('direct_mention',function(bot,message) {
-  // reply to _message_ by using the _bot_ object
-  bot.reply(message,'I heard you mention me!');
-});
-```
+**Easy to extend** `Slackbot` from `@xene/slack` package is just a subclass of `Bot` from `@xene/core` with two `super` calls. Same for any other bot of any messenger. This is all because core package was designed as simple building block without limitations for end users.
 
-It seems very legit and understandable, but in fact it's bound to Slack API, because we listen to `direct_mention` event which is Slack specific. So if you use Botkit, you still have to write a lot of code to support different APIs of different messengers.
 
-- **Existing libraries are complex.** I had to read [Get Started](https://github.com/howdyai/botkit/blob/master/docs/readme.md) guide of Botkit and it's still not clear what the hell chains of callbacks do.
-
-## The Solution
-
-**Meet `xene`.**
-
-The key concept of xene is that it trully provides **one** interface for chatting, _but_ in the same time all cool features of each messengers are still available.
+All that together results in this simple example.
 
 ```ts
-import Slackbot from '@xene/slack'
 import { Dialog } from '@xene/core'
+import { Slackbot } from '@xene/slack'
+import { Consolebot } from '@xene/console'
 
 class Greeting extends Dialog {
-  static match = msg => /(hi|hello)/i.test(msg)
+  static match(msg) { return /(hi|hello)/.test(msg) }
+
   async talk() {
-    await this.message('Hi ${user.name}')
-    const isGreat = await this.ask('How is your day?', reply => /(great|good)/i.test(reply))
-    return this.message(isGreat ? 'Cool, keep up human.' : "Oh, sorry to hear.")
+    const isGood = await this.ask('Sup, human?', msg => /(good|great)/.test(msg))
+    return this.message(isGood ? 'Keep rocking man 🤘' : 'Oh, sorry to hear...')
   }
 }
 
-const bot = new Slackbot({ dialogs:[ Greeting ], /* tokens */ })
+const slackbot = new Slackbot({ dialogs: [Greeting], /* Slack API tokens */ })
+const consolebot = new Consolebot({ dialogs: [Greeting] })
 ```
 
-**Basics are same.** Xene provides `Dialog`s for conversations in which you can `message`, `ask` and `parse`. This is very simple idea and it's constant no matter what messenger your users use.
-
-**`async/await` is much simpler for conversations.** Xene is all about Promises and it's designed with `async/await` in mind. You can just await for user to reply to your question.
-
-```ts
-const isGreat = await this.ask('How is your day?', reply => /(great|good)/i.test(reply))
-```
+Here we created simple `Greeting` dialog which works with both Slack API and in your console.
