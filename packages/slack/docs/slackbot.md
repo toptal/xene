@@ -1,5 +1,6 @@
 ---
 id:       slackbot
+prev:     introduction
 category: reference
 
 ---

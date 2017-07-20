@@ -1,6 +1,6 @@
 ---
 id:       introduction
-category: quick-start
+category: guide
 
 ---
 
