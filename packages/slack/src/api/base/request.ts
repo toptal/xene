@@ -1,16 +1,25 @@
+import * as async from 'async'
 import * as request from 'request-promise-native'
+import logger from '../../logger'
 
-let queue = Promise.resolve()
-const resolveInQueue = (cb) => queue = queue.then(cb)
-const pause = (ms: number) => resolveInQueue(() => new Promise(r => setTimeout(r, ms)))
+type Callback = (arg: any) => void
+type Task = { uri: string, form: any, resolve: Callback, reject: Callback }
 
-const post = (uri: string, form: any) => request.post({ uri, json: true, form })
-const queuedPost = (uri: string, form: any) => new Promise(resolveInQueue).then(() => post(uri, form))
-
-export default function requestWithRatelimit(uri: string, form: any) {
-  return queuedPost(uri, form).catch(error => {
-    if (error.statusCode !== 429) throw error
-    pause(Number(error.response.headers['retry-after']) * 1000)
-    return requestWithRatelimit(uri, form)
-  })
+const worker = async (task: Task, done) => {
+  try {
+    await request.post({ uri: task.uri, json: true, form: task.form }).then(task.resolve)
+  } catch (error) {
+    if (error.statusCode !== 429) return task.reject(error)
+    const delay = Number(error.response.headers['retry-after']) * 1000
+    logger.info('Slack API rate limited for %s ms', delay)
+    setTimeout(queue.resume, delay)
+    queue.unshift(task)
+    queue.pause()
+  }
+  done()
 }
+
+const queue = async.queue(worker, 3)
+
+export default (uri: string, form: any) =>
+  new Promise<any>((resolve, reject) => queue.push({ uri, form, resolve, reject}))

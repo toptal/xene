@@ -2,6 +2,7 @@ import * as WebSocket from 'ws'
 import { EventEmitter } from 'eventemitter3'
 
 import Base from '../base'
+import logger from '../../logger'
 import { On, Off } from './types'
 import * as converters from '../converters'
 
@@ -50,6 +51,7 @@ export default class RTM extends Base {
     const msg = JSON.parse(msgString)
     if (msg.type === 'hello') this.handleHello()
     if (msg.type === 'pong') this.lastPong = Date.now()
+    logger.verbose('Imcoming RTM message %s', msg.type)
     this.ee.emit(msg.subtype ? `${msg.type}.${msg.subtype}` : msg.type, msg)
   }
 
@@ -60,6 +62,7 @@ export default class RTM extends Base {
   }
 
   private reconnect() {
+    logger.verbose('Reconnecting to RTM API')
     this.disconnect()
     this.connect()
   }
