@@ -1,4 +1,4 @@
-import { get, map, filter, find } from 'lodash/fp'
+import { get, map, find } from 'lodash/fp'
 import Base from './base'
 import IUser from './types/user'
 import converter from './converters/user'
