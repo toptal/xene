@@ -1,7 +1,8 @@
 import * as Koa from 'koa'
-import * as Express from 'express'
 import * as qs from 'querystring'
+import * as Express from 'express'
 import * as rawBody from 'raw-body'
+import * as request from 'request-promise-native'
 import { get, isString, isEqual } from 'lodash'
 
 import { camel } from '../api/converters'
@@ -13,9 +14,9 @@ const existingPayload = payload => typeof payload === 'string' ? JSON.parse(payl
 
 const middlewareContext = (payload): MiddlewareContext => {
   const action = payload.actions[0]
-  const { user, team, channel, token, callbackId } = payload
+  const { user, team, channel, token, callbackId, responseUrl } = payload
   return {
-    user, team, channel, token, callbackId, ephemeral: undefined,
+    user, team, channel, token, callbackId, ephemeral: undefined, responseUrl,
     message: format.fromSlack(payload.originalMessage),
     action: {
       value: action.type === 'button' ? action.value : action.selectedOptions[0].value,
@@ -25,15 +26,15 @@ const middlewareContext = (payload): MiddlewareContext => {
   }
 }
 
-const getResponse = async (handler: MiddlewareHandler, payload) => {
-  const context = middlewareContext(payload)
+const processRequestWithHandler = async (handler: MiddlewareHandler, payload) => {
+  const context = middlewareContext(camel(payload))
   await handler(context)
 
   let response
   const { ephemeral, message } = context
   const ephemeralAdded = ephemeral != null
   const messageDeleted = message == null
-  const messageChanged = !messageDeleted && !isEqual(message, format.fromSlack(payload.originalMessage))
+  const messageChanged = !messageDeleted && !isEqual(message, format.fromSlack(payload.original_message))
 
   if (ephemeralAdded && messageChanged)
     throw new Error("Can't show ephemeral message and update original message in the same time.")
@@ -47,7 +48,8 @@ const getResponse = async (handler: MiddlewareHandler, payload) => {
     response.delete_original = messageDeleted
   }
 
-  return response
+  const body = response || payload.original_message
+  request.post({ uri: context.responseUrl, body, json: true })
 }
 
 export const koa = async (handler: MiddlewareHandler, ctx: Koa.Context, next) => {
@@ -56,8 +58,8 @@ export const koa = async (handler: MiddlewareHandler, ctx: Koa.Context, next) =>
   // if any body parsers middleware is already used in code
   // tslint:disable
   const payload = existingPayload(get(ctx, 'request.body.payload')) || await streamPayload(ctx.req)
-  const body = await getResponse(handler, camel(payload))
-  ctx.body = body || payload.original_message
+  processRequestWithHandler(handler, payload)
+  ctx.body = payload.original_message
   ctx.status = 200
   return next()
 }
@@ -65,7 +67,7 @@ export const koa = async (handler: MiddlewareHandler, ctx: Koa.Context, next) =>
 export const express = async (handler: MiddlewareHandler, req: Express.Request, res: Express.Response, next) => {
   if (req.method.toLowerCase() !== 'post') return
   const payload = existingPayload(get(req, 'body.payload')) || await streamPayload(req)
-  const body = await getResponse(handler, camel(payload))
-  body ? res.send(body) : res.status(200).end()
+  processRequestWithHandler(handler, payload)
+  res.status(200).end()
   return next()
 }
