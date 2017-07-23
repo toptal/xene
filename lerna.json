@@ -6,6 +6,8 @@
   "publish": {
     "ignore": [
       "tslint.json",
+      "yarn.lock",
+      "src/**",
       "*.md"
     ]
   },
