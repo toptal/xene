@@ -1,9 +1,9 @@
-import Base from './base'
+import { APIModule } from './base'
 import request from './base/request'
-import converter from './converters/camel'
-import * as Errors from '../errors'
+import { camel } from './converters'
+import { APIError } from '../errors'
 
-export default class Auth extends Base {
+export class Auth extends APIModule {
   static async access(options: { id: string, secret: string, code: string, redirectUri?: string }) {
     const uri = `https://slack.com/api/oauth.access`
     const form = {
@@ -14,8 +14,8 @@ export default class Auth extends Base {
     }
     try {
       const response = await request(uri, form)
-      if (!response.ok) throw new Errors.API(response.error)
-      return converter(response)
+      if (!response.ok) throw new APIError(response.error)
+      return camel(response)
     } catch (e) {
       throw e
     }

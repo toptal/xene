@@ -1,8 +1,8 @@
 import * as _ from 'lodash'
 import request from './request'
-import * as Errors from '../../errors'
+import { APIError } from '../../errors'
 
-abstract class ApiModule {
+export abstract class APIModule {
   protected namespace: string
 
   constructor(private token: string) {
@@ -14,12 +14,10 @@ abstract class ApiModule {
     form = _.mapValues(form, v => _.isObject(v) ? JSON.stringify(v) : v)
     try {
       const response = await request(uri, form)
-      if (!response.ok) throw new Errors.API(response.error)
+      if (!response.ok) throw new APIError(response.error)
       return response
     } catch (e) {
       throw e
     }
   }
 }
-
-export default ApiModule

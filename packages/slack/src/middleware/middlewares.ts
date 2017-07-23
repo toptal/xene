@@ -4,10 +4,9 @@ import * as qs from 'querystring'
 import * as rawBody from 'raw-body'
 import { get, isString, isEqual } from 'lodash'
 
-import camelize from '../api/converters/camel'
-import { Message } from '../api/types/message'
+import { camel } from '../api/converters'
 import * as format from '../helpers/formatters/message'
-import { Handler, MiddlewareContext } from './types'
+import { MiddlewareContext, MiddlewareHandler } from '../types'
 
 const streamPayload = request => rawBody(request, { encoding: true }).then(qs.parse).then(i => JSON.parse(i.payload))
 const existingPayload = payload => typeof payload === 'string' ? JSON.parse(payload) : payload
@@ -26,7 +25,7 @@ const middlewareContext = (payload): MiddlewareContext => {
   }
 }
 
-const getResponse = async (handler: Handler, payload) => {
+const getResponse = async (handler: MiddlewareHandler, payload) => {
   const context = middlewareContext(payload)
   await handler(context)
 
@@ -51,22 +50,22 @@ const getResponse = async (handler: Handler, payload) => {
   return response
 }
 
-export const koa = async (handler: Handler, ctx: Koa.Context, next) => {
+export const koa = async (handler: MiddlewareHandler, ctx: Koa.Context, next) => {
   if (ctx.method.toLowerCase() !== 'post') return
   // ctx.request.body hack is to get parsed body
   // if any body parsers middleware is already used in code
   // tslint:disable
   const payload = existingPayload(get(ctx, 'request.body.payload')) || await streamPayload(ctx.req)
-  const body = await getResponse(handler, camelize(payload))
+  const body = await getResponse(handler, camel(payload))
   ctx.body = body || payload.original_message
   ctx.status = 200
   return next()
 }
 
-export const express = async (handler: Handler, req: Express.Request, res: Express.Response, next) => {
+export const express = async (handler: MiddlewareHandler, req: Express.Request, res: Express.Response, next) => {
   if (req.method.toLowerCase() !== 'post') return
   const payload = existingPayload(get(req, 'body.payload')) || await streamPayload(req)
-  const body = await getResponse(handler, camelize(payload))
+  const body = await getResponse(handler, camel(payload))
   body ? res.send(body) : res.status(200).end()
   return next()
 }

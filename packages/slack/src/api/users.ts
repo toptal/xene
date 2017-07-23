@@ -1,15 +1,15 @@
 import { get, map, find } from 'lodash/fp'
-import Base from './base'
-import IUser from './types/user'
-import converter from './converters/user'
+import { APIModule } from './base'
+import { User } from '../types'
+import * as converter from './converters'
 
-export default class Users extends Base {
-  info(user: string | Partial<IUser>): Promise<IUser> {
-    if (typeof user === 'string') return this.request('info', { user }).then(get('user')).then(converter)
+export class Users extends APIModule {
+  info(user: string | Partial<User>): Promise<User> {
+    if (typeof user === 'string') return this.request('info', { user }).then(get('user')).then(converter.user)
     return this.list().then(find(user)) as any
   }
 
-  list(): Promise<IUser[]> {
-    return this.request('list').then(get('members')).then(map(converter))
+  list(): Promise<User[]> {
+    return this.request('list').then(get('members')).then(map(converter.user))
   }
 }

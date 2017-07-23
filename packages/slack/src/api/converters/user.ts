@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
-import IUser from '../types/user'
+import { User } from '../../types'
 
-function transformer(result, value, key): IUser {
+function transformer(result, value, key): User {
   switch (key) {
     case 'id':
       result.id = value
@@ -28,6 +28,6 @@ function transformer(result, value, key): IUser {
   return result
 }
 
-export default function(user: any): IUser {
+export function user(user: any): User {
   return _.reduce(user, transformer, {})
 }

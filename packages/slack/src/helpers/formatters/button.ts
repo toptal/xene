@@ -1,4 +1,4 @@
-import { IButton } from '../../api/types/message'
+import { IButton } from '../../types'
 
 export const toSlack = (b: IButton) => ({
   style: b.type || 'default',

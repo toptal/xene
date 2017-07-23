@@ -8,19 +8,12 @@ import middleware from './middleware'
 import isMentioned from './helpers/is-mentioned'
 import { isPrivateChannel } from './helpers/channel-type'
 
-import IUser from './api/types/user'
-import { Message as APIMessage } from './api/types/message'
+import { User, Message as APIMessage } from './types'
 export type Message = string | APIMessage
 
-// API Modules
-import Auth from './api/auth'
-import RTM from './api/rtm'
-import Chat from './api/chat'
-import Users from './api/users'
-import Groups from './api/groups'
-import Channels from './api/channels'
+import { Auth, RTM, Chat, Users, Groups, Channels } from './api'
 
-export default class Slackbot extends Bot<Message, IUser> {
+export class Slackbot extends Bot<Message, User> {
   // Default dispatcher, used when user didn't provide
   // custom dispatcher. This is moslty used when user has
   // one type of bot, which is a common case

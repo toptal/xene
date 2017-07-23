@@ -1,8 +1,3 @@
-import user from './user'
-import camel from './camel'
-import snake from './snake'
-export {
-  user,
-  camel,
-  snake
-}
+export { user } from './user'
+export { camel } from './camel'
+export { snake } from './snake'

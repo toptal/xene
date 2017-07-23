@@ -1,5 +1,5 @@
 import { isString } from 'lodash'
-import { IMenu } from '../../api/types/message'
+import { IMenu } from '../../types'
 
 const optionToSlack = ({ label, value }) => ({ text: label, value })
 const optionFromSlack = ({ text, value }) => ({ label: text, value })

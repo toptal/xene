@@ -1,4 +1,4 @@
-import { Attachment } from '../../api/types/message'
+import { Attachment } from '../../types'
 import * as buttonFormat from './button'
 import * as menuFormat from './menu'
 
