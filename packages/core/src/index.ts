@@ -1,3 +1,3 @@
-export { default as Bot } from './bot'
-export { default as Dialog } from './dialog'
-export { default as Command } from './command'
+export { Bot } from './bot'
+export { Dialog } from './dialog'
+export { Command } from './command'

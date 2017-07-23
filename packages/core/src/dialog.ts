@@ -1,5 +1,5 @@
-import Bot from '../bot'
-import Queue from './queue'
+import { Bot } from './bot'
+import { Queue } from './queue'
 
 export type ErrorFunc<T> = (reply: string, parsed: T) => void
 export type ParseFunc<T> = (message: string) => T
@@ -10,7 +10,7 @@ export type Parser<T> = ParseFunc<T> | ParserObject<T>
 const isNil = v => v == null
 const isFunction = (v): v is Function => typeof v === 'function'
 
-export default class Dialog<B extends Bot<any, { id: string }>> {
+export class Dialog<B extends Bot<any, { id: string }>> {
   static isDefault = false
   static match(message: string): boolean { return false }
 
@@ -80,7 +80,7 @@ export default class Dialog<B extends Bot<any, { id: string }>> {
     return this.parse<T>(parser as ParseFunc<T>, error)
   }
 
-  startDialog(dialog: typeof Dialog, options: {[key: string]: any} = {}) {
+  startDialog(dialog: typeof Dialog, options: { [key: string]: any } = {}) {
     return this.bot.startDialog({ dialog, chat: this.chat, user: this.user, options })
   }
 }

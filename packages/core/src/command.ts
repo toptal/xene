@@ -1,6 +1,6 @@
-import Bot from './bot'
+import { Bot } from './bot'
 
-class Command<B extends Bot<any, { id: string }>> {
+export class Command<B extends Bot<any, { id: string }>> {
   static match(message: string): boolean { return false }
   user: B['_']['User']
 
@@ -21,5 +21,3 @@ class Command<B extends Bot<any, { id: string }>> {
     throw new Error('Method perform is not defined')
   }
 }
-
-export default Command

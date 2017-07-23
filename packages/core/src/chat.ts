@@ -1,8 +1,8 @@
-import Bot from './bot'
-import Dialog from './dialog'
+import { Bot } from './bot'
+import { Dialog } from './dialog'
 import { BaseUser } from './types'
 
-export default class Chat<B extends Bot<any, BaseUser>> {
+export class Chat<B extends Bot<any, BaseUser>> {
   private dialogs: Map<string, Dialog<B>> = new Map()
 
   constructor(public id: string, public bot: B) { }

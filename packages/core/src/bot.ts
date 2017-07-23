@@ -1,10 +1,10 @@
-import Chat from './chat'
-import Dialog from './dialog'
-import Command from './command'
+import { Chat } from './chat'
+import { Dialog } from './dialog'
+import { Command } from './command'
 
 import { UserMessage, BaseUser } from './types'
 
-abstract class Bot<Message, User extends BaseUser> {
+export abstract class Bot<Message, User extends BaseUser> {
   // This is a workaround to bind interfaces of User and Message
   // to Bot class so we can use them in other dependent classes
   // with typesafty, but we don't need them in runtime
@@ -58,6 +58,9 @@ abstract class Bot<Message, User extends BaseUser> {
     this.getChat(chat).stopDialog(user)
   }
 
+  abstract sendMessage(chat: string, message: Message): Promise<any>
+  abstract formatMessage(message: Message, object: any): Message
+
   private getChat(id: string): Chat<this> {
     if (this.chats.has(id)) return this.chats.get(id)
     const chat = new Chat(id, this)
@@ -69,7 +72,4 @@ abstract class Bot<Message, User extends BaseUser> {
     return this.commands.some(c => c.match(message))
   }
 
-  abstract sendMessage(chat: string, message: Message): Promise<any>
-  abstract formatMessage(message: Message, object: any): Message
 }
-export default Bot
