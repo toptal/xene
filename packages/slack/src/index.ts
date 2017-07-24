@@ -1,2 +1,2 @@
-import { Slackbot } from './bot'
+export { Slackbot } from './bot'
 export * from './types'
