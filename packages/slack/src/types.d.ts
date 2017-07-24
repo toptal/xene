@@ -132,6 +132,7 @@ export type MiddlewareContext = {
    */
   readonly token: string
   readonly callbackId: string
+  readonly responseUrl: string
   readonly user: { id: string, name: string }
   readonly team: { id: string, domain: string }
   readonly channel: { id: string, name: string }
