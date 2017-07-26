@@ -41,9 +41,9 @@
   version "4.14.66"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.66.tgz#3dbb83477becf130611f8fac82a8fdb199805981"
 
-"@xene/core@^0.0.12":
-  version "0.0.12"
-  resolved "https://registry.yarnpkg.com/@xene/core/-/core-0.0.12.tgz#2e33ca4f6f78a39071a3baffb372169bbc896f46"
+"@xene/core@^0.0.13":
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/@xene/core/-/core-0.0.13.tgz#62eef38db16b658c76e80c5714dd2d2f75a9c47b"
 
 abbrev@1:
   version "1.1.0"
