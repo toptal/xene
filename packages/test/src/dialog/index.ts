@@ -79,7 +79,7 @@ export class Tester {
   }
 
   private async onEnd(error?: any) {
-    if (this.userPointer) return error ? this.userPointer.resolve() : this.userPointer.reject(error)
+    if (this.userPointer) return error ? this.userPointer.reject(error) : this.userPointer.resolve()
     const expectation = this.botExpectations.shift()
     if (expectation && error) expectation.reject(error)
   }
