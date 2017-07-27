@@ -6,6 +6,7 @@ import Dispatcher from './dispatcher'
 import middleware from './middleware'
 
 import isMentioned from './helpers/is-mentioned'
+import interpolate from './helpers/interpolate'
 import { isPrivateChannel } from './helpers/channel-type'
 
 import { User, Message as APIMessage } from './types'
@@ -59,11 +60,8 @@ export class Slackbot extends Bot<Message, User> {
     else Slackbot.dispatcher.add(this.id, this)
   }
 
-  formatMessage(message: Message, object: any): Message {
-    if (_.isPlainObject(message)) return _.mapValues(message, v => this.formatMessage(v, object))
-    if (_.isArray(message)) return (message as any).map(v => this.formatMessage(v, object))
-    if (_.isString(message)) return _.template(message)(object)
-    return message
+  formatMessage(message: Message, object: object): Message {
+    return interpolate(message, object)
   }
 
   async sendMessage(chat: string, message: Message, options?: any) {
