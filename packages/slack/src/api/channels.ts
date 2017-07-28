@@ -1,4 +1,4 @@
-import { get, map, filter, find } from 'lodash/fp'
+import { get, map, filter, find, head } from 'lodash/fp'
 import { Channel } from '../types'
 import { APIModule } from './base'
 import { camel } from './converters'
@@ -19,5 +19,13 @@ export class Channels extends APIModule {
 
   invite(channel: string, user: string): Promise<Channel> {
     return this.request('invite', { channel, user }).then(get('channel')).then(camel)
+  }
+
+  history(channel: string, options) {
+    return this.request('history', { channel, ...options }).then(get('messages')).then(map(camel))
+  }
+
+  getMessage(channel: string, ts: string) {
+    return this.history(channel, {inclusive: true, count: 1, latest: ts}).then(head)
   }
 }
