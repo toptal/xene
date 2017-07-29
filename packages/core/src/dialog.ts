@@ -1,4 +1,4 @@
-import { Bot } from './bot'
+import { Bot as B } from './bot'
 import { Queue } from './queue'
 
 export type ErrorFunc<T> = (reply: string, parsed: T) => void
@@ -10,14 +10,19 @@ export type Parser<T> = ParseFunc<T> | ParserObject<T>
 const isNil = v => v == null
 const isFunction = (v): v is Function => typeof v === 'function'
 
-export class Dialog<B extends Bot<any, { id: string }>> {
+export class Dialog<
+  Bot extends B<any, { id: string }>,
+  BotMessage extends Bot['_']['Message']= Bot['_']['Message'],
+  User extends Bot['_']['User']= Bot['_']['User']
+  > {
+
   static isDefault = false
   static match(message: string): boolean { return false }
 
-  user: B['_']['User']
+  user: User
   queue: Queue = new Queue()
 
-  constructor(public bot: B, public chat: string) {
+  constructor(public bot: Bot, public chat: string) {
     this.ask = this.ask.bind(this)
     this.parse = this.parse.bind(this)
     this.message = this.message.bind(this)
@@ -31,19 +36,35 @@ export class Dialog<B extends Bot<any, { id: string }>> {
    * to this dialog, but run `match` on dialogs and try to find next suitable
    * dialog.
    */
-  async talk(): Promise<void> { throw new Error('Method talk is not defined') }
+  async talk(): Promise<any> {
+    throw new Error('Method talk is not defined')
+  }
 
-  onIncomingMessage(message: string): void | Promise<void> { /* implemented in a subclass */ }
-  onOutgoingMessage(message: B['_']['Message']): void | Promise<void> { /* implemented in a subclass */ }
-  onStart(): void | Promise<void> { /* implemented in a subclass */ }
-  onAbort(error?: any): void | Promise<void> { /* implemented in a subclass */ }
-  onEnd(): void | Promise<void> { /* implemented in a subclass */ }
+  onIncomingMessage(message: string): void | Promise<void> {
+    /* implemented in a subclass */
+  }
+
+  onOutgoingMessage(message: BotMessage): void | Promise<void> {
+    /* implemented in a subclass */
+  }
+
+  onStart(): void | Promise<void> {
+    /* implemented in a subclass */
+  }
+
+  onAbort(error?: any): void | Promise<void> {
+    /* implemented in a subclass */
+  }
+
+  onEnd(): void | Promise<void> {
+    /* implemented in a subclass */
+  }
 
   /**
    * Format and send message to user.
    * To learn more about formatting, check [[formatting spec]]
    */
-  message(message: B['_']['Message']) {
+  message(message: BotMessage) {
     const formatted = this.bot.formatMessage(message, this)
     this.onOutgoingMessage(formatted)
     return this.bot.sendMessage(this.chat, formatted)
@@ -53,11 +74,11 @@ export class Dialog<B extends Bot<any, { id: string }>> {
    * Queue parse for user messages
    */
   parse<T>(parserFunc: ParseFunc<T>): Promise<T>
-  parse<T>(parserFunc: ParseFunc<T>, errorMessage: B['_']['Message']): Promise<T>
+  parse<T>(parserFunc: ParseFunc<T>, errorMessage: BotMessage): Promise<T>
   parse<T>(parserFunc: ParseFunc<T>, errorCallback: ErrorFunc<T>): Promise<T>
-  parse<T>(parserObject: ParserObject<T>, errorMessage: B['_']['Message']): Promise<T>
+  parse<T>(parserObject: ParserObject<T>, errorMessage: BotMessage): Promise<T>
   parse<T>(parserObject: ParserObject<T>, errorCallback: ErrorFunc<T>): Promise<T>
-  parse<T>(parser: Parser<T>, error?: B['_']['Message'] | ErrorFunc<T>): Promise<T> {
+  parse<T>(parser: Parser<T>, error?: BotMessage | ErrorFunc<T>): Promise<T> {
     const onError = (!isNil(error) && !isFunction(error)) ? () => this.message(error) : error
     if (isFunction(parser)) parser = { parse: parser, check: parsed => !isNil(parsed) }
     return new Promise((resolve, reject) => this.queue.push({
@@ -67,20 +88,20 @@ export class Dialog<B extends Bot<any, { id: string }>> {
     }))
   }
 
-  ask<T>(message: B['_']['Message'], parserFunc: ParseFunc<T>): Promise<T>
-  ask<T>(message: B['_']['Message'], parserFunc: ParseFunc<T>, errorMessage: B['_']['Message']): Promise<T>
-  ask<T>(message: B['_']['Message'], parserFunc: ParseFunc<T>, errorCallback: ErrorFunc<T>): Promise<T>
-  ask<T>(message: B['_']['Message'], parserObject: ParserObject<T>): Promise<T>
-  ask<T>(message: B['_']['Message'], parserObject: ParserObject<T>, errorMessage: B['_']['Message']): Promise<T>
-  ask<T>(message: B['_']['Message'], parserObject: ParserObject<T>, errorCallback: ErrorFunc<T>): Promise<T>
-  async ask<T>(message: B['_']['Message'], parser: Parser<T>, error?: B['_']['Message'] | ErrorFunc<T>): Promise<T> {
+  ask<T>(message: BotMessage, parserFunc: ParseFunc<T>): Promise<T>
+  ask<T>(message: BotMessage, parserFunc: ParseFunc<T>, errorMessage: BotMessage): Promise<T>
+  ask<T>(message: BotMessage, parserFunc: ParseFunc<T>, errorCallback: ErrorFunc<T>): Promise<T>
+  ask<T>(message: BotMessage, parserObject: ParserObject<T>): Promise<T>
+  ask<T>(message: BotMessage, parserObject: ParserObject<T>, errorMessage: BotMessage): Promise<T>
+  ask<T>(message: BotMessage, parserObject: ParserObject<T>, errorCallback: ErrorFunc<T>): Promise<T>
+  async ask<T>(message: BotMessage, parser: Parser<T>, error?: BotMessage | ErrorFunc<T>): Promise<T> {
     await this.message(message)
     this.queue.resetMessage()
     if (!error) error = () => this.message(message)
     return this.parse<T>(parser as ParseFunc<T>, error)
   }
 
-  startDialog(dialog: typeof Dialog, options: { [key: string]: any } = {}) {
+  startDialog(dialog: typeof Dialog, options: object = {}) {
     return this.bot.startDialog({ dialog, chat: this.chat, user: this.user, options })
   }
 }
