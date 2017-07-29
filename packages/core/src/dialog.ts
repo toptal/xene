@@ -1,4 +1,5 @@
 import { Bot as B } from './bot'
+import { DialogFactory } from './types'
 import { Queue } from './queue'
 
 export type ErrorFunc<T> = (reply: string, parsed: T) => void
@@ -88,7 +89,7 @@ export class Dialog<
    * `onAbort()` is called when conversation is aborted via
    * [`Bot#stopDialog()`] method call or when error occures in `talk()`
    * method. In second case `onAbort()` will be called with the error.
-   * @param {any} error Optional error object
+   * @param {any} error optional error object
    */
   onAbort(error?: any): void {
     /* implemented in a subclass */
@@ -167,7 +168,7 @@ export class Dialog<
     return this.parse<T>(parser as ParseFunc<T>, error)
   }
 
-  startDialog(dialog: typeof Dialog, properties?: object) {
+  startDialog(dialog: DialogFactory<Bot>, properties?: object) {
     return this.bot.startDialog({ dialog, chat: this.chat, user: this.user, properties })
   }
 }
