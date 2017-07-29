@@ -13,6 +13,7 @@ export abstract class Bot<Message, User extends BaseUser> {
     Message: Message
     UserMessage: UserMessage<User>
   }
+
   private chats: Map<string, Chat<this>> = new Map()
   private dialogs: typeof Dialog[] = []
   private commands: typeof Command[] = []
@@ -45,13 +46,8 @@ export abstract class Bot<Message, User extends BaseUser> {
     return this.commands.find(c => c.match(message))
   }
 
-  startDialog(options: {
-    dialog: typeof Dialog,
-    chat: string,
-    user: User,
-    options?: { [key: string]: any }
-  }) {
-    this.getChat(options.chat).startDialog(options.dialog, options.user, options.options || {})
+  startDialog(options: { dialog: typeof Dialog, chat: string, user: User, properties?: object }) {
+    this.getChat(options.chat).startDialog(options.dialog, options.user, options.properties)
   }
 
   stopDialog(chat: string, user: string) {

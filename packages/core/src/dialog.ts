@@ -101,7 +101,7 @@ export class Dialog<
     return this.parse<T>(parser as ParseFunc<T>, error)
   }
 
-  startDialog(dialog: typeof Dialog, options: object = {}) {
-    return this.bot.startDialog({ dialog, chat: this.chat, user: this.user, options })
+  startDialog(dialog: typeof Dialog, properties?: object) {
+    return this.bot.startDialog({ dialog, chat: this.chat, user: this.user, properties })
   }
 }
