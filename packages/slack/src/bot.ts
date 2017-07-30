@@ -1,6 +1,6 @@
 import * as uuid from 'uuid'
 import * as _ from 'lodash'
-import { Bot, Dialog, Command } from '@xene/core'
+import { Bot, DialogFactory, CommandFactory } from '@xene/core'
 
 import Dispatcher from './dispatcher'
 import middleware from './middleware'
@@ -9,12 +9,10 @@ import isMentioned from './helpers/is-mentioned'
 import interpolate from './helpers/interpolate'
 import { isPrivateChannel } from './helpers/channel-type'
 
-import { User, Message as APIMessage } from './types'
-export type Message = string | APIMessage
-
+import { User, Message } from './types'
 import { Auth, RTM, Chat, Users, Groups, Channels } from './api'
 
-export class Slackbot extends Bot<Message, User> {
+export class Slackbot extends Bot<string | Message, User> {
   // Default dispatcher, used when user didn't provide
   // custom dispatcher. This is moslty used when user has
   // one type of bot, which is a common case
@@ -37,8 +35,8 @@ export class Slackbot extends Bot<Message, User> {
     id?: string,
     botToken: string,
     appToken?: string,
-    dialogs: (typeof Dialog)[],
-    commands?: (typeof Command)[],
+    dialogs: DialogFactory<Slackbot>[],
+    commands?: CommandFactory<Slackbot>[],
     dispatcher?: Dispatcher
   }) {
     super(options)
@@ -60,11 +58,11 @@ export class Slackbot extends Bot<Message, User> {
     else Slackbot.dispatcher.add(this.id, this)
   }
 
-  formatMessage(message: Message, object: object): Message {
+  formatMessage(message: string | Message, object: object) {
     return interpolate(message, object)
   }
 
-  async sendMessage(chat: string, message: Message, options?: any) {
+  async sendMessage(chat: string, message: string | Message, options?: any) {
     const init = { text: '', attachments: [] }
     message = _.isString(message) ? { ...init, text: message } : { ...init, ...message }
     message.attachments.forEach(a => a.callbackId = a.callbackId || this.id)

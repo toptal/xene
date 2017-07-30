@@ -2,12 +2,12 @@
 // await tester.userSays('Some message')
 // await tester.botSays('Some message')
 // tester.on('Some message').says('')
-import { Bot, Dialog } from '@xene/core'
+import { Bot, DialogFactory, BotFactory } from '@xene/core'
 import { isEqual } from 'lodash'
 
-const testbot = (dialog: typeof Dialog, bot: typeof Bot, tester ) => {
-  class Testbot extends bot<any, any>{
-    constructor(dialog: typeof Dialog, private tester: Tester) {
+const testbot = (dialog: DialogFactory<Bot>, bot: BotFactory, tester) => {
+  class Testbot extends bot {
+    constructor(dialog: DialogFactory<Bot>, private tester: Tester) {
       super({ dialogs: [dialog] })
     }
 
@@ -49,7 +49,7 @@ export class Tester {
   user: { says: (message: string) => Promise<void> }
   bot: { says: (message: any) => Promise<void> }
 
-  constructor(dialogClass: typeof Dialog, bot: typeof Bot, private dialogUser: any) {
+  constructor(dialogClass: DialogFactory<Bot>, bot: BotFactory, private dialogUser: any) {
     const dialog = this.bind(dialogClass)
     this.testbot = testbot(dialog as any, bot, this)
     this.user = { says: this.userSays.bind(this) }
@@ -88,16 +88,16 @@ export class Tester {
     this.testbot.onMessage({ id: '', text, user: this.dialogUser, chat: '' })
   }
 
-  private bind(dialogClass: typeof Dialog) {
+  private bind(dialogClass: DialogFactory<Bot>) {
     const onEnd = this.onEnd.bind(this)
     const originalOnEnd = dialogClass.prototype.onEnd
     const originalOnAbort = dialogClass.prototype.onAbort
-    dialogClass.prototype.onEnd = function() { originalOnEnd.call(this); onEnd() }
-    dialogClass.prototype.onAbort = function(e) { originalOnAbort.call(this, e); onEnd(e) }
+    dialogClass.prototype.onEnd = function () { originalOnEnd.call(this); onEnd() }
+    dialogClass.prototype.onAbort = function (e) { originalOnAbort.call(this, e); onEnd(e) }
     return dialogClass
   }
 }
 
-export default function dialog(dialogClass: typeof Dialog, bot: typeof Bot, user: any) {
-  return new Tester(dialogClass, bot, user)
+export default function dialog(dialog: DialogFactory<Bot>, bot: BotFactory, user: any) {
+  return new Tester(dialog, bot, user)
 }

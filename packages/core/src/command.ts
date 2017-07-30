@@ -1,14 +1,19 @@
-import { Bot } from './bot'
+import { Bot as B } from './bot'
 
-export class Command<B extends Bot<any, { id: string }>> {
+export class Command<
+  Bot extends B,
+  BotMessage extends Bot['_']['Message']= Bot['_']['Message'],
+  User extends Bot['_']['User']= Bot['_']['User']
+  > {
+
   static match(message: string): boolean { return false }
-  user: B['_']['User']
+  user: User
 
-  constructor(public bot: B, public chat: string) {
+  constructor(public bot: Bot, public chat: string) {
     this.message = this.message.bind(this)
   }
 
-  message(message: B['_']['Message']) {
+  message(message: BotMessage) {
     const formatted = this.bot.formatMessage(message, this)
     return this.bot.sendMessage(this.chat, formatted)
   }
