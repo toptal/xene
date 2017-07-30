@@ -18,10 +18,6 @@ export class Command<
     return this.bot.sendMessage(this.chat, formatted)
   }
 
-  stopDialog() {
-    this.bot.stopDialog(this.chat, this.user.id)
-  }
-
   perform(): Promise<void> | void {
     throw new Error('Method perform is not defined')
   }

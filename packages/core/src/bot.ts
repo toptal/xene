@@ -50,8 +50,8 @@ export abstract class Bot<
     this.getChat(options.chat).startDialog(options.dialog, options.user, options.properties)
   }
 
-  stopDialog(chat: string, user: string) {
-    this.getChat(chat).stopDialog(user)
+  stopDialog(chat: string, user: User) {
+    this.getChat(chat).stopDialog(user.id)
   }
 
   abstract sendMessage(chat: string, message: Message): Promise<any>
