@@ -2,11 +2,11 @@
 // await tester.userSays('Some message')
 // await tester.botSays('Some message')
 // tester.on('Some message').says('')
-import { Bot, DialogFactory } from '@xene/core'
+import { Bot, DialogFactory, BotFactory } from '@xene/core'
 import { isEqual } from 'lodash'
 
-const testbot = (dialog: DialogFactory<Bot>, bot: typeof Bot, tester) => {
-  class Testbot extends bot<any, any>{
+const testbot = (dialog: DialogFactory<Bot>, bot: BotFactory, tester) => {
+  class Testbot extends bot {
     constructor(dialog: DialogFactory<Bot>, private tester: Tester) {
       super({ dialogs: [dialog] })
     }
@@ -49,7 +49,7 @@ export class Tester {
   user: { says: (message: string) => Promise<void> }
   bot: { says: (message: any) => Promise<void> }
 
-  constructor(dialogClass: DialogFactory<Bot>, bot: typeof Bot, private dialogUser: any) {
+  constructor(dialogClass: DialogFactory<Bot>, bot: BotFactory, private dialogUser: any) {
     const dialog = this.bind(dialogClass)
     this.testbot = testbot(dialog as any, bot, this)
     this.user = { says: this.userSays.bind(this) }
@@ -98,6 +98,6 @@ export class Tester {
   }
 }
 
-export default function dialog(dialogClass: DialogFactory<Bot>, bot: typeof Bot, user: any) {
-  return new Tester(dialogClass, bot, user)
+export default function dialog(dialog: DialogFactory<Bot>, bot: BotFactory, user: any) {
+  return new Tester(dialog, bot, user)
 }

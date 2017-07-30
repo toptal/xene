@@ -18,3 +18,7 @@ export interface DialogFactory<B extends Bot> extends Statics<typeof Dialog> {
 export interface CommandFactory<B extends Bot> extends Statics<typeof Command> {
   new(bot: B, chat: string): Command<B>
 }
+
+export interface BotFactory<B extends Bot = Bot> extends Statics<typeof Bot> {
+  new(...args: any[]): B
+}
