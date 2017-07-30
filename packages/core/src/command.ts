@@ -1,7 +1,7 @@
 import { Bot as B } from './bot'
 
 export class Command<
-  Bot extends B<any, { id: string }>,
+  Bot extends B,
   BotMessage extends Bot['_']['Message']= Bot['_']['Message'],
   User extends Bot['_']['User']= Bot['_']['User']
   > {

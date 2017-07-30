@@ -1,24 +1,20 @@
-import { Bot as B } from './bot'
+import { Bot } from './bot'
 import { Dialog } from './dialog'
-import * as Types from './types'
+import { UserMessage, BaseUser, DialogFactory } from './types'
 
-export class Chat<
-  Bot extends B<any, Types.BaseUser>,
-  User extends Types.BaseUser = Bot['_']['User'],
-  UserMessage extends Types.UserMessage<User> = Types.UserMessage<User>
-  > {
+export class Chat {
 
   private dialogs: Map<string, Dialog<Bot>> = new Map()
 
   constructor(public id: string, public bot: Bot) { }
 
-  processMessage(message: UserMessage) {
+  processMessage(message: UserMessage<BaseUser>) {
     const dialog = this.dialogs.get(message.user.id)
     if (!dialog) return this.startFromMessage(message)
     this.forwardMessageToDialog(dialog, message.text)
   }
 
-  startDialog(DialogClass: typeof Dialog, user: User, properties?: object) {
+  startDialog(DialogClass: DialogFactory<Bot>, user: BaseUser, properties?: object) {
     const dialog = this.instantiateDialog(DialogClass, user, properties)
     dialog.onStart()
     this.runDialog(dialog)
@@ -32,7 +28,7 @@ export class Chat<
     this.dialogs.delete(userId)
   }
 
-  private startFromMessage({ user, text }: UserMessage) {
+  private startFromMessage({ user, text }: UserMessage<BaseUser>) {
     const DialogClass = this.bot.matchDialog(text)
     if (!DialogClass) return
     const dialog = this.instantiateDialog(DialogClass, user)
@@ -53,7 +49,7 @@ export class Chat<
       .then(this.removeDialog.bind(this, dialog))
   }
 
-  private instantiateDialog(DialogClass: typeof Dialog, user: User, properties: object = {}) {
+  private instantiateDialog(DialogClass: DialogFactory<Bot>, user: BaseUser, properties: object = {}) {
     const dialog = new DialogClass(this.bot, this.id)
     this.dialogs.set(user.id, dialog)
     Object.assign(dialog, { user, ...properties })
