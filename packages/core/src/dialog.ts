@@ -22,6 +22,6 @@ export class Dialog<
   ask = <T>(message: BotMessage, parser: ParseType<T>, onError?: BotMessage | ((reply: string) => any)) => {
     const parserObj = new Parser(parser)
     const errorHandler = (onError != null && typeof onError !== 'function') ? () => this.say(onError) : onError
-    return this.bot.ask<T>(this.chat, this.users, message, parserObj, errorHandler)
+    return this.bot.ask<T>(this.chat, this.users, message, parserObj, errorHandler as (reply: string) => any)
   }
 }

@@ -1,3 +1,3 @@
-export { Slackbot } from './bot'
+export { Slackbot } from './Slackbot'
 export { default as interpolate } from './helpers/interpolate'
 export * from './types'

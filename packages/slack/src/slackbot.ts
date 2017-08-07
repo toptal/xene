@@ -1,6 +1,6 @@
 import * as uuid from 'uuid'
 import * as _ from 'lodash'
-import { Bot, DialogFactory, CommandFactory } from '@xene/core'
+import { Bot } from '@xene/core'
 
 import Dispatcher from './dispatcher'
 import middleware from './middleware'
@@ -12,9 +12,9 @@ import { isPrivateChannel } from './helpers/channel-type'
 import { User, Message } from './types'
 import { Auth, RTM, Chat, Users, Groups, Channels } from './api'
 
-export class Slackbot extends Bot<string | Message, User> {
+export class Slackbot extends Bot<string | Message> {
   // Default dispatcher, used when user didn't provide
-  // custom dispatcher. This is moslty used when user has
+  // custom dispatcher. This is mostly used when user has
   // one type of bot, which is a common case
   static dispatcher = new Dispatcher()
   static middleware = middleware
@@ -35,18 +35,13 @@ export class Slackbot extends Bot<string | Message, User> {
     id?: string,
     botToken: string,
     appToken?: string,
-    dialogs: DialogFactory<Slackbot>[],
-    commands?: CommandFactory<Slackbot>[],
     dispatcher?: Dispatcher
   }) {
-    super(options)
+    super()
     this.id = options.id || uuid.v4()
 
     this.chat = new Chat(options.botToken)
     this.rtm = new RTM(options.botToken)
-    this.rtm.on('message', this.onRtmMessage.bind(this))
-    this.rtm.connect().then(i => this.bot = i.self)
-
     // Some of these API scopes' methods require additional
     // scopes which are defined only for apps and app tokens respectively
     this.auth = new Auth(options.appToken || options.botToken)
@@ -58,15 +53,27 @@ export class Slackbot extends Bot<string | Message, User> {
     else Slackbot.dispatcher.add(this.id, this)
   }
 
-  formatMessage(message: string | Message, object: object) {
-    return interpolate(message, object)
-  }
-
-  async sendMessage(chat: string, message: string | Message, options?: any) {
+  async say(chat: string, message: string | Message) {
     const init = { text: '', attachments: [] }
     message = _.isString(message) ? { ...init, text: message } : { ...init, ...message }
     message.attachments.forEach(a => a.callbackId = a.callbackId || this.id)
     return this.chat.postMessage(chat, message)
+  }
+
+  listen() {
+    this.rtm.on('message', this.onRtmMessage.bind(this))
+    this.rtm.connect().then(i => this.bot = i.self)
+    return this
+  }
+
+  // Process new incoming RTM messages
+  private onRtmMessage(payload: { ts: string, text: string, user: string, channel: string }) {
+    const { user, ts, text, channel } = payload
+    if (this.bot.id === user) return
+    const isBotMentioned = isMentioned(this.bot.id, text)
+    const isPrivate = isPrivateChannel(channel)
+    if (!isPrivate && !isBotMentioned) return
+    this.onMessage({ id: ts, text, user, chat: channel })
   }
 
   // Process incoming interactive messages
@@ -81,12 +88,12 @@ export class Slackbot extends Bot<string | Message, User> {
       id: payload.ts,
       text: selected.value,
       chat: payload.channel.id,
-      user: await this.users.info(payload.user.id)
+      user: payload.user.id
     })
     return { text, attachments }
   }
 
-  markActionSelected(action, attachment) {
+  private markActionSelected(action, attachment) {
     const selectedReplacer = ':white_check_mark: ' + action.text
     if (_.find(attachment.actions, ['value', action.value])) {
       const title = attachment.title
@@ -94,21 +101,5 @@ export class Slackbot extends Bot<string | Message, User> {
       attachment.title = title ? (title + '\n' + selectedReplacer) : selectedReplacer
     }
     return attachment
-  }
-
-  // Process new incoming RTM messages
-  private async onRtmMessage(payload: { ts: string, text: string, user: string, channel: string }) {
-    if (this.bot.id === payload.user) return
-
-    const isBotMentioned = isMentioned(this.bot.id, payload.text)
-    const isPrivate = isPrivateChannel(payload.channel)
-    if (!isPrivate && !isBotMentioned) return
-
-    this.onMessage({
-      id: payload.ts,
-      text: payload.text,
-      user: await this.users.info(payload.user),
-      chat: payload.channel
-    })
   }
 }

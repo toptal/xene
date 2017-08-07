@@ -4,6 +4,11 @@ import { ChatQueue } from './queue'
 import { Question } from './question'
 import { UserMessage, Register } from './types'
 
+export type WhenRegister<T extends Bot> = {
+  dialog: (handler: (dialog: Dialog<T>) => any) => T
+  command: (handler: (bot: T) => any) => T
+}
+
 export abstract class Bot<BotMessage = any> {
 
   _: { BotMessage: BotMessage }
@@ -27,10 +32,10 @@ export abstract class Bot<BotMessage = any> {
     return question.promise
   }
 
-  when(match: (message: string) => boolean) {
+  when(match: (message: string) => boolean): WhenRegister<this> {
     return {
-      dialog: this.register<(dialog: Dialog<this>) => any>(match, '_dialogs'),
-      command: this.register<(bot: this) => any>(match, '_commands')
+      dialog: this.register(match, '_dialogs'),
+      command: this.register(match, '_commands')
     }
   }
 
@@ -53,7 +58,7 @@ export abstract class Bot<BotMessage = any> {
     return queue
   }
 
-  private register = <T>(match, type) => (handler: T) => {
+  private register = (match, type) => handler => {
     this[type].push({ match, handler })
     return this
   }
