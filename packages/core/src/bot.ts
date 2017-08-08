@@ -1,65 +1,49 @@
+import { Chat } from './chat'
+import { Binder } from './binder'
 import { Parser } from './parser'
 import { Dialog } from './dialog'
-import { ChatQueue } from './queue'
 import { Question } from './question'
 import { UserMessage, Register } from './types'
 
-export type WhenRegister<T extends Bot> = {
-  dialog: (handler: (dialog: Dialog<T>) => any) => T
-  command: (handler: (bot: T) => any) => T
-}
-
 export abstract class Bot<BotMessage = any> {
+  protected _: { BotMessage: BotMessage }
+  private _chats = new Map<string, Chat>()
 
-  _: { BotMessage: BotMessage }
-
-  private _chats = new Map<string, ChatQueue>()
-  private _dialogs: Register<Dialog<this>>[] = []
-  private _commands: Register<this>[] = []
+  /** @internal */ _dialogs: Register<Dialog<this>>[] = []
+  /** @internal */ _performers: Register<this>[] = []
 
   abstract listen(arg?: any): this
   abstract say(chat: string, message: BotMessage): Promise<any>
 
-  ask<T>(
-    chat: string,
-    users: string[],
-    message: BotMessage,
-    parser: Parser<T>,
-    onError?: (reply: string) => any
-  ): Promise<T> {
-    const question = new Question<T>(this, chat, message, parser, onError)
-    this.chatFor(chat).add(question, users)
-    return question.promise
-  }
+  when = Binder.for(this)
 
-  when(match: (message: string) => boolean): WhenRegister<this> {
-    return {
-      dialog: this.register(match, '_dialogs'),
-      command: this.register(match, '_commands')
-    }
-  }
+  // ask<T>(
+  //   chat: string,
+  //   users: string[],
+  //   message: BotMessage,
+  //   parser: Parser<T>,
+  //   onError?: (reply: string) => any
+  // ): Promise<T> {
+  //   const question = new Question<T>(this, chat, message, parser, onError)
+  //   this.chatFor(chat).add(question, users)
+  //   return question.promise
+  // }
 
-  protected onMessage(message: UserMessage): void {
-    const command = this._commands.find(c => c.match(message.text))
-    if (command) return command.handler(this)
+  protected onMessage(message: UserMessage): any {
+    const performer = this._performers.find(c => c.match(message.text))
+    if (performer) return performer.handler(this)
 
     const chat = this.chatFor(message.chat)
-    if (!chat.queueFor(message.user).isEmpty) {
-      chat.processMessage(message)
-    }
+    const hasActions = !chat.hasFor(message.user)
+    if (hasActions) return chat.processMessage(message)
 
     const dialog = this._dialogs.find(c => c.match(message.text))
     if (dialog) dialog.handler(new Dialog(this, message.chat, [message.user]))
   }
 
-  private chatFor(chat: string) {
-    const queue = this._chats.get(chat) || new ChatQueue()
-    this._chats.set(chat, queue)
-    return queue
-  }
-
-  private register = (match, type) => handler => {
-    this[type].push({ match, handler })
-    return this
+  private chatFor(chatId: string) {
+    const chat = this._chats.get(chatId) || new Chat()
+    this._chats.set(chatId, chat)
+    return chat
   }
 }
