@@ -1,8 +1,6 @@
 import { Chat } from './chat'
 import { Binder } from './binder'
-import { Parser } from './parser'
 import { Dialog } from './dialog'
-import { Question } from './question'
 import { UserMessage, Register } from './types'
 
 export abstract class Bot<BotMessage = any> {

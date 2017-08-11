@@ -1,24 +1,35 @@
-import { UserMessage, ParseType, ParseFun } from './types'
+import { Resolvable } from './resolvable'
+import { UserMessage, ParseType } from './types'
 
 export class Parser<T = any> {
-  private _parse: (reply: string) => T
-  private _isValid: (parsed: T) => boolean
+  protected _resolvable = new Resolvable<T>()
+  protected _parse: (reply: string) => T
+  protected _isValid(parsed: T) { return parsed != null }
 
-  constructor(parser: ParseType<T>) {
+  constructor(
+    parser: ParseType<T>,
+    protected _onError?: (reply: any) => any
+  ) {
     if (typeof parser !== 'function') {
-      this._isValid = parser.isValid
       this._parse = parser.parse
-    } else {
-      this._isValid = v => v != null
-      this._parse = parser
-    }
+      this._isValid = parser.isValid
+    } else this._parse = parser
   }
 
-  parse(message: UserMessage): T {
-    return this._parse(message.text)
+  tryToParse(message: UserMessage): boolean {
+    const parsed = this._parse(message.text)
+    const isValid = this._isValid(parsed)
+    if (isValid) this._resolvable.resolve(parsed)
+    else if (this.hasOnError) this._onError(message)
+    else this._resolvable.resolve(parsed)
+    return isValid ? true : !this.hasOnError
   }
 
-  isValid(parsed: T): boolean {
-    return this._isValid(parsed)
+  get hasOnError() {
+    return Boolean(this._onError)
+  }
+
+  get promise() {
+    return this._resolvable.promise
   }
 }

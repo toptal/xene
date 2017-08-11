@@ -1,39 +1,22 @@
-import { Bot } from './bot'
 import { Parser } from './parser'
-import { UserMessage } from './types'
-import { Resolvable } from './resolvable'
+import { ParseType, UserMessage } from './types'
 
-export class Question<T = any>{
-  private _isSend = false
-  private _resolvable = new Resolvable<T>()
-
+export class Question<T = any> extends Parser<T> {
   constructor(
-    private _bot: Bot,
-    private _chat: string,
-    private _message: any,
-    private _parser: Parser<T>,
-    private _onError?: (reply: any) => any
-  ) { }
-
-  get isSend() { return this._isSend }
-  get promise() { return this._resolvable.promise }
+    private _ask: () => any,
+    parser: ParseType<T>,
+    onError?: (reply: any) => any
+  ) { super(parser, onError || _ask) }
 
   ask() {
-    if (this._isSend) return
-    this._isSend = true
-    this._bot.say(this._chat, this._message)
+    this._ask()
   }
 
   tryToParse(message: UserMessage): boolean {
-    const parsed = this._parser.parse(message)
-    const isValid = this._parser.isValid(parsed)
+    const parsed = this._parse(message.text)
+    const isValid = this._isValid(parsed)
     if (isValid) this._resolvable.resolve(parsed)
-    else this.onError(message)
+    else this._onError(message)
     return isValid
-  }
-
-  private onError(message: UserMessage) {
-    if (this._onError) return this._onError(message)
-    return this._bot.say(this._chat, this._message)
   }
 }
