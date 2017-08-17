@@ -4,6 +4,12 @@ import { Manager } from './manager'
 import { Question } from './question'
 import { ParseType } from './types'
 
+const isMessage = <T>(arg): arg is object =>
+  arg != null && typeof arg !== 'function'
+
+const errorHandler = (say, arg): ((reply: string) => any) =>
+  isMessage(arg) ? () => say(arg) : arg
+
 export class Dialog<
   Bot extends B,
   BotMessage extends Bot['_']['BotMessage']= Bot['_']['BotMessage']> {
@@ -11,11 +17,11 @@ export class Dialog<
   bot: Bot
   chat: string
   users: string[]
-
-  /** @internal */ _manager = new Manager(this.users)
+  /** @internal */ _manager: Manager
 
   constructor(bot: Bot, chat: string, users: string[]) {
     this.bot = bot, this.chat = chat, this.users = users
+    this._manager = new Manager(bot, chat, users)
   }
 
   say = (message: BotMessage) => {
@@ -23,15 +29,14 @@ export class Dialog<
   }
 
   parse = <T>(parser: ParseType<T>, onError?: BotMessage | ((reply: string) => any)): Promise<T> => {
-    const errorHandler = (onError != null && typeof onError !== 'function') ? () => this.say(onError) : onError
-    const parserObj = new Parser(parser, errorHandler)
+    const parserObj = new Parser(parser, errorHandler(this.say, onError))
     this._manager.push(parserObj)
     return parserObj.promise
   }
 
   ask = <T>(message: BotMessage, parser: ParseType<T>, onError?: BotMessage | ((reply: string) => any)) => {
-    const errorHandler = (onError != null && typeof onError !== 'function') ? () => this.say(onError) : onError
-    const question = new Question(message, parser, onError)
+    const sayMessage = () => this.say(message)
+    const question = new Question(sayMessage, parser, errorHandler(this.say, onError))
     this._manager.push(question)
     return question.promise
   }

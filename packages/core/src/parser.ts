@@ -25,6 +25,14 @@ export class Parser<T = any> {
     return isValid ? true : !this.hasOnError
   }
 
+  justParse(message: UserMessage): boolean {
+    const parsed = this._parse(message.text)
+    const isValid = this._isValid(parsed)
+    if (isValid || !this.hasOnError)
+      this._resolvable.resolve(parsed)
+    return isValid ? true : !this.hasOnError
+  }
+
   get hasOnError() {
     return Boolean(this._onError)
   }

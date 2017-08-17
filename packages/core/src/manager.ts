@@ -1,22 +1,53 @@
+import { Bot } from './bot'
 import { Action } from './chat'
 import { Parser } from './parser'
 import { Question } from './question'
 import { UserMessage } from './types'
 
-const isQuestion = (a): a is Question => a instanceof Question
+const isQuestion = (q): q is Question =>
+  q instanceof Question
 
 export class Manager implements Action {
   private _queue: (Parser | Question)[] = []
   private _messages: UserMessage[] = []
 
-  constructor(public users: string[]) { }
+  constructor(
+    private _bot: Bot,
+    private _chatId: string,
+    public users: string[]
+  ) { }
 
+  /**
+   * For questions call to ask is required and so it
+   * should be just added to the end of queue until
+   * previous question/parsers finish.
+   *
+   * For Parser there no need to prepare it
+   * and it's possible just to parse last message
+   * since it may contain info parser tries to get
+   * (unlike questions, which need to ask question
+   * before parsing). So call to parse here will do
+   * almost the same thing as in perform but without
+   * triggering error hander of parser to not mess
+   * up with queue. If it fails then same flow applied
+   * as for question e.g. add to queue.
+   */
   push(action: Parser | Question) {
+    if (isQuestion(action)) {
+      this._queue.push(action)
+      return this._chat.add(this)
+    }
+
+    const index = this._messages.length - 1
+    const isParsed = action.justParse(this._messages[index])
+    if (isParsed) return
     this._queue.push(action)
+    this._chat.add(this)
   }
 
   prepare() {
-    if (isQuestion(this._head)) this._head.ask()
+    if (isQuestion(this._head))
+      this._head.ask()
   }
 
   async perform(message: UserMessage) {
@@ -29,6 +60,8 @@ export class Manager implements Action {
     else return this.perform(message)
   }
 
+
+  private get _chat() { return this._bot._chatFor(this._chatId) }
   private get _isEmpty() { return this._queue.length === 0 }
   private get _head() { return this._queue[0] }
 }
