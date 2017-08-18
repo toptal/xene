@@ -1,45 +1,41 @@
 import { UserMessage } from './types'
 
-export type Action = {
+export interface IManager {
   perform(msg: UserMessage): Promise<boolean>
   prepare(): any
   users: string[]
 }
 
 export class Chat {
-  private actions = new Set<Action>()
+  private managers = new Set<IManager>()
 
-  add(action: Action) {
-    const canPrepare = action.users.some(u => !this.hasFor(u))
-    this.actions.add(action)
-    if (canPrepare) action.prepare()
-  }
-
-  prepend(action: Action) {
-    this.actions = new Set([action, ...this.actions])
+  add(manager: IManager) {
+    const canPrepare = manager.users.some(u => !this.hasFor(u))
+    this.managers.add(manager)
+    if (canPrepare) manager.prepare()
   }
 
   async processMessage(message: UserMessage) {
-    const action = this.headFor(message.user)
-    const canContinue = action && await action.perform(message)
-    if (canContinue) this.prepareNext(action)
+    const manager = this.headFor(message.user)
+    const canContinue = manager && await manager.perform(message)
+    if (canContinue) this.prepareNext(manager)
   }
 
   hasFor(user: string) {
-    for (const { users } of this.actions)
+    for (const { users } of this.managers)
       if (users.includes(user)) return true
     return false
   }
 
-  private prepareNext(action: Action) {
-    const users = action.users.reduce((acc, u) =>
-      this.headFor(u) === action ? acc.concat(u) : acc, [])
-    this.actions.delete(action)
+  private prepareNext(manager: IManager) {
+    const users = manager.users.reduce((acc, u) =>
+      this.headFor(u) === manager ? acc.concat(u) : acc, [])
+    this.managers.delete(manager)
     users.forEach(u => this.hasFor(u) ? this.headFor(u).prepare() : null)
   }
 
   private headFor(user: string) {
-    for (const action of this.actions)
-      if (action.users.includes(user)) return action
+    for (const manager of this.managers)
+      if (manager.users.includes(user)) return manager
   }
 }

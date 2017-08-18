@@ -16,24 +16,20 @@ export class Parser<T = any> {
     } else this._parse = parser
   }
 
-  tryToParse(message: UserMessage): boolean {
-    const parsed = this._parse(message.text)
-    const isValid = this._isValid(parsed)
-    if (isValid) this._resolvable.resolve(parsed)
-    else if (this.hasOnError) this._onError(message)
-    else this._resolvable.resolve(parsed)
-    return isValid ? true : !this.hasOnError
+  error(message: UserMessage) {
+    if (this.hasErrorHandler)
+      this._onError(message)
   }
 
-  justParse(message: UserMessage): boolean {
+  parse(message: UserMessage): boolean {
     const parsed = this._parse(message.text)
     const isValid = this._isValid(parsed)
-    if (isValid || !this.hasOnError)
+    if (isValid || !this.hasErrorHandler)
       this._resolvable.resolve(parsed)
-    return isValid ? true : !this.hasOnError
+    return isValid ? true : !this.hasErrorHandler
   }
 
-  get hasOnError() {
+  get hasErrorHandler() {
     return Boolean(this._onError)
   }
 

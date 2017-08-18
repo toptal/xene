@@ -44,6 +44,10 @@ export abstract class Bot<BotMessage = any> {
     if (hasActions) return chat.processMessage(message)
 
     const dialog = this._dialogs.find(c => c.match(message))
-    if (dialog) dialog.handler(new Dialog(this, message.chat, [message.user]))
+    if (dialog) {
+      const obj = new Dialog(this, message.chat, [message.user])
+      obj._manager.perform(message)
+      dialog.handler(obj)
+    }
   }
 }

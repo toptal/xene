@@ -1,5 +1,5 @@
 import { Bot } from './bot'
-import { Action } from './chat'
+import { IManager } from './chat'
 import { Parser } from './parser'
 import { Question } from './question'
 import { UserMessage } from './types'
@@ -7,7 +7,7 @@ import { UserMessage } from './types'
 const isQuestion = (q): q is Question =>
   q instanceof Question
 
-export class Manager implements Action {
+export class Manager implements IManager {
   private _queue: (Parser | Question)[] = []
   private _messages: UserMessage[] = []
 
@@ -38,29 +38,31 @@ export class Manager implements Action {
       return this._chat.add(this)
     }
 
-    const index = this._messages.length - 1
-    const isParsed = action.justParse(this._messages[index])
-    if (isParsed) return
+    if (action.parse(this._lastMessage)) return
     this._queue.push(action)
     this._chat.add(this)
   }
 
   prepare() {
-    if (isQuestion(this._head))
-      this._head.ask()
+    if (isQuestion(this._head)) this._head.ask()
+    else this._head.error(this._lastMessage)
   }
 
-  async perform(message: UserMessage) {
+  perform(message: UserMessage) {
     this._messages.push(message)
     if (this._isEmpty) return true
-    const wasParsed = this._head.tryToParse(message)
-    if (!wasParsed) return false
+    const wasParsed = this._head.parse(message)
+    if (!wasParsed) {
+      this._head.error(message)
+      return false
+    }
     this._queue.shift()
     if (isQuestion(this._head)) return true
     else return this.perform(message)
   }
 
 
+  private get _lastMessage() { return this._messages[this._messages.length - 1] }
   private get _chat() { return this._bot._chatFor(this._chatId) }
   private get _isEmpty() { return this._queue.length === 0 }
   private get _head() { return this._queue[0] }
