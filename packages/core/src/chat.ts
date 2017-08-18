@@ -1,9 +1,9 @@
 import { UserMessage } from './types'
 
 export interface IManager {
-  perform(msg: UserMessage): Promise<boolean>
-  prepare(): any
   users: string[]
+  prepare(): any
+  perform(msg: UserMessage): Promise<boolean>
 }
 
 export class Chat {

@@ -21,12 +21,12 @@ const normalizeMatcher = (matcher: AnyMatcher): Matcher => {
   else throw new Error(`Don't know how to match messages with ${matcher}.`)
 }
 
-export class Binder<B extends Bot>{
-  constructor(private _bot: B, private _matcher: AnyMatcher) { }
-
+export class Binder<B extends Bot> {
   static for<T extends Bot>(bot: T) {
     return (matcher: AnyMatcher) => new Binder<T>(bot, matcher)
   }
+
+  constructor(private _bot: B, private _matcher: AnyMatcher) { }
 
   say(message: B['_']['BotMessage']) {
     const match = normalizeMatcher(this._matcher)

@@ -4,7 +4,6 @@ import { UserMessage, ParseType } from './types'
 export class Parser<T = any> {
   protected _resolvable = new Resolvable<T>()
   protected _parse: (reply: string) => T
-  protected _isValid(parsed: T) { return parsed != null }
 
   constructor(
     parser: ParseType<T>,
@@ -35,5 +34,9 @@ export class Parser<T = any> {
 
   get promise() {
     return this._resolvable.promise
+  }
+
+  protected _isValid(parsed: T) {
+    return parsed != null
   }
 }

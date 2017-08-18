@@ -14,18 +14,21 @@ type PerformerHandler<T> = Matcher & {
 }
 
 export abstract class Bot<BotMessage = any> {
+  /** @internal */
+  _dialogs: DialogHandler<this>[] = []
+  /** @internal */
+  _performers: PerformerHandler<this>[] = []
+
+  when = Binder.for(this)
+
   protected _: { BotMessage: BotMessage }
   private _chats = new Map<string, Chat>()
-
-  /** @internal */ _dialogs: DialogHandler<this>[] = []
-  /** @internal */ _performers: PerformerHandler<this>[] = []
 
   abstract listen(arg?: any): this
   abstract say(chat: string, message: BotMessage): Promise<any>
 
-  when = Binder.for(this)
-
-  /** @internal */ _chatFor(chatId: string) {
+  /** @internal */
+  _chatFor(chatId: string) {
     const chat = this._chats.get(chatId) || new Chat()
     this._chats.set(chatId, chat)
     return chat

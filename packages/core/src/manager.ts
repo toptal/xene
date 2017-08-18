@@ -61,7 +61,6 @@ export class Manager implements IManager {
     else return this.perform(message)
   }
 
-
   private get _lastMessage() { return this._messages[this._messages.length - 1] }
   private get _chat() { return this._bot._chatFor(this._chatId) }
   private get _isEmpty() { return this._queue.length === 0 }

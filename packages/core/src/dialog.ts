@@ -17,7 +17,8 @@ export class Dialog<
   bot: Bot
   chat: string
   users: string[]
-  /** @internal */ _manager: Manager
+  /** @internal */
+  _manager: Manager
 
   constructor(bot: Bot, chat: string, users: string[]) {
     this.bot = bot, this.chat = chat, this.users = users

@@ -3,6 +3,7 @@
   "rules": {
     "curly": false,
     "member-access": false,
+    "no-default-export": true,
     "ordered-imports": [
       false
     ],
@@ -21,7 +22,7 @@
     ],
     "arrow-parens": [
       false,
-      "avoid-on-single-parameter"
+      "ban-single-arg-parens"
     ],
     "space-before-function-paren": [
       true,
@@ -48,6 +49,28 @@
     "array-type": [
       true,
       "array"
+    ],
+    "completed-docs": [
+      true,
+      {
+        "methods": {
+          "privacies": [
+            "public",
+            "protected"
+          ]
+        },
+        "properties": {
+          "privacies": [
+            "public",
+            "protected"
+          ]
+        },
+        "functions": {
+          "visibilities": [
+            "exported"
+          ]
+        }
+      }
     ]
   }
 }

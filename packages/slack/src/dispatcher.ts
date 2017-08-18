@@ -1,4 +1,4 @@
-import { Slackbot } from './bot'
+import { Slackbot } from './slackbot'
 import { camel } from './api/converters'
 
 export default class SlackbotDispatcher {
