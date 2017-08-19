@@ -31,14 +31,14 @@ export class Dialog<
 
   parse = <T>(parser: ParseType<T>, onError?: BotMessage | ((reply: string) => any)): Promise<T> => {
     const parserObj = new Parser(parser, errorHandler(this.say, onError))
-    this._manager.push(parserObj)
+    this._manager.add(parserObj)
     return parserObj.promise
   }
 
   ask = <T>(message: BotMessage, parser: ParseType<T>, onError?: BotMessage | ((reply: string) => any)) => {
     const sayMessage = () => this.say(message)
     const question = new Question(sayMessage, parser, errorHandler(this.say, onError))
-    this._manager.push(question)
+    this._manager.add(question)
     return question.promise
   }
 }

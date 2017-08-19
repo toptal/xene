@@ -32,15 +32,15 @@ export class Manager implements IManager {
    * up with queue. If it fails then same flow applied
    * as for question e.g. add to queue.
    */
-  push(action: Parser | Question) {
+  add(action: Parser | Question) {
     if (isQuestion(action)) {
       this._queue.push(action)
       return this._chat.add(this)
     }
 
-    if (action.parse(this._lastMessage)) return
+    if (this._lastMessage && action.parse(this._lastMessage)) return
+    if (!this._queue.some(isQuestion)) this._chat.add(this)
     this._queue.push(action)
-    this._chat.add(this)
   }
 
   prepare() {

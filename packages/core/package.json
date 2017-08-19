@@ -8,18 +8,39 @@
   "author": "Ike Ku <dempfi@yahoo.com>",
   "license": "Apache-2.0",
   "scripts": {
+    "test": "rm -rf dist && tsc && nyc ava -c=5 --verbose",
     "lint": "tslint --project tsconfig.json -t stylish",
-    "build": "rm -rf ./dist && tsc -t ES6",
+    "build": "rm -rf dist && tsc -t ES6 && rm -rf dist/test",
     "watch": "tsc -w --pretty"
   },
   "publishConfig": {
     "access": "public"
   },
+  "ava": {
+    "babel": {},
+    "files": [
+      "dist/test/**/*.js"
+    ]
+  },
+  "nyc": {
+    "include": [
+      "dist/**/*.js"
+    ],
+    "exclude": [
+      "dist/test/**/*.js"
+    ],
+    "reporter": [
+      "html"
+    ],
+    "check-coverage": true,
+    "sourceMap": true
+  },
   "files": [
     "dist"
   ],
   "devDependencies": {
-    "ava": "^0.19.1",
+    "@types/node": "^8.0.24",
+    "ava": "^0.22.0",
     "nyc": "^11.0.3",
     "tslint": "^5.6.0",
     "typescript": "^2.4.2"

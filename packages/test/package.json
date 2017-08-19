@@ -8,6 +8,7 @@
   "author": "Ike Ku <dempfi@yahoo.com>",
   "license": "Apache-2.0",
   "scripts": {
+    "test": "echo 'No test'",
     "lint": "tslint --project tsconfig.json -t stylish",
     "build": "rm -rf ./dist && tsc -t ES6",
     "watch": "tsc -w --pretty"
