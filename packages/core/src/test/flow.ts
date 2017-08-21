@@ -1,13 +1,13 @@
 import test, { TestContext } from 'ava'
 import { TestBot } from './helpers/test-bot'
 
-interface Context extends TestContext { context: { bot: TestBot } }
+interface IContext extends TestContext { context: { bot: TestBot } }
 test.beforeEach(t => { t.context.bot = new TestBot() })
 
 const CHAT = 'chat'
 const msg = (message) => ({ chat: CHAT, message })
 
-test('When same pattern registered twice, only first matches', (t: Context) => {
+test('When same pattern registered twice, only first matches', (t: IContext) => {
   t.context.bot
     .when('hi').say('hey you')
     .when(/hi/i).do((m, b) => b.say(m.chat, 'ho ho ho'))
@@ -16,7 +16,7 @@ test('When same pattern registered twice, only first matches', (t: Context) => {
   t.deepEqual(t.context.bot.lastMessage, msg('hey you'))
 })
 
-test('Questions of dialogs are asked only when previous question to user is resolved', (t: Context) => {
+test('Questions of dialogs are asked only when previous question to user is resolved', (t: IContext) => {
   const dialog1 = t.context.bot.dialog(CHAT, ['user'])
   const dialog2 = t.context.bot.dialog(CHAT, ['user'])
   dialog1.ask('q1', m => true)
@@ -36,7 +36,7 @@ test('Questions of dialogs are asked only when previous question to user is reso
   t.deepEqual(t.context.bot.lastMessage, msg('q4'))
 })
 
-test('Different users, different dialogs, same chat', (t: Context) => {
+test('Different users, different dialogs, same chat', (t: IContext) => {
   const parser = () => true
   const dialog1 = t.context.bot.dialog('chat', ['user1'])
   const dialog2 = t.context.bot.dialog('chat', ['user1', 'user2'])
@@ -57,13 +57,13 @@ test('Different users, different dialogs, same chat', (t: Context) => {
   t.deepEqual(t.context.bot.messages, [msg('q1'), msg('q2'), msg('q4'), msg('q5')])
 })
 
-test('Dialog with parsing errors', async (t: Context) => {
+test('Dialog with parsing errors', async (t: IContext) => {
   const dialog1 = t.context.bot.dialog('chat', ['user1'])
   const dialog2 = t.context.bot.dialog('chat', ['user1', 'user2'])
-  const parser = (a) => ({ parse: msg => msg === a, isValid: i => i === true })
+  const parser = (a) => ({ parse: reply => reply === a, isValid: i => i === true })
   dialog1.ask('q1', parser('q'))
-  dialog1.parse(msg => { if (msg === 'p') return 'parsed' }).then(i => dialog1.say(i))
-  dialog2.ask('q2', msg => msg === 'q')
+  dialog1.parse(reply => { if (reply === 'p') return 'parsed' }).then(i => dialog1.say(i))
+  dialog2.ask('q2', reply => reply === 'q')
   dialog2.parse(parser('p'), 'err')
 
   t.deepEqual(t.context.bot.messages, [msg('q1'), msg('q2')])

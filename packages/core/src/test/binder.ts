@@ -2,12 +2,12 @@ import test, { TestContext } from 'ava'
 import { TestBot } from './helpers/test-bot'
 import { Binder } from '../binder'
 
-interface Context extends TestContext { context: { bot: TestBot } }
+interface IContext extends TestContext { context: { bot: TestBot } }
 test.beforeEach(t => { t.context.bot = new TestBot() })
 
 const msg = (message) => ({ chat: '#', message })
 
-test('Can bind with any matcher', (t: Context) => {
+test('Can bind with any matcher', (t: IContext) => {
   t.plan(3)
   t.context.bot
     .when('string').do(() => t.pass())
@@ -19,13 +19,13 @@ test('Can bind with any matcher', (t: Context) => {
   t.context.bot.incoming('', '', 'func')
 })
 
-test('Throws on unknown matcher', (t: Context) => {
-  t.throws(() => t.context.bot.when(45 as any).do(() => { }))
+test('Throws on unknown matcher', (t: IContext) => {
+  t.throws(() => t.context.bot.when(45 as any).do(() => { /* noop */ }))
 })
 
-test('Can bind to any handler', (t: Context) => {
+test('Can bind to any handler', (t: IContext) => {
   t.context.bot
-    .when('do').do((msg, b) => b.say(msg.chat, 'done'))
+    .when('do').do(({ chat }, b) => b.say(chat, 'done'))
     .when('talk').talk(d => d.say('talked'))
     .when('say').say('said')
 
