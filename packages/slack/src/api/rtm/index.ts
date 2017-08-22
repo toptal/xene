@@ -51,7 +51,7 @@ export class RTM extends APIModule {
     const msg = JSON.parse(msgString)
     if (msg.type === 'hello') this.handleHello()
     if (msg.type === 'pong') this.lastPong = Date.now()
-    logger.verbose('Imcoming RTM message %s', msg.type)
+    logger.verbose('Incoming RTM message %s', msg.type)
     this.ee.emit(msg.subtype ? `${msg.type}.${msg.subtype}` : msg.type, msg)
   }
 
