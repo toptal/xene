@@ -2,7 +2,7 @@ import { Bot as B } from './bot'
 import { Parser } from './parser'
 import { Manager } from './manager'
 import { Question } from './question'
-import { ParseType, ParseFun, ParseObj } from './types'
+import { UserMessage, ParseType, ParseFun, ParseObj } from './types'
 
 const isMessage = <T>(arg): arg is object =>
   arg != null && typeof arg !== 'function'
@@ -25,6 +25,18 @@ export class Dialog<
     this._manager = new Manager(bot, chat, users)
     this.parse = this.parse.bind(this)
     this.ask = this.ask.bind(this)
+  }
+
+  on(event: 'end', callback: () => any)
+  on(event: 'abort', callback: () => any)
+  on(event: 'incomingMessage', callback: (message: UserMessage) => any)
+  on(event: 'outgoingMessage', callback: (message: BotMessage) => any)
+  on(event: string, callback: (arg: any) => any) {
+
+  }
+
+  end = () => {
+
   }
 
   say = (message: BotMessage) => {

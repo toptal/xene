@@ -41,6 +41,10 @@
   version "4.14.66"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.66.tgz#3dbb83477becf130611f8fac82a8fdb199805981"
 
+"@types/node@^8.0.24":
+  version "8.0.24"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.24.tgz#06c580084d9add1fb40c1510ef0b448961246fb1"
+
 "@xene/core@^0.0.15":
   version "0.0.15"
   resolved "https://registry.yarnpkg.com/@xene/core/-/core-0.0.15.tgz#d16411ab9a3f3a98b8708a02a1847f18ae51ecd1"

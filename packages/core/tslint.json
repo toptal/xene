@@ -51,7 +51,7 @@
       "array"
     ],
     "completed-docs": [
-      true,
+      false,
       {
         "methods": {
           "privacies": [

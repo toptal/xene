@@ -1,1 +1,2 @@
-export { default as dialog } from './dialog'
+import * as testbot from './bot'
+export { testbot }
