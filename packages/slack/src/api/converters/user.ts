@@ -1,4 +1,5 @@
 import * as _ from 'lodash'
+import { camel } from './camel'
 import { User } from '../../types'
 
 function transformer(result, value, key): User {
@@ -8,17 +9,12 @@ function transformer(result, value, key): User {
       result.handler = `<@${value}>`
       break
 
-    case 'profile':
-      result.email = value.email
-      result.phone = value.phone || ''
-      result.title = value.title || ''
-      result.skype = value.skype || ''
-      result.firstName = value.first_name
-      result.lastName = value.last_name
-      break
-
     case 'real_name':
       result.fullName = value
+      break
+
+    case 'profile':
+      result['profile'] = camel(value)
       break
 
     default:

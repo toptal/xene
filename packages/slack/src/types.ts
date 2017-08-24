@@ -99,23 +99,34 @@ export type MessageOptions = {
   unfurlMedia?: boolean
 }
 
-export type User = {
-  id: string
-  title: string
-  email: string
-  phone: string
-  skype: string
-  handler: string
-  lastName: string
+export type UserProfile = {
+  avatarHash: string
+  currentStatus: string
   firstName: string
-  fullName: string
-  teamId: string
-  deleted: boolean
-  status: null
-  color: string
+  lastName: string
+  realName: string
   tz: string
   tzLabel: string
   tzOffset: number
+  email: string
+  skype: string
+  phone: string
+  image24: string
+  image32: string
+  image48: string
+  image72: string
+  image192: string
+}
+
+export type User = {
+  id: string
+  title: string
+  handler: string
+  fullName: string
+  teamId: string
+  deleted: boolean
+  color: string
+  profile: UserProfile
   isAdmin: boolean
   isOwner: boolean
   isPrimaryOwner: boolean
