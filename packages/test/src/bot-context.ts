@@ -6,13 +6,13 @@ type Check<B extends Bot> = (chat: string, message: B['_']['BotMessage']) => voi
 type TExpectation<B extends Bot> = { check: Check<B>, message: string, chat: string, user: string }
 
 export class BotContext<B extends Bot = Bot> {
+  on = Expectation.create<B, this>(this)
+  messages: { chat: string, message: B['_']['BotMessage'] }[] = []
+  private _expects: TExpectation<B>[] = []
+
   constructor(private _subject: B) {
     this._subject.say = this._check.bind(this)
   }
-
-  private _expects: TExpectation<B>[] = []
-  on = Expectation.create<B, this>(this)
-  messages: { chat: string, message: B['_']['BotMessage'] }[] = []
 
   get lastMessage() {
     return this.messages[this.messages.length - 1]
@@ -22,6 +22,10 @@ export class BotContext<B extends Bot = Bot> {
     return this.messages.some(m => chat ? is(m, { chat, message }) : is(m.message, message))
   }
 
+  reset() {
+    this._expects = []
+    this.messages = []
+  }
 
   /** @internal */
   _add(check: Check<B>, message: string, chat: string, user: string) {
@@ -39,7 +43,6 @@ export class BotContext<B extends Bot = Bot> {
   }
 
   private _prepareNext() {
-    console.log('n')
     const last = this._expects[this._expects.length - 1]
     const id = `I${Math.random().toString()}`
     const { message, chat, user } = last
