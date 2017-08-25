@@ -28,4 +28,20 @@ export class Channels extends APIModule {
   getMessage(channel: string, ts: string) {
     return this.history(channel, {inclusive: true, count: 1, latest: ts}).then(head)
   }
+
+  create(name: string, validate: boolean = false): Promise<Channel> {
+    return this.request('create', { name, validate }).then(get('channel')).then(camel)
+  }
+
+  archive(channel: string) {
+    return this.request('archive', { channel })
+  }
+
+  setTopic(channel: string, topic: string) {
+    return this.request('setTopic', {channel, topic})
+  }
+
+  setPurpose(channel: string, purpose: string) {
+    return this.request('setPurpose', {channel, purpose})
+  }
 }
