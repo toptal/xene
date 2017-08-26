@@ -1,6 +1,7 @@
 import { Bot } from './bot'
-import { IManager } from './chat'
 import { Parser } from './parser'
+import { IManager } from './chat'
+import { EventEmitter } from './ee'
 import { Question } from './question'
 import { UserMessage } from './types'
 
@@ -8,6 +9,11 @@ const isQuestion = (q): q is Question =>
   q instanceof Question
 
 export class Manager implements IManager {
+  /** @internal */
+  _ee = new EventEmitter()
+  emit = this._ee.emit
+  on = this._ee.on
+
   private _queue: (Parser | Question)[] = []
   private _messages: UserMessage[] = []
 
@@ -49,6 +55,7 @@ export class Manager implements IManager {
   }
 
   perform(message: UserMessage) {
+    this.emit('incomingMessage', message)
     this._messages.push(message)
     if (this._isEmpty) return true
     const wasParsed = this._head.parse(message)
@@ -59,6 +66,14 @@ export class Manager implements IManager {
     this._queue.shift()
     if (isQuestion(this._head)) return true
     else return this.perform(message)
+  }
+
+  abort() {
+    this.emit('abort')
+  }
+
+  unbind() {
+    this._chat.without(this)
   }
 
   private get _lastMessage() { return this._messages[this._messages.length - 1] }

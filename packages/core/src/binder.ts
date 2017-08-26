@@ -31,19 +31,19 @@ export class Binder<B extends Bot> {
   say(message: B['_']['BotMessage']) {
     const match = normalizeMatcher(this._matcher)
     const handler = (msg: UserMessage, bot: B) => bot.say(msg.chat, message)
-    this._bot._performers.push({ match, handler })
+    this._bot._performerHandlers.push({ match, handler })
     return this._bot
   }
 
   do(handler: (message: UserMessage, bot: B) => any) {
     const match = normalizeMatcher(this._matcher)
-    this._bot._performers.push({ match, handler })
+    this._bot._performerHandlers.push({ match, handler })
     return this._bot
   }
 
   talk(handler: (dialog: Dialog<B>) => any) {
     const match = normalizeMatcher(this._matcher)
-    this._bot._dialogs.push({ match, handler })
+    this._bot._dialogHandlers.push({ match, handler })
     return this._bot
   }
 }

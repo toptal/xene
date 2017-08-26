@@ -25,21 +25,25 @@ export class Dialog<
     this._manager = new Manager(bot, chat, users)
     this.parse = this.parse.bind(this)
     this.ask = this.ask.bind(this)
+    this._manager.emit('start')
   }
 
   on(event: 'end', callback: () => any)
+  on(event: 'start', callback: () => any)
   on(event: 'abort', callback: () => any)
   on(event: 'incomingMessage', callback: (message: UserMessage) => any)
-  on(event: 'outgoingMessage', callback: (message: BotMessage) => any)
-  on(event: string, callback: (arg: any) => any) {
-
+  on(event: 'outgoingMessage', callback: (chat: string, message: BotMessage) => any)
+  on(event: string, callback: (...args: any[]) => any) {
+    this._manager.on(event, callback)
   }
 
   end = () => {
-
+    this._manager.emit('end')
+    this._manager.unbind()
   }
 
   say = (message: BotMessage) => {
+    this._manager.emit('outgoingMessage', this.chat, message)
     return this.bot.say(this.chat, message)
   }
 

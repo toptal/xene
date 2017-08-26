@@ -2,8 +2,9 @@ import { UserMessage } from './types'
 
 export interface IManager {
   users: string[]
-  prepare(): any
   perform(msg: UserMessage): Promise<boolean>
+  prepare(): any
+  abort(): any
 }
 
 const remove = <T>(array: T[], el: T): T[] => {
@@ -30,6 +31,15 @@ export class Chat {
     for (const { users } of this._managers)
       if (users.includes(user)) return true
     return false
+  }
+
+  without(manager: IManager) {
+    this._managers = this._managers.filter(m => m !== manager)
+  }
+
+  abort(user: string) {
+    const head = this._headFor(user)
+    if (head) head.abort()
   }
 
   private _prepareNext(manager: IManager) {

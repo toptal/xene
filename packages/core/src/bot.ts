@@ -15,9 +15,9 @@ type PerformerHandler<T> = Matcher & {
 
 export abstract class Bot<BotMessage = any> {
   /** @internal */
-  _dialogs: DialogHandler<this>[] = []
+  _dialogHandlers: DialogHandler<this>[] = []
   /** @internal */
-  _performers: PerformerHandler<this>[] = []
+  _performerHandlers: PerformerHandler<this>[] = []
 
   when = Binder.for(this)
 
@@ -38,17 +38,21 @@ export abstract class Bot<BotMessage = any> {
     return new Dialog(this, chat, users)
   }
 
+  abortDialog(chat: string, user: string) {
+    this._chatFor(chat).abort(user)
+  }
+
   protected onMessage(message: UserMessage): any {
-    const performer = this._performers.find(c => c.match(message))
+    const performer = this._performerHandlers.find(c => c.match(message))
     if (performer) return performer.handler(message, this)
 
     const chat = this._chatFor(message.chat)
     const hasActions = chat.hasFor(message.user)
     if (hasActions) return chat.processMessage(message)
 
-    const dialog = this._dialogs.find(c => c.match(message))
+    const dialog = this._dialogHandlers.find(c => c.match(message))
     if (dialog) {
-      const obj = new Dialog(this, message.chat, [message.user])
+      const obj = this.dialog(message.chat, [message.user])
       obj._manager.perform(message)
       dialog.handler(obj)
     }
