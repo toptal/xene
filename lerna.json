@@ -6,11 +6,12 @@
   "publish": {
     "ignore": [
       "tslint.json",
-      "yarn.lock",
       "src/**",
       "*.md"
     ]
   },
-  "npmClient": "yarn",
+  "npmClientArgs": [
+    "--no-package-lock"
+  ],
   "version": "independent"
 }
