@@ -6,7 +6,7 @@ function transformer(result, value, key): User {
   switch (key) {
     case 'id':
       result.id = value
-      result.handler = `<@${value}>`
+      result.handle = `<@${value}>`
       break
 
     case 'real_name':
@@ -14,7 +14,7 @@ function transformer(result, value, key): User {
       break
 
     case 'profile':
-      result['profile'] = camel(value)
+      result.profile = camel(value)
       break
 
     default:

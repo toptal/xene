@@ -26,7 +26,7 @@ export class Channels extends APIModule {
   }
 
   getMessage(channel: string, ts: string) {
-    return this.history(channel, {inclusive: true, count: 1, latest: ts}).then(head)
+    return this.history(channel, { inclusive: true, count: 1, latest: ts }).then(head)
   }
 
   create(name: string, validate: boolean = false): Promise<Channel> {
@@ -38,10 +38,10 @@ export class Channels extends APIModule {
   }
 
   setTopic(channel: string, topic: string) {
-    return this.request('setTopic', {channel, topic})
+    return this.request('setTopic', { channel, topic })
   }
 
   setPurpose(channel: string, purpose: string) {
-    return this.request('setPurpose', {channel, purpose})
+    return this.request('setPurpose', { channel, purpose })
   }
 }

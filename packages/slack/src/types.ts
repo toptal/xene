@@ -99,40 +99,38 @@ export type MessageOptions = {
   unfurlMedia?: boolean
 }
 
-export type UserProfile = {
-  avatarHash: string
-  currentStatus: string
-  firstName: string
-  lastName: string
-  realName: string
-  tz: string
-  tzLabel: string
-  tzOffset: number
-  email: string
-  skype: string
-  phone: string
-  image24: string
-  image32: string
-  image48: string
-  image72: string
-  image192: string
-}
-
 export type User = {
   id: string
   title: string
-  handler: string
+  handle: string
   fullName: string
   teamId: string
-  deleted: boolean
   color: string
-  profile: UserProfile
+  deleted: boolean
   isAdmin: boolean
+  isBot: boolean
   isOwner: boolean
   isPrimaryOwner: boolean
   isRestricted: boolean
   isUltraRestricted: boolean
-  isBot: boolean
+  profile: {
+    avatarHash: string
+    currentStatus: string
+    email: string
+    firstName: string
+    image192: string
+    image24: string
+    image32: string
+    image48: string
+    image72: string
+    lastName: string
+    phone: string
+    realName: string
+    skype: string
+    tz: string
+    tzLabel: string
+    tzOffset: number
+  }
 }
 
 export type MiddlewareHandler = (context: MiddlewareContext) => void | Promise<void>
