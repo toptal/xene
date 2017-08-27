@@ -3,6 +3,6 @@ node_modules
 test/tmp
 *.log
 *.cache
-/coverage
+coverage
 dist
 .nyc_output

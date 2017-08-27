@@ -1,70 +1,60 @@
 import { Chat } from './chat'
-import { UserMessage, BaseUser, DialogFactory, CommandFactory } from './types'
+import { Binder } from './binder'
+import { Dialog } from './dialog'
+import { UserMessage } from './types'
 
-export abstract class Bot<
-  Message extends any = any,
-  User extends BaseUser = BaseUser
-  > {
-  // This is a workaround to bind interfaces of User and Message
-  // to Bot class so we can use them in other dependent classes
-  // with typesafty, but we don't need them in runtime
-  _: {
-    User: User
-    Message: Message
-    UserMessage: UserMessage<User>
-  }
+type Matcher = { match: (message: UserMessage) => boolean }
 
-  private chats: Map<string, Chat> = new Map()
-  private dialogs: DialogFactory<Bot>[] = []
-  private commands: CommandFactory<Bot>[] = []
+type DialogHandler<T extends Bot> = Matcher & {
+  handler: (dialog: Dialog<T>) => any
+}
 
-  constructor({ dialogs, commands }: {
-    dialogs: DialogFactory<Bot>[], commands?: CommandFactory<Bot>[]
-  }) {
-    if (dialogs) this.dialogs = dialogs
-    if (commands) this.commands = commands
-  }
+type PerformerHandler<T> = Matcher & {
+  handler: (message: UserMessage, bot: T) => any
+}
 
-  onMessage(message: UserMessage<User>): void {
-    const chat = this.getChat(message.chat)
-    const isCommand = this.isCommand(message.text)
-    if (!isCommand) return chat.processMessage(message)
-    const CommandClass = this.matchCommand(message.text)
-    const command = new CommandClass(this, message.chat)
-    command.user = message.user
-    command.perform()
-  }
+export abstract class Bot<BotMessage = any> {
+  /** @internal */
+  _dialogHandlers: DialogHandler<this>[] = []
+  /** @internal */
+  _performerHandlers: PerformerHandler<this>[] = []
 
-  matchDialog(message: string): DialogFactory<Bot> {
-    const dialogs = this.dialogs
-    const isDefault = d => d.isDefault === true
-    const predicate = d => d.match && d.match(message)
-    return dialogs.find(predicate) || dialogs.find(isDefault)
-  }
+  when = Binder.for(this)
 
-  matchCommand(message: string): CommandFactory<Bot> {
-    return this.commands.find(c => c.match(message))
-  }
+  protected _: { BotMessage: BotMessage }
+  private _chats = new Map<string, Chat>()
 
-  startDialog(options: { dialog: DialogFactory<Bot>, chat: string, user: User, properties?: object }) {
-    this.getChat(options.chat).startDialog(options.dialog, options.user, options.properties)
-  }
+  abstract listen(arg?: any): this
+  abstract say(chat: string, message: BotMessage): Promise<any>
 
-  stopDialog(chat: string, user: User) {
-    this.getChat(chat).stopDialog(user.id)
-  }
-
-  abstract sendMessage(chat: string, message: Message): Promise<any>
-  abstract formatMessage(message: Message, object: any): Message
-
-  private getChat(id: string): Chat {
-    if (this.chats.has(id)) return this.chats.get(id)
-    const chat = new Chat(id, this)
-    this.chats.set(id, chat)
+  /** @internal */
+  _chatFor(chatId: string) {
+    const chat = this._chats.get(chatId) || new Chat()
+    this._chats.set(chatId, chat)
     return chat
   }
 
-  private isCommand(message: string): boolean {
-    return this.commands.some(c => c.match(message))
+  dialog(chat: string, users: string[]) {
+    return new Dialog(this, chat, users)
+  }
+
+  abortDialog(chat: string, user: string) {
+    this._chatFor(chat).abort(user)
+  }
+
+  protected onMessage(message: UserMessage): any {
+    const performer = this._performerHandlers.find(c => c.match(message))
+    if (performer) return performer.handler(message, this)
+
+    const chat = this._chatFor(message.chat)
+    const hasActions = chat.hasFor(message.user)
+    if (hasActions) return chat.processMessage(message)
+
+    const dialog = this._dialogHandlers.find(c => c.match(message))
+    if (dialog) {
+      const obj = this.dialog(message.chat, [message.user])
+      obj._manager.perform(message)
+      dialog.handler(obj)
+    }
   }
 }

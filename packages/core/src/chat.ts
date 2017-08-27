@@ -1,64 +1,57 @@
-import { Bot } from './bot'
-import { Dialog } from './dialog'
-import { UserMessage, BaseUser, DialogFactory } from './types'
+import { UserMessage } from './types'
+
+export interface IManager {
+  users: string[]
+  perform(msg: UserMessage): Promise<boolean>
+  prepare(): any
+  abort(): any
+}
+
+const remove = <T>(array: T[], el: T): T[] => {
+  const index = array.indexOf(el)
+  return index >= 0 ? array.splice(index, 1) : array
+}
 
 export class Chat {
+  private _managers: IManager[] = []
 
-  private dialogs: Map<string, Dialog<Bot>> = new Map()
-
-  constructor(public id: string, public bot: Bot) { }
-
-  processMessage(message: UserMessage<BaseUser>) {
-    const dialog = this.dialogs.get(message.user.id)
-    if (!dialog) return this.startFromMessage(message)
-    this.forwardMessageToDialog(dialog, message.text)
+  add(manager: IManager) {
+    const canPrepare = manager.users.some(u => !this.hasFor(u))
+    this._managers.push(manager)
+    if (canPrepare) manager.prepare()
   }
 
-  startDialog(DialogClass: DialogFactory<Bot>, user: BaseUser, properties?: object) {
-    const dialog = this.instantiateDialog(DialogClass, user, properties)
-    dialog.onStart()
-    this.runDialog(dialog)
-    return dialog
+  processMessage(message: UserMessage) {
+    const manager = this._headFor(message.user)
+    const canContinue = manager && manager.perform(message)
+    if (canContinue) this._prepareNext(manager)
   }
 
-  async stopDialog(userId: string) {
-    const dialog = this.dialogs.get(userId)
-    if (!dialog) return
-    dialog.onAbort()
-    this.dialogs.delete(userId)
+  hasFor(user: string) {
+    for (const { users } of this._managers)
+      if (users.includes(user)) return true
+    return false
   }
 
-  private startFromMessage({ user, text }: UserMessage<BaseUser>) {
-    const DialogClass = this.bot.matchDialog(text)
-    if (!DialogClass) return
-    const dialog = this.instantiateDialog(DialogClass, user)
-    dialog.onStart()
-    this.forwardMessageToDialog(dialog, text)
-    this.runDialog(dialog)
+  without(manager: IManager) {
+    this._managers = this._managers.filter(m => m !== manager)
   }
 
-  private forwardMessageToDialog(dialog: Dialog<Bot>, message: string) {
-    dialog.onIncomingMessage(message)
-    dialog.queue.processMessage(message)
+  abort(user: string) {
+    const head = this._headFor(user)
+    if (head) head.abort()
   }
 
-  private runDialog(dialog: Dialog<Bot>) {
-    dialog.talk()
-      .then(() => dialog.onEnd())
-      .catch(error => dialog.onAbort(error))
-      .then(this.removeDialog.bind(this, dialog))
+  private _prepareNext(manager: IManager) {
+    const users = manager.users.reduce((acc, u) =>
+      this._headFor(u) === manager ? acc.concat(u) : acc, [])
+
+    remove(this._managers, manager)
+    users.forEach(u => this.hasFor(u) ? this._headFor(u).prepare() : null)
   }
 
-  private instantiateDialog(DialogClass: DialogFactory<Bot>, user: BaseUser, properties: object = {}) {
-    const dialog = new DialogClass(this.bot, this.id)
-    this.dialogs.set(user.id, dialog)
-    Object.assign(dialog, { user, ...properties })
-    return dialog
-  }
-
-  private removeDialog(dialog: Dialog<Bot>) {
-    this.dialogs.forEach((value, user, dialogs) => {
-      if (value === dialog) dialogs.delete(user)
-    })
+  private _headFor(user: string) {
+    for (const manager of this._managers)
+      if (manager.users.includes(user)) return manager
   }
 }
