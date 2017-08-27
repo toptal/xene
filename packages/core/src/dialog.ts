@@ -19,13 +19,13 @@ export class Dialog<
   users: string[]
   /** @internal */
   _manager: Manager
+  get user() { return this.users[0] }
 
   constructor(bot: Bot, chat: string, users: string[]) {
     this.bot = bot, this.chat = chat, this.users = users
     this._manager = new Manager(bot, chat, users)
     this.parse = this.parse.bind(this)
     this.ask = this.ask.bind(this)
-    this._manager.emit('start')
   }
 
   on(event: 'end', callback: () => any)
