@@ -29,7 +29,6 @@ export class Dialog<
   }
 
   on(event: 'end', callback: () => any)
-  on(event: 'start', callback: () => any)
   on(event: 'abort', callback: () => any)
   on(event: 'incomingMessage', callback: (message: UserMessage) => any)
   on(event: 'outgoingMessage', callback: (chat: string, message: BotMessage) => any)

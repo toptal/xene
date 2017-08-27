@@ -17,8 +17,13 @@ test('When same pattern registered twice, only first matches', (t: IContext) => 
 })
 
 test('Questions of dialogs are asked only when previous question to user is resolved', (t: IContext) => {
+  t.plan(9)
   const dialog1 = t.context.bot.dialog(CHAT, ['user'])
   const dialog2 = t.context.bot.dialog(CHAT, ['user'])
+
+  dialog1.on('incomingMessage', m => t.pass())
+  dialog1.on('outgoingMessage', m => t.pass())
+
   dialog1.ask('q1', m => true)
   dialog2.ask('q2', m => true)
   dialog1.ask('q3', m => true)
