@@ -1,4 +1,10 @@
-<p align="center"><img src="http://imgur.com/YgPmLct.png" width="445"/></p>
+<div align="center"><img src="http://imgur.com/YgPmLct.png" width="445"/></div>
+
+<div align="center">
+  <a href="https://travis-ci.org/dempfi/xene">
+    <img src="https://travis-ci.org/dempfi/xene.svg?branch=master" />
+  </a>
+</div>
 
 ```js
 import { Slackbot } from '@xene/slack'
