@@ -1,15 +1,54 @@
 <p align="center"><img src="http://imgur.com/YgPmLct.png" width="445"/></p>
 
-Xene is a framework for building conversational bots either with TypeScript or modern JavaScript. From simple command based bots to rich natural language bots the framework provides all of the features needed to manage the conversational aspects of a bot. You can easily connect bots built using the framework to your users wherever they converse, from Slack to site to a terminal.
+```js
+import { Slackbot } from '@xene/slack'
 
-## Docs
-For docs check `docs/` folder. For fast example, check [Create your first bot](#create-your-first-bot)
+new Slackbot({ botToken: 'xxx-token' })
+  // Match with regular expression and just reply
+  .when(/hi|hey|hello/i).say('Hi there!')
 
-## Installation
+  // Match exact string and execute some function
+  .when('stop it').do((msg, bot) => bot.abortDialog(msg.chat, msg.user))
 
-To install `xene` just run `npm i --save xene` or `yarn add xene`.
+  // Match with function and start new dialog with user
+  .when(msg => msg.text === 'I want pizza!').talk(async (dialog, bot) => {
+    const user = await bot.users.info(dialog.user)
+    // Await for user to reply to a question and parse their reply
+    const withPepperoni = await dialog.ask('With pepperoni?', (msg) => msg === 'yes')
+    placePizzaOrder(dialog.user, { pepperoni: withPepperoni })
+    await dialog.say(`Ok, ${user.profile.firstName}, you pizza is on its way. `)
+  })
+```
 
-__NOTE: `xene` is written in TypeScript and npm package already includes all typings.__
+Xene is a framework for building conversational bots either with modern JavaScript. From simple command based bots to rich natural language bots the framework provides all of the features needed to manage the conversational aspects of a bot.
+
+### Packages
+Xene is split into different packages and depending on with which service your bot should work you should install appropriate package.
+<table align="center">
+  <tr>
+    <td><strong>Core</strong></td>
+    <td><code>npm i @xene/core</code></td>
+    <td>Core of each bots xene provides. Because of this library all they have same simple API for conversations.</td>
+  </tr>
+  <tr>
+    <td><a href="https://slack.com">Slack</a></td>
+    <td><code>npm i @xene/slack</code></td>
+    <td>Interface for Slack bot with additions for interactive message handling.</td>
+  </tr>
+  <tr>
+    <td><a href="https://telegram.org">Telegram</a></td>
+    <td><code>npm i @xene/telegram</code></td>
+    <td><em>In progress</em></td>
+  </tr>
+  <tr>
+    <td><strong>Test</strong></td>
+    <td><code>npm i @xene/test</code></td>
+    <td>Interface to test your bot. Like supertest for koa/express.</td>
+  </tr>
+</table>
+
+### TypeScript
+`xene` is written in TypeScript and npm package already includes all typings.
 
 ## Create your first bot
 

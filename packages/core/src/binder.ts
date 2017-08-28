@@ -41,7 +41,7 @@ export class Binder<B extends Bot> {
     return this._bot
   }
 
-  talk(handler: (dialog: Dialog<B>) => any) {
+  talk(handler: (dialog: Dialog<B>, bot: B) => any) {
     const match = normalizeMatcher(this._matcher)
     this._bot._dialogHandlers.push({ match, handler })
     return this._bot

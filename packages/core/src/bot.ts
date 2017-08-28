@@ -6,7 +6,7 @@ import { UserMessage } from './types'
 type Matcher = { match: (message: UserMessage) => boolean }
 
 type DialogHandler<T extends Bot> = Matcher & {
-  handler: (dialog: Dialog<T>) => any
+  handler: (dialog: Dialog<T>, bot: T) => any
 }
 
 type PerformerHandler<T> = Matcher & {
@@ -54,7 +54,7 @@ export abstract class Bot<BotMessage = any> {
     if (dialog) {
       const obj = this.dialog(message.chat, [message.user])
       obj._manager.perform(message)
-      dialog.handler(obj)
+      dialog.handler(obj, this)
     }
   }
 }
