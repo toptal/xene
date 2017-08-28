@@ -1,14 +1,16 @@
 {
-  "lerna": "2.0.0",
+  "lerna": "2.1.0",
   "packages": [
     "packages/*"
   ],
-  "publish": {
-    "ignore": [
-      "tslint.json",
-      "src/**",
-      "*.md"
-    ]
+  "commands": {
+    "publish": {
+      "ignore": [
+        "tslint.json",
+        "src/**",
+        "*.md"
+      ]
+    }
   },
   "npmClientArgs": [
     "--no-package-lock"

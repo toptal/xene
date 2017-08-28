@@ -1,5 +1,29 @@
 {
+  "scripts": {
+    "bootstrap": "lerna bootstrap --hoist",
+    "pretest": "lerna exec tsc",
+    "test": "nyc ava -c=5 --verbose"
+  },
+  "ava": {
+    "babel": {},
+    "files": [
+      "packages/**/dist/test/**/*.js"
+    ]
+  },
+  "nyc": {
+    "include": [
+      "packages/**/dist/**/*.js"
+    ],
+    "exclude": [
+      "packages/**/dist/test/**/*.js"
+    ],
+    "reporter": [
+      "html"
+    ],
+    "check-coverage": true,
+    "sourceMap": true
+  },
   "devDependencies": {
-    "lerna": "^2.0.0"
+    "lerna": "^2.1.0"
   }
 }

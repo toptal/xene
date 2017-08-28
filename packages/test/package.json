@@ -17,25 +17,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "ava": {
-    "babel": {},
-    "files": [
-      "dist/test/**/*.js"
-    ]
-  },
-  "nyc": {
-    "include": [
-      "dist/**/*.js"
-    ],
-    "exclude": [
-      "dist/test/**/*.js"
-    ],
-    "reporter": [
-      "html"
-    ],
-    "check-coverage": true,
-    "sourceMap": true
-  },
   "files": [
     "dist"
   ],
@@ -44,11 +25,11 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.65",
+    "@types/lodash": "^4.14.66",
     "@types/node": "^8.0.24",
     "ava": "^0.22.0",
     "nyc": "^11.1.0",
-    "tslint": "^5.4.3",
+    "tslint": "^5.6.0",
     "typescript": "^2.4.2"
   }
 }
