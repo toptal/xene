@@ -8,19 +8,32 @@
 
 ```js
 import { Slackbot } from '@xene/slack'
-
-new Slackbot({ botToken: 'xxx-token' })
-  // Match with regular expression and just reply
-  .when(/hi|hey|hello/i).say('Hi there!')
-
-  // Match exact string and execute some function
-  .when('stop it').do((msg, bot) => bot.abortDialog(msg.chat, msg.user))
-
-  // Match with function and start new dialog with user
-  .when(msg => msg.text === 'I want pizza!').talk(async (dialog, bot) => {
+const bot = new Slackbot({ botToken: 'xxx-token' })
+```
+```js
+// Match with regular expression
+bot.when(/hi|hey|hello/i)
+  // and just reply with some message
+  .say('Hi there!')
+```
+```js
+// Match exact string
+bot.when('stop it')
+  // and execute some function with bot and message
+  .do((msg, bot) => bot.abortDialog(msg.chat, msg.user))
+```
+```js
+// Match with function
+bot.when(msg => msg.text === 'I want pizza!')
+  // and start new dialog with user
+  .talk(async (dialog, bot) => {
+    // load complete profile of user using Slack specific API
     const user = await bot.users.info(dialog.user)
-    // Await for user to reply to a question and parse their reply
+
+    // and ask any question and await for user to answer
     const withPepperoni = await dialog.ask('With pepperoni?', (msg) => msg === 'yes')
+
+    // do something with user's reply
     placePizzaOrder(dialog.user, { pepperoni: withPepperoni })
     await dialog.say(`Ok, ${user.profile.firstName}, you pizza is on its way. `)
   })
@@ -30,6 +43,8 @@ Xene is a framework for building conversational bots either with modern JavaScri
 
 ### Packages
 Xene is split into different packages and depending on with which service your bot should work you should install appropriate package.
+All bot packages extend Core bot package with APIs specific to that service. And all conversational API is implemented in core. This means you can use same API to build conversation in Slack or Telegram and that it's relatively easy to add new service since all you need to do is to subclass base Bot class from Core package and add 3 methods to interact with that service.
+
 <table align="center">
   <tr>
     <td><strong>Core</strong></td>
@@ -55,47 +70,3 @@ Xene is split into different packages and depending on with which service your b
 
 ### TypeScript
 `xene` is written in TypeScript and npm package already includes all typings.
-
-## Create your first bot
-
-Let's create a simple bot, that will reply to our messages right in our terminal:
-
-_NOTE: for all available types of bots check [bots doc](docs/bots.md)_
-
-```ts
-import Consolebot from 'xene/bots/console'
-const bot = new Consolebot({})
-```
-
-Here we just created the silent bot, because if you try now to chat with him, he wouldn't reply. Let's add [dialogs](docs/dialogs.md) now.
-
-```ts
-import Dialog from 'xene/dialog'
-import Consolebot from 'xene/bots/console'
-
-function yesOrNoParser(message: string) {
-  return /yes/i.test(message) ? 'yes' : 'no'
-}
-
-class Time extends Dialog<Consolebot> {
-  time = new Date()
-  static match(message: string) {
-    return /(how\s+?much\s+?time)/i.test(message)
-  }
-
-  async talk() {
-    const {message, ask} = this
-    await message("Let's see!")
-    const reply = await ask('You want me to say it in milliseconds?', yesOrNoParser)
-    if (reply === 'yes') {
-      return message('Time is ${time.getMilliseconds()}')
-    } else {
-      return message('Time is ${time.getSeconds()}')
-    }
-  }
-}
-
-const bot = new Consolebot({ dialogs: [Time] })
-```
-
-This is it, we just created our first annoying bot
