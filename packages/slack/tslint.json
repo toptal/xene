@@ -13,6 +13,10 @@
       "never"
     ],
     "object-literal-sort-keys": false,
+    "no-submodule-imports": [
+      true,
+      "lodash/fp"
+    ],
     "interface-over-type-literal": false,
     "adjacent-overload-signatures": true,
     "quotemark": [

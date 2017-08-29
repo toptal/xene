@@ -9,7 +9,7 @@ import { camel } from '../api/converters'
 import * as format from '../helpers/formatters/message'
 import { MiddlewareContext, MiddlewareHandler } from '../types'
 
-const streamPayload = request => rawBody(request, { encoding: true }).then(qs.parse).then(i => JSON.parse(i.payload))
+const streamPayload = req => rawBody(req, { encoding: true }).then(qs.parse).then(i => JSON.parse(i.payload))
 const existingPayload = payload => typeof payload === 'string' ? JSON.parse(payload) : payload
 
 const middlewareContext = (payload): MiddlewareContext => {

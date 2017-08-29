@@ -8,4 +8,4 @@ const transport = new (winston.transports.Console)({
   colorize: true,
   level
 })
-export default new (winston.Logger)({ transports: [transport ] })
+export const logger = new (winston.Logger)({ transports: [transport] })

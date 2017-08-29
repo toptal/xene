@@ -1,13 +1,13 @@
 import * as async from 'async'
-import * as request from 'request-promise-native'
-import logger from '../../logger'
+import * as rp from 'request-promise-native'
+import { logger } from '../../logger'
 
 type Callback = (arg: any) => void
 type Task = { uri: string, form: any, resolve: Callback, reject: Callback }
 
 const worker = async (task: Task, done) => {
   try {
-    await request.post({ uri: task.uri, json: true, form: task.form }).then(task.resolve)
+    await rp.post({ uri: task.uri, json: true, form: task.form }).then(task.resolve)
   } catch (error) {
     if (error.statusCode !== 429) return task.reject(error)
     const delay = Number(error.response.headers['retry-after']) * 1000
@@ -21,5 +21,5 @@ const worker = async (task: Task, done) => {
 
 const queue = async.queue(worker, 3)
 
-export default (uri: string, form: any) =>
-  new Promise<any>((resolve, reject) => queue.push({ uri, form, resolve, reject}))
+export const request = (uri: string, form: any) =>
+  new Promise<any>((resolve, reject) => queue.push({ uri, form, resolve, reject }))

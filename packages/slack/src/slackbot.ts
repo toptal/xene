@@ -2,11 +2,10 @@ import * as uuid from 'uuid'
 import * as _ from 'lodash'
 import { Bot } from '@xene/core'
 
-import Dispatcher from './dispatcher'
-import middleware from './middleware'
-
-import isMentioned from './helpers/is-mentioned'
-import interpolate from './helpers/interpolate'
+import { SlackbotDispatcher } from './dispatcher'
+import { middleware } from './middleware'
+import { isMentioned } from './helpers/is-mentioned'
+import { interpolate } from './helpers/interpolate'
 import { isPrivateChannel } from './helpers/channel-type'
 
 import { User, Message } from './types'
@@ -16,7 +15,7 @@ export class Slackbot extends Bot<string | Message> {
   // Default dispatcher, used when user didn't provide
   // custom dispatcher. This is mostly used when user has
   // one type of bot, which is a common case
-  static dispatcher = new Dispatcher()
+  static dispatcher = new SlackbotDispatcher()
   static middleware = middleware
   static oauthAccess = Auth.access
 
@@ -35,7 +34,7 @@ export class Slackbot extends Bot<string | Message> {
     id?: string,
     botToken: string,
     appToken?: string,
-    dispatcher?: Dispatcher
+    dispatcher?: SlackbotDispatcher
   }) {
     super()
     this.id = options.id || uuid.v4()
@@ -66,19 +65,11 @@ export class Slackbot extends Bot<string | Message> {
     return this
   }
 
-  // Process new incoming RTM messages
-  private onRtmMessage(payload: { ts: string, text: string, user: string, channel: string }) {
-    const { user, ts, text, channel } = payload
-    if (this.bot.id === user) return
-    const isBotMentioned = isMentioned(this.bot.id, text)
-    const isPrivate = isPrivateChannel(channel)
-    if (!isPrivate && !isBotMentioned) return
-    this.onMessage({ id: ts, text, user, chat: channel })
-  }
-
-  // Process incoming interactive messages
-  // like button actions from slack
-  // Called from Dispatcher
+  /**
+   * Process incoming interactive messages
+   * like button actions from slack
+   * Called from Dispatcher
+   */
   async onInteractiveMessage(payload): Promise<Message> {
     const selected = payload.actions[0]
     const text = payload.originalMessage.text
@@ -91,6 +82,18 @@ export class Slackbot extends Bot<string | Message> {
       user: payload.user.id
     })
     return { text, attachments }
+  }
+
+  /**
+   * Process new incoming RTM messages
+   */
+  private onRtmMessage(payload: { ts: string, text: string, user: string, channel: string }) {
+    const { user, ts, text, channel } = payload
+    if (this.bot.id === user) return
+    const isBotMentioned = isMentioned(this.bot.id, text)
+    const isPrivate = isPrivateChannel(channel)
+    if (!isPrivate && !isBotMentioned) return
+    this.onMessage({ id: ts, text, user, chat: channel })
   }
 
   private markActionSelected(action, attachment) {

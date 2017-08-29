@@ -24,6 +24,5 @@ function transformer(result, value, key): User {
   return result
 }
 
-export function user(user: any): User {
-  return _.reduce(user, transformer, {})
-}
+export const user = (userObj: any): User =>
+  _.reduce(userObj, transformer, {})

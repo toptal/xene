@@ -2,7 +2,9 @@
   "scripts": {
     "bootstrap": "lerna bootstrap --hoist",
     "pretest": "lerna exec tsc",
-    "test": "nyc ava -c=5 --verbose"
+    "test": "nyc ava -c=5 --verbose",
+    "build": "lerna run build",
+    "lint": "lerna run lint"
   },
   "ava": {
     "babel": {},

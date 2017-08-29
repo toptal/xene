@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import request from './request'
+import { request } from './request'
 import { APIError } from '../../errors'
 
 export abstract class APIModule {

@@ -6,7 +6,7 @@ import { BotContext } from './bot-context'
 export type On<B extends Bot> =
   (message: string, chat?: string, user?: string) => Expectation<B>
 
-export class Expectation<B extends Bot>{
+export class Expectation<B extends Bot> {
   static create = <B extends Bot, C extends BotContext>(context: C): On<B> =>
     (message, ...args) => new Expectation<B>(context, message, ...args)
 

@@ -1,5 +1,5 @@
 import { APIModule } from './base'
-import request from './base/request'
+import { request } from './base/request'
 import { camel } from './converters'
 import { APIError } from '../errors'
 
