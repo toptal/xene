@@ -7,7 +7,6 @@
     "publish": {
       "ignore": [
         "tslint.json",
-        "src/**",
         "*.md"
       ]
     }
