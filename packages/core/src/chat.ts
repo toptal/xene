@@ -14,6 +14,7 @@ const remove = <T>(array: T[], el: T): T[] => {
 
 export class Chat {
   private _managers: IManager[] = []
+  private _allManagers: IManager[] = []
 
   add(manager: IManager) {
     const canPrepare = manager.users.some(u => !this.hasFor(u))
@@ -33,12 +34,17 @@ export class Chat {
     return false
   }
 
+  bind(manager: IManager) {
+    this._allManagers.push(manager)
+  }
+
   without(manager: IManager) {
+    this._allManagers = this._allManagers.filter(m => m !== manager)
     this._managers = this._managers.filter(m => m !== manager)
   }
 
   abort(user: string) {
-    const head = this._headFor(user)
+    const head = this._allManagers.find(m => m.users.includes(user))
     if (head) head.abort()
   }
 

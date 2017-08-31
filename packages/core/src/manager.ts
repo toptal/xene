@@ -21,7 +21,9 @@ export class Manager implements IManager {
     private _bot: Bot,
     private _chatId: string,
     public users: string[]
-  ) { }
+  ) {
+    this._chat.bind(this)
+  }
 
   /**
    * For questions call to ask is required and so it
