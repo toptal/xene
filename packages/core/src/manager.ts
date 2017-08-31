@@ -45,8 +45,8 @@ export class Manager implements IManager {
     }
 
     if (this._lastMessage && action.parse(this._lastMessage)) return
+    else this._queue.push(action)
     if (!this._queue.some(isQuestion)) this._chat.add(this)
-    this._queue.push(action)
   }
 
   prepare() {
