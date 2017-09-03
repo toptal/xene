@@ -1,72 +1,193 @@
-<div align="center"><img src="http://imgur.com/YgPmLct.png" width="445"/></div>
+<div align="center"><img src="assets/hero.png" width="445"/></div>
 
-<div align="center">
-  <a href="https://travis-ci.org/dempfi/xene">
-    <img src="https://travis-ci.org/dempfi/xene.svg?branch=master" />
-  </a>
-</div>
+Xene is a framework for building conversational bots with modern JavaScript(or
+TypeScript). From simple command based bots to rich natural language bots the
+framework provides all of the features needed to manage the conversational aspects of a bot.
 
 ```js
 import { Slackbot } from '@xene/slack'
-const bot = new Slackbot({ botToken: 'xxx-token' })
-```
-```js
-// Match with regular expression
-bot.when(/hi|hey|hello/i)
-  // and just reply with some message
-  .say('Hi there!')
-```
-```js
-// Match exact string
-bot.when('stop it')
-  // and execute some function with bot and message
-  .do((msg, bot) => bot.abortDialog(msg.chat, msg.user))
-```
-```js
-// Match with function
-bot.when(msg => msg.text === 'I want pizza!')
-  // and start new dialog with user
-  .talk(async (dialog, bot) => {
-    // load complete profile of user using Slack specific API
-    const user = await bot.users.info(dialog.user)
 
-    // and ask any question and await for user to answer
-    const withPepperoni = await dialog.ask('With pepperoni?', (msg) => msg === 'yes')
+new Slackbot(/* API token */)
+  .when(/hi|hello/i).say('Hi there!')
+  .when(/talk/i).talk(async dialog => {
+    const user = await dialog.bot.users.info(dialog.user)
+    const topic = await dialog.ask('What about?', topicParser)
+    await dialog.say(`Ok ${user.profile.firstName}, let's talk about ${topic}.`)
+    // ...
+  })
+  .listen()
+```
 
-    // do something with user's reply
-    placePizzaOrder(dialog.user, { pepperoni: withPepperoni })
-    await dialog.say(`Ok, ${user.profile.firstName}, you pizza is on its way. `)
+<img src="assets/blank.png" width="1" height="30"/>
+
+## 📦 Packages
+Xene is split into different packages for different services and purposes.
+There are 2 main packages that differ from rest: `@xene/core` and `@xene/test`.
+
+- [`@xene/core`](https://www.npmjs.com/package/@xene/core) is the place where actual conversation API is implemented and all other packages(like
+`@xene/slack`) derive from it.
+- [`@xene/test`](https://www.npmjs.com/package/@xene/test) defines a convenient
+wrapper to help you test your bots. It works nicely with all other packages
+(Slack or Telegram).
+- [`@xene/slack`](https://www.npmjs.com/package/@xene/slack) provides
+`Slackbot` which provides all features to build communication and it also
+provides all [api methods of Slack](https://api.slack.com/methods) with
+promises and in camel case 🙂
+- `@xene/telegram` is still in progress but will be as smooth as Slackbot 😉
+
+<img src="assets/blank.png" width="1" height="30"/>
+
+## 💬 Talking
+
+Xene provides two main ways to talk with users — in response to some users'
+message and a way to start talking completely programmatically.
+
+### 📥 In response to message
+To talk with a user when a user says something, first of all, we need to match
+user's message. Xene bots provide `.when()` method for this.
+
+```js
+import { Slackbot } from '@xene/slack'
+
+new Slackbot(/* API token */)
+  .when(/hi|hello/i).talk(dialog => /* ... */)
+```
+
+Once user says something that matches, callback passed to `.talk()` will be
+invoked with an instance of `Dialog` class. Which provides three main methods
+to parse something from most recent users' message(`dialog.parse()`), to say
+something to user(`dialog.say()`) and to ask a question to which user can reply
+(`dialog.ask()`). Read more about them and Dialog [here](#dialog).
+
+```js
+import { Slackbot } from '@xene/slack'
+
+new Slackbot(/* API token */)
+  .when(/hi|hello/i).talk(async dialog => {
+    await dialog.say('Hi there!')
+    const play = await dialog.ask('Wanna play a game?', reply => /yes/i.test(reply))
+    // start a game...
+  })
+```
+<div align="center"><img src="assets/ex-1.png" width="400"/></div>
+
+### 📤 Initiate proactively
+
+The dialog can also be created proactively when you need them. To do so you can
+call `bot.dialog()` method. It expects chat id (slack channel would do) and an
+array of users' ids. Rest is the same as in the above example.
+
+```js
+import { Slackbot } from '@xene/slack'
+
+const bot = new Slackbot(/* API token */)
+
+const whoAmI = async () => {
+  const dialog = bot.dialog('#chat-id', ['@user1-id', '@user2-id'])
+  const name = await dialog.ask('Guys, who am I?', reply => reply)
+  await dialog.say(`So, I am a ${name}... OK.`)
+  bot.name = name
+  dialog.end()
+}
+
+whoAmI()
+```
+
+<div align="center"><img src="assets/ex-2.png" width="400"/></div>
+
+### ⚙️ Dialog API
+In the examples above we've been dealing with instances of `Dialog` class.
+It provides following methods and properties.
+
+#### .bot: Bot
+The instance of the `Bot` to which dialog belongs to
+```js
+dialog.bot
+```
+
+#### .chat: string
+The unique id of a chat where the dialog is happening.
+```js
+dialog.chat
+```
+
+#### .users: Array\<string>
+An array of ids of all users to whom dialog is attached to.
+```js
+dialog.users
+```
+
+#### .user: string
+The id of the primary user to whom dialog is attached to.
+```js
+dialog.user
+```
+
+#### .on(event: string, callback: function)
+Add an event listener to life cycle events of a dialog.
+```js
+dialog.on('end', _ => console.log('Dialog has ended.'))
+dialog.on('abort', _ => console.log('Dialog was aborted by user.'))
+dialog.on('incomingMessage', m => console.log(`Incoming message ${JSON.stringify(m)}`))
+dialog.on('outgoingMessage', m => console.log(`Outgoing message ${JSON.stringify(m)}`))
+```
+
+#### .end()
+Abort dialog, use this to stop dialog. For example when users asks to.
+```js
+dialog.on('abort', _ => dialog.end())
+```
+
+#### .say(message)
+Send a message to chat, type of the message depends on the bot to which dialog
+belongs to. For Slackbot message can be either `string` or message object
+described [here](https://api.slack.com/methods/chat.postMessage).
+```js
+dialog.say('Hello world!')
+```
+
+#### .parse(parser, [onError])
+Parse most recent message from the bot. This method accepts one or two arguments.
+
+If an error handler isn't provided, this method will return the result of the first attempt
+to apply parser even if it's an undefined.
+```js
+new Slackbot(/* API token */)
+  .when(/hi/i).talk(async dialog => {
+    await dialog.say('Hi!')
+    const parser = reply => (reply.match(/[A-Z][a-z]+/) || [])[0]
+    const name = await dialog.parse(parser)
+    if (!name) await dialog.say("I didn't get your name, but it's OK.")
+    else await dialog.say(`Nice to meet you ${name}.`)
   })
 ```
 
-Xene is a framework for building conversational bots either with modern JavaScript. From simple command based bots to rich natural language bots the framework provides all of the features needed to manage the conversational aspects of a bot.
+<div align="center"><img src="assets/ex-3.png" width="400"/></div>
 
-### Packages
-Xene is split into different packages and depending on with which service your bot should work you should install appropriate package.
-All bot packages extend Core bot package with APIs specific to that service. And all conversational API is implemented in core. This means you can use same API to build conversation in Slack or Telegram and that it's relatively easy to add new service since all you need to do is to subclass base Bot class from Core package and add 3 methods to interact with that service.
+If there is an error handler xene will call it for every failed attempt to parse
+user's message. Xene counts all parsing failed if `null` or `undefined` were
+returned from parser function. To fine tune this behavior you can pass an object
+as a parser with two methods — `parse` and `isValid`. Xene will call `isValid` to determine if parsing failed.
 
-<table align="center">
-  <tr>
-    <td><strong>Core</strong></td>
-    <td><code>npm i @xene/core</code></td>
-    <td>Core of each bots xene provides. Because of this library all they have same simple API for conversations.</td>
-  </tr>
-  <tr>
-    <td><a href="https://slack.com">Slack</a></td>
-    <td><code>npm i @xene/slack</code></td>
-    <td>Interface for Slack bot with additions for interactive message handling.</td>
-  </tr>
-  <tr>
-    <td><a href="https://telegram.org">Telegram</a></td>
-    <td><code>npm i @xene/telegram</code></td>
-    <td><em>In progress</em></td>
-  </tr>
-  <tr>
-    <td><strong>Test</strong></td>
-    <td><code>npm i @xene/test</code></td>
-    <td>Interface to test your bot. Like supertest for koa/express.</td>
-  </tr>
-</table>
+```js
+new Slackbot(/* API token */)
+  .when(/invite/i).talk(async dialog => {
+    const parser = {
+      parse: reply => reply.match(/[A-Z][a-z]+/),
+      isValid: parsed => parsed && parsed.length
+    }
+    const names = await dialog.parse(parser, 'Whom to invite?')
+    // ...
+  })
+```
 
-### TypeScript
-`xene` is written in TypeScript and npm package already includes all typings.
+<div align="center"><img src="assets/ex-4.png" width="400"/></div>
+
+<img src="assets/blank.png" width="1" height="30"/>
+
+## ✅ Testing
+
+<img src="assets/blank.png" width="1" height="30"/>
+
+## TypeScript
+Xene is written in TypeScript and npm package already includes all typings.
