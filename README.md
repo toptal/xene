@@ -128,6 +128,8 @@ Add an event listener to life cycle events of a dialog.
 ```js
 dialog.on('end', _ => console.log('Dialog has ended.'))
 dialog.on('abort', _ => console.log('Dialog was aborted by user.'))
+dialog.on('pause', _ => console.log('Dialog was paused.'))
+dialog.on('unpause', _ => console.log('Dialog was unpaused.'))
 dialog.on('incomingMessage', m => console.log(`Incoming message ${JSON.stringify(m)}`))
 dialog.on('outgoingMessage', m => console.log(`Outgoing message ${JSON.stringify(m)}`))
 ```

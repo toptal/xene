@@ -1,12 +1,15 @@
 import { Bot } from './bot'
-import { Parser } from './parser'
 import { IManager } from './chat'
 import { EventEmitter } from './ee'
-import { Question } from './question'
 import { UserMessage } from './types'
+import { Parse } from './actions/parse'
+import { Pause } from './actions/pause'
+import { Action } from './actions/action'
+import { Question } from './actions/question'
 
-const isQuestion = (q): q is Question =>
-  q instanceof Question
+const isPause = (p): p is Pause => p instanceof Pause
+const isParse = (p): p is Parse => p instanceof Parse
+const isQuestion = (q): q is Question => q instanceof Question
 
 export class Manager implements IManager {
   /** @internal */
@@ -14,7 +17,7 @@ export class Manager implements IManager {
   emit = this._ee.emit
   on = this._ee.on
 
-  private _queue: (Parser | Question)[] = []
+  private _queue: Action[] = []
   private _messages: UserMessage[] = []
 
   constructor(
@@ -40,34 +43,38 @@ export class Manager implements IManager {
    * up with queue. If it fails then same flow applied
    * as for question e.g. add to queue.
    */
-  add(action: Parser | Question) {
-    if (isQuestion(action)) {
+  add(action: Action) {
+    if (isQuestion(action) || isPause(action)) {
       this._queue.push(action)
       return this._chat.add(this)
     }
 
-    if (this._lastMessage && action.parse(this._lastMessage)) return
+    if (this._lastMessage && action.perform(this._lastMessage)) return
     else this._queue.push(action)
     if (!this._queue.some(isQuestion)) this._chat.add(this)
   }
 
   prepare() {
     if (isQuestion(this._head)) this._head.ask()
-    else this._head.error(this._lastMessage)
+    else if (isPause(this._head)) return
+    else this._head.failed(this._lastMessage)
   }
 
   perform(message: UserMessage) {
     this.emit('incomingMessage', message)
     this._messages.push(message)
     if (this._isEmpty) return true
-    const wasParsed = this._head.parse(message)
-    if (!wasParsed) {
-      this._head.error(message)
+    if (!this._head.perform(message)) {
+      this._head.failed(message)
       return false
     }
     this._queue.shift()
     if (isQuestion(this._head)) return true
     else return this.perform(message)
+  }
+
+  unpause() {
+    this._queue = this._queue.filter(p => !isPause(p))
   }
 
   abort() {

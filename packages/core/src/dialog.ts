@@ -1,7 +1,8 @@
 import { Bot as B } from './bot'
-import { Parser } from './parser'
 import { Manager } from './manager'
-import { Question } from './question'
+import { Pause } from './actions/pause'
+import { Parse } from './actions/parse'
+import { Question } from './actions/question'
 import { UserMessage, ParseType, ParseFun, ParseObj } from './types'
 
 const isMessage = <T>(arg): arg is object =>
@@ -17,6 +18,7 @@ export class Dialog<
   bot: Bot
   chat: string
   users: string[]
+  isPaused: boolean = false
   /** @internal */
   _manager: Manager
   get user() { return this.users[0] }
@@ -26,23 +28,38 @@ export class Dialog<
     this._manager = new Manager(bot, chat, users)
     this.parse = this.parse.bind(this)
     this.ask = this.ask.bind(this)
+    this.say = this.say.bind(this)
   }
 
   on(event: 'end', callback: () => any)
   on(event: 'abort', callback: () => any)
+  on(event: 'pause', callback: () => any)
+  on(event: 'unpause', callback: () => any)
   on(event: 'incomingMessage', callback: (message: UserMessage) => any)
   on(event: 'outgoingMessage', callback: (chat: string, message: BotMessage) => any)
   on(event: string, callback: (...args: any[]) => any) {
     this._manager.on(event, callback)
   }
 
-  end = () => {
+  end() {
     this._manager.emit('end')
     this._manager.unbind()
   }
 
-  say = (message: BotMessage) => {
+  pause(message: BotMessage) {
+    this.isPaused = true
+    this._manager.emit('pause')
+    const handler = () => this.say(message, false)
+    this._manager.add(new Pause(handler))
+  }
+
+  say(message: BotMessage, unpause: boolean = true) {
     this._manager.emit('outgoingMessage', this.chat, message)
+    if (this.isPaused && unpause) {
+      this._manager.unpause()
+      this._manager.emit('unpause')
+      this.isPaused = false
+    }
     return this.bot.say(this.chat, message)
   }
 
@@ -52,7 +69,7 @@ export class Dialog<
   parse<T>(parserObject: ParseObj<T>, errorMessage: BotMessage): Promise<T>
   parse<T>(parserObject: ParseObj<T>, errorCallback: (reply: string) => any): Promise<T>
   parse<T>(parser: ParseType<T>, onError?: BotMessage | ((reply: string) => any)): Promise<T> {
-    const parserObj = new Parser(parser, errorHandler(this.say, onError))
+    const parserObj = new Parse(parser, errorHandler(this.say, onError))
     this._manager.add(parserObj)
     return parserObj.promise
   }

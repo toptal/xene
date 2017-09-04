@@ -87,3 +87,16 @@ test('Dialog with parsing errors', async (t: IContext) => {
   t.context.bot.incoming(CHAT, 'user1', 'p')
   t.deepEqual(t.context.bot.messages, [msg('q1'), msg('q2'), msg('q1'), msg(undefined), msg('err')])
 })
+
+test('Flow with pause', async (t: IContext) => {
+  t.plan(5)
+  const dialog = t.context.bot.dialog(CHAT, ['user'])
+  dialog.on('pause', () => t.pass())
+  dialog.on('unpause', () => t.pass())
+  dialog.pause('PAUSED')
+  t.true(dialog.isPaused)
+  t.context.bot.incoming(CHAT, 'user', 'message')
+  t.deepEqual(t.context.bot.messages, [msg('PAUSED')])
+  await dialog.say('Hi')
+  t.false(dialog.isPaused)
+})
