@@ -21,7 +21,7 @@ export abstract class Bot<BotMessage = any> {
 
   when = Binder.for(this)
 
-  protected _: { BotMessage: BotMessage }
+  _: { BotMessage: BotMessage }
   private _chats = new Map<string, Chat>()
 
   abstract listen(arg?: any): this
