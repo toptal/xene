@@ -1,6 +1,6 @@
 {
   "name": "@xene/core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Core of the xene framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
