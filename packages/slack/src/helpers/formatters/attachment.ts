@@ -12,8 +12,8 @@ export function toSlack(attachment: Attachment) {
 export function fromSlack(attachment): Attachment {
   const { actions, ...rest } = attachment
   return {
-    buttons: actions.filter(a => a.type === 'button').map(buttonFormat.fromSlack),
-    menus: actions.filter(a => a.type === 'menu').map(menuFormat.fromSlack),
+    buttons: (actions || []).filter(a => a.type === 'button').map(buttonFormat.fromSlack),
+    menus: (actions || []).filter(a => a.type === 'menu').map(menuFormat.fromSlack),
     ...rest
   }
 }
