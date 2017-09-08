@@ -140,7 +140,7 @@ Abort dialog, use this to stop dialog. For example when users asks to.
 dialog.on('abort', _ => dialog.end())
 ```
 
-#### .say(message)
+#### .say(message: Message)
 Send a message to chat, type of the message depends on the bot to which dialog
 belongs to. For Slackbot message can be either `string` or message object
 described [here](https://api.slack.com/methods/chat.postMessage).
@@ -148,8 +148,8 @@ described [here](https://api.slack.com/methods/chat.postMessage).
 dialog.say('Hello world!')
 ```
 
-#### .parse(parser, [onError])
-Parse most recent message from the bot. This method accepts one or two arguments.
+#### .parse(parser: Function || { parse: Function, isValid: Function } , [onError: Message || Function])
+Parse the most recent message from the user. This method accepts one or two arguments.
 
 If an error handler isn't provided, this method will return the result of the first attempt
 to apply parser even if it's an undefined.
@@ -184,6 +184,22 @@ new Slackbot(/* API token */)
 ```
 
 <div align="center"><img src="assets/ex-4.png" width="400"/></div>
+
+#### .ask(question: Message, parser: Function || { parse: Function, isValid: Function }, [onError: Message || Function])
+Ask the question to user and parse response from user to this question. If parsing fails and error handler `onError` is defined it will be called. If error handler `onError` isn't defined than question will be asked again.
+
+```js
+new Slackbot(/* API token */)
+  .when(/hi/i).talk(async dialog => {
+    await dialog.say('Hi!')
+    const parser = reply => (reply.match(/[A-Z][a-z]+/) || [])[0]
+    const name = await dialog.ask('How can I call you?', parser, 'Sorry?')
+    await dialog.say(`Nice to meet you, ${name}.`)
+  })
+```
+<div align="center"><img src="assets/ex-5.png" width="400"/></div>
+This example also shows us importance of better parser then one based on capital letter in front of the words 😅.
+
 
 <img src="assets/blank.png" width="1" height="30"/>
 
