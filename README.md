@@ -1,5 +1,7 @@
 <div align="center"><img src="assets/hero.png" width="445"/></div>
 
+[![Build Status](https://travis-ci.org/dempfi/xene.svg?branch=master)](https://travis-ci.org/dempfi/xene) [![npm](https://img.shields.io/npm/dm/@xene/core.svg)](https://www.npmjs.com/package/@xene/core) [![first timers only](http://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat)](http://www.firsttimersonly.com)
+
 Xene is a framework for building conversational bots with modern JavaScript(or
 TypeScript). From simple command based bots to rich natural language bots the
 framework provides all of the features needed to manage the conversational aspects of a bot.
