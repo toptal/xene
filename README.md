@@ -1,6 +1,6 @@
 <div align="center"><img src="assets/hero.png" width="445"/></div>
 
-[![Build Status](https://travis-ci.org/dempfi/xene.svg?branch=master)](https://travis-ci.org/dempfi/xene) [![npm](https://img.shields.io/npm/dm/@xene/core.svg)](https://www.npmjs.com/package/@xene/core) [![first timers only](http://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat)](http://www.firsttimersonly.com)
+[![Travis](https://img.shields.io/travis/dempfi/xene.svg?style=flat-square&label=tests)](https://travis-ci.org/dempfi/xene) [![npm](https://img.shields.io/npm/dm/@xene/core.svg?style=flat-square)](https://www.npmjs.com/package/@xene/core) [![first timers only](http://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](http://www.firsttimersonly.com)
 
 Xene is a framework for building conversational bots with modern JavaScript(or
 TypeScript). From simple command based bots to rich natural language bots the
@@ -84,15 +84,16 @@ import { Slackbot } from '@xene/slack'
 
 const bot = new Slackbot(/* API token */)
 
-const whoAmI = async () => {
+const getGloriousPurpose = async () => {
   const dialog = bot.dialog('#chat-id', ['@user1-id', '@user2-id'])
-  const name = await dialog.ask('Guys, who am I?', reply => reply)
-  await dialog.say(`So, I am a ${name}... OK.`)
-  bot.name = name
+  const purpose = await dialog.ask('Guys, what is my purpose?', reply => reply)
+  const comment = purpose === 'to pass butter' ? 'Oh my god.' : 'Nice.'
+  await dialog.say(`"${purpose}"... ${comment}`)
+  bot.purpose = purpose
   dialog.end()
 }
 
-whoAmI()
+getGloriousPurpose()
 ```
 
 <div align="center"><img src="assets/ex-2.png" width="400"/></div>
