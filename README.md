@@ -140,12 +140,19 @@ Abort dialog, use this to stop dialog. For example when users asks to.
 dialog.on('abort', _ => dialog.end())
 ```
 
-#### .say(message: Message)
+#### .say(message: Message, [unpause: Boolean = true])
 Send a message to chat, type of the message depends on the bot to which dialog
 belongs to. For Slackbot message can be either `string` or message object
 described [here](https://api.slack.com/methods/chat.postMessage).
+
+`unpause` option is optional it's here to help you to control whether dialog
+should be unpaused when bot says something or not. By default it's true and
+dialog will be unpaused. [Read more about pasue.](#pause)
+
 ```js
 dialog.say('Hello world!')
+dialog.pause('Paused!')
+dialog.say('Hi again', false)
 ```
 
 #### .parse(parser: Function || { parse: Function, isValid: Function } , [onError: Message || Function])
@@ -186,7 +193,9 @@ new Slackbot(/* API token */)
 <div align="center"><img src="assets/ex-4.png" width="400"/></div>
 
 #### .ask(question: Message, parser: Function || { parse: Function, isValid: Function }, [onError: Message || Function])
-Ask the question to user and parse response from user to this question. If parsing fails and error handler `onError` is defined it will be called. If error handler `onError` isn't defined than question will be asked again.
+Ask the `question` to user and parse response from user to the question. If
+parsing fails and error handler `onError` is defined it will be called. If
+error handler `onError` isn't defined than question will be asked again.
 
 ```js
 new Slackbot(/* API token */)
@@ -200,6 +209,21 @@ new Slackbot(/* API token */)
 <div align="center"><img src="assets/ex-5.png" width="400"/></div>
 This example also shows us importance of better parser then one based on capital letter in front of the words 😅.
 
+#### .pause(message: Message)
+Reply to all incoming user's messages with `message` until dialog is unpaused.
+Dialog unpauses when a message is sent to user or question is asked(`.say()`
+and `.ask()` methods). This method can help your bot to give status to user during some have calculations which takes some time.
+
+```js
+new Slackbot(/* API token */)
+  .when(/meaning of life/i).talk(async dialog => {
+    dialog.pause(`Wait human, I'm thinking...`)
+    await dialog.say('OK, let me think about this.', false)
+    await new Promise(resolve, setTimeout(resolve, 24 * 60 * 60 * 1000))
+    await dialog.say('Eureka! The answer is ... 42.')
+  })
+```
+<div align="center"><img src="assets/ex-6.png" width="400"/></div>
 
 <img src="assets/blank.png" width="1" height="30"/>
 
