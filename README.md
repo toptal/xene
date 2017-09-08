@@ -221,8 +221,8 @@ new Slackbot(/* API token */)
   .when(/meaning of life/i).talk(async dialog => {
     dialog.pause(`Wait human, I'm thinking...`)
     await dialog.say('OK, let me think about this.', false)
-    await new Promise(resolve, setTimeout(resolve, 24 * 60 * 60 * 1000))
-    await dialog.say('Eureka! The answer is ... 42.')
+    await new Promise(resolve, setTimeout(resolve, 24 * 60 * 60 * 1000)) // wait 24 hours
+    await dialog.say('The answer is... 42.')
   })
 ```
 <div align="center"><img src="assets/ex-6.png" width="400"/></div>
