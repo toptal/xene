@@ -97,6 +97,8 @@ export type MessageOptions = {
   linkNames?: 1
   unfurlLinks?: boolean
   unfurlMedia?: boolean
+  replyBroadcast?: boolean
+  threadTs?: string
 }
 
 export type User = {
