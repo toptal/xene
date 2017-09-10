@@ -234,5 +234,5 @@ new Slackbot(/* API token */)
 
 <img src="assets/blank.png" width="1" height="30"/>
 
-## TypeScript
+#### TypeScript
 Xene is written in TypeScript and npm package already includes all typings.
