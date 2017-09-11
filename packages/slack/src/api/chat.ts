@@ -28,8 +28,11 @@ export class Chat extends APIModule {
         channel, asUser: true, ...options,
         ...messageFormat.toSlack(message)
       }))
-      .then(messageFormat.fromSlack)
       .then(camel)
+      .then(({message, ...rest}) => ({
+        message: messageFormat.fromSlack(message),
+        ...rest
+      }))
   }
 
   update(channel: string, ts: string, message: Message) {
