@@ -1,20 +1,21 @@
 import { APIModule } from './base'
+import { get, map, find } from 'lodash/fp'
 import { camel, snake } from './converters'
-import { Message, MessageOptions } from '../types'
+import { File, FileUploadOptions } from '../types'
 import * as messageFormat from '../helpers/formatters/message'
 
 export class Files extends APIModule {
   /**
    * https://api.slack.com/methods/files.upload
    */
-  upload(options = {}) {
-    return this.request('upload', snake(options)).then(camel)
+  upload(options: Partial<FileUploadOptions>): Promise<File> {
+    return this.request('upload', snake(options)).then(get('file')).then(camel)
   }
 
   /**
    * https://api.slack.com/methods/files.sharedPublicURL
    */
-  sharedPublicURL(options = {}) {
-    return this.request('sharedPublicURL', snake(options)).then(camel)
+  sharedPublicURL(options: { file: string }): Promise<File> {
+    return this.request('sharedPublicURL', snake(options)).then(get('file')).then(camel)
   }
 }
