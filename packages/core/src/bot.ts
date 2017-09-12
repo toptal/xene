@@ -1,6 +1,6 @@
-import { Chat } from './chat'
 import { Binder } from './binder'
 import { Dialog } from './dialog'
+import { Channel } from './channel'
 import { UserMessage } from './types'
 
 type Matcher = { match: (message: UserMessage) => boolean }
@@ -22,37 +22,37 @@ export abstract class Bot<BotMessage = any> {
   when = Binder.for(this)
 
   _: { BotMessage: BotMessage }
-  private _chats = new Map<string, Chat>()
+  private _channels = new Map<string, Channel>()
 
   abstract listen(arg?: any): this
-  abstract say(chat: string, message: BotMessage): Promise<any>
+  abstract say(channel: string, message: BotMessage): Promise<any>
 
   /** @internal */
-  _chatFor(chatId: string) {
-    const chat = this._chats.get(chatId) || new Chat()
-    this._chats.set(chatId, chat)
-    return chat
+  _channelFor(channelId: string) {
+    const channel = this._channels.get(channelId) || new Channel()
+    this._channels.set(channelId, channel)
+    return channel
   }
 
-  dialog(chat: string, users: string[]) {
-    return new Dialog(this, chat, users)
+  dialog(channel: string, users: string[]) {
+    return new Dialog(this, channel, users)
   }
 
-  abortDialog(chat: string, user: string) {
-    this._chatFor(chat).abort(user)
+  abortDialog(channel: string, user: string) {
+    this._channelFor(channel).abort(user)
   }
 
   protected onMessage(message: UserMessage): any {
     const performer = this._performerHandlers.find(c => c.match(message))
     if (performer) return performer.handler(message, this)
 
-    const chat = this._chatFor(message.chat)
-    const hasActions = chat.hasFor(message.user)
-    if (hasActions) return chat.processMessage(message)
+    const channel = this._channelFor(message.channel)
+    const hasActions = channel.hasFor(message.user)
+    if (hasActions) return channel.processMessage(message)
 
     const dialog = this._dialogHandlers.find(c => c.match(message))
     if (dialog) {
-      const obj = this.dialog(message.chat, [message.user])
+      const obj = this.dialog(message.channel, [message.user])
       obj._manager.perform(message)
       dialog.handler(obj, this)
     }

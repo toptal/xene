@@ -12,7 +12,7 @@ const remove = <T>(array: T[], el: T): T[] => {
   return index >= 0 ? array.splice(index, 1) : array
 }
 
-export class Chat {
+export class Channel {
   private _managers: IManager[] = []
   private _allManagers: IManager[] = []
 

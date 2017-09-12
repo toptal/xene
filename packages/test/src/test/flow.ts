@@ -3,13 +3,13 @@ import { Bot as CoreBot } from '@xene/core'
 import { wrap } from '../'
 
 class Bot extends CoreBot<string | object> {
-  async say(chat, msg) { /* noop */ }
+  async say(channel, msg) { /* noop */ }
   listen() { return this }
 }
 
 const subject = wrap(new Bot()
-  .when(m => m.text === '2' && m.chat === 'c1' && m.user === 'u1').say('7')
-  .when(m => m.text === '2' && m.chat === 'c1').say('3')
+  .when(m => m.text === '2' && m.channel === 'c1' && m.user === 'u1').say('7')
+  .when(m => m.text === '2' && m.channel === 'c1').say('3')
   .when('3').say({ message: ['3'] })
   .when('1').say('2')
 )

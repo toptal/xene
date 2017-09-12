@@ -52,11 +52,11 @@ export class Slackbot extends Bot<string | Message> {
     else Slackbot.dispatcher.add(this.id, this)
   }
 
-  async say(chat: string, message: string | Message) {
+  async say(channel: string, message: string | Message) {
     const init = { text: '', attachments: [] }
     message = _.isString(message) ? { ...init, text: message } : { ...init, ...message }
     message.attachments.forEach(a => a.callbackId = a.callbackId || this.id)
-    return this.chat.postMessage(chat, message)
+    return this.chat.postMessage(channel, message)
   }
 
   listen() {
@@ -76,10 +76,10 @@ export class Slackbot extends Bot<string | Message> {
     let attachments = payload.originalMessage.attachments
     attachments = attachments.map(this.markActionSelected.bind(this, selected))
     this.onMessage({
-      id: payload.ts,
+      channel: payload.channel.id,
+      user: payload.user.id,
       text: selected.value,
-      chat: payload.channel.id,
-      user: payload.user.id
+      id: payload.ts
     })
     return { text, attachments }
   }
@@ -93,7 +93,7 @@ export class Slackbot extends Bot<string | Message> {
     const isBotMentioned = isMentioned(this.bot.id, text)
     const isPrivate = isPrivateChannel(channel)
     if (!isPrivate && !isBotMentioned) return
-    this.onMessage({ id: ts, text, user, chat: channel })
+    this.onMessage({ id: ts, text, user, channel })
   }
 
   private markActionSelected(action, attachment) {

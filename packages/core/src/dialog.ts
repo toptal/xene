@@ -16,16 +16,16 @@ export class Dialog<
   BotMessage extends Bot['_']['BotMessage']= Bot['_']['BotMessage']> {
 
   bot: Bot
-  chat: string
   users: string[]
+  channel: string
   isPaused: boolean = false
   /** @internal */
   _manager: Manager
   get user() { return this.users[0] }
 
-  constructor(bot: Bot, chat: string, users: string[]) {
-    this.bot = bot, this.chat = chat, this.users = users
-    this._manager = new Manager(bot, chat, users)
+  constructor(bot: Bot, channel: string, users: string[]) {
+    this.bot = bot, this.channel = channel, this.users = users
+    this._manager = new Manager(bot, channel, users)
     this.parse = this.parse.bind(this)
     this.ask = this.ask.bind(this)
     this.say = this.say.bind(this)
@@ -36,7 +36,7 @@ export class Dialog<
   on(event: 'pause', callback: () => any)
   on(event: 'unpause', callback: () => any)
   on(event: 'incomingMessage', callback: (message: UserMessage) => any)
-  on(event: 'outgoingMessage', callback: (chat: string, message: BotMessage) => any)
+  on(event: 'outgoingMessage', callback: (channel: string, message: BotMessage) => any)
   on(event: string, callback: (...args: any[]) => any) {
     this._manager.on(event, callback)
   }
@@ -54,13 +54,13 @@ export class Dialog<
   }
 
   say(message: BotMessage, unpause: boolean = true) {
-    this._manager.emit('outgoingMessage', this.chat, message)
+    this._manager.emit('outgoingMessage', this.channel, message)
     if (this.isPaused && unpause) {
       this._manager.unpause()
       this._manager.emit('unpause')
       this.isPaused = false
     }
-    return this.bot.say(this.chat, message)
+    return this.bot.say(this.channel, message)
   }
 
   parse<T>(parserFunc: ParseFun<T>): Promise<T>

@@ -1,18 +1,18 @@
 import { Bot } from '../../bot'
 
 export class TestBot extends Bot<string> {
-  messages: { chat: string, message: string }[] = []
+  messages: { channel: string, message: string }[] = []
   listen() { return this }
 
-  async say(chat: string, message: string) {
-    this.messages.push({ chat, message })
+  async say(channel: string, message: string) {
+    this.messages.push({ channel, message })
   }
 
   get lastMessage() {
     return this.messages[this.messages.length - 1]
   }
 
-  incoming(chat: string, user: string, text: string) {
-    this.onMessage({ id: '', chat, user, text })
+  incoming(channel: string, user: string, text: string) {
+    this.onMessage({ id: '', channel, user, text })
   }
 }

@@ -1,5 +1,5 @@
 import { Bot } from './bot'
-import { IManager } from './chat'
+import { IManager } from './channel'
 import { EventEmitter } from './ee'
 import { UserMessage } from './types'
 import { Parse } from './actions/parse'
@@ -22,10 +22,10 @@ export class Manager implements IManager {
 
   constructor(
     private _bot: Bot,
-    private _chatId: string,
+    private _channelID: string,
     public users: string[]
   ) {
-    this._chat.bind(this)
+    this._channel.bind(this)
   }
 
   /**
@@ -46,12 +46,12 @@ export class Manager implements IManager {
   add(action: Action) {
     if (isQuestion(action) || isPause(action)) {
       this._queue.push(action)
-      return this._chat.add(this)
+      return this._channel.add(this)
     }
 
     if (this._lastMessage && action.perform(this._lastMessage)) return
     else this._queue.push(action)
-    if (!this._queue.some(isQuestion)) this._chat.add(this)
+    if (!this._queue.some(isQuestion)) this._channel.add(this)
   }
 
   prepare() {
@@ -82,11 +82,11 @@ export class Manager implements IManager {
   }
 
   unbind() {
-    this._chat.without(this)
+    this._channel.without(this)
   }
 
   private get _lastMessage() { return this._messages[this._messages.length - 1] }
-  private get _chat() { return this._bot._chatFor(this._chatId) }
+  private get _channel() { return this._bot._channelFor(this._channelID) }
   private get _isEmpty() { return this._queue.length === 0 }
   private get _head() { return this._queue[0] }
 }

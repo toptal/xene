@@ -76,7 +76,7 @@ new Slackbot(/* API token */)
 ### 📤 Initiate proactively
 
 The dialog can also be created proactively when you need them. To do so you can
-call `bot.dialog()` method. It expects chat id (slack channel would do) and an
+call `bot.dialog()` method. It expects channel id (slack channel would do) and an
 array of users' ids. Rest is the same as in the above example.
 
 ```js
@@ -85,7 +85,7 @@ import { Slackbot } from '@xene/slack'
 const bot = new Slackbot(/* API token */)
 
 const getGloriousPurpose = async () => {
-  const dialog = bot.dialog('#chat-id', ['@user1-id', '@user2-id'])
+  const dialog = bot.dialog('#channel-id', ['@user1-id', '@user2-id'])
   const purpose = await dialog.ask('Guys, what is my purpose?', reply => reply)
   const comment = purpose === 'to pass butter' ? 'Oh my god.' : 'Nice.'
   await dialog.say(`"${purpose}"... ${comment}`)
@@ -104,30 +104,35 @@ It provides following methods and properties.
 
 #### .bot: Bot
 The instance of the `Bot` to which dialog belongs to
+
 ```js
 dialog.bot
 ```
 
-#### .chat: string
-The unique id of a chat where the dialog is happening.
+#### .channel: string
+The unique id of a channel where the dialog is happening.
+
 ```js
-dialog.chat
+dialog.channel
 ```
 
 #### .users: Array\<string>
 An array of ids of all users to whom dialog is attached to.
+
 ```js
 dialog.users
 ```
 
 #### .user: string
 The id of the primary user to whom dialog is attached to.
+
 ```js
 dialog.user
 ```
 
 #### .on(event: string, callback: function)
 Add an event listener to life cycle events of a dialog.
+
 ```js
 dialog.on('end', _ => console.log('Dialog has ended.'))
 dialog.on('abort', _ => console.log('Dialog was aborted by user.'))
@@ -139,14 +144,15 @@ dialog.on('outgoingMessage', m => console.log(`Outgoing message ${JSON.stringify
 
 #### .end()
 Abort dialog, use this to stop dialog. For example when users asks to.
+
 ```js
 dialog.on('abort', _ => dialog.end())
 ```
 
 #### .say(message: Message, [unpause: Boolean = true])
-Send a message to chat, type of the message depends on the bot to which dialog
+Send a message to channel, type of the message depends on the bot to which dialog
 belongs to. For Slackbot message can be either `string` or message object
-described [here](https://api.slack.com/methods/chat.postMessage).
+described [here](https://api.slack.com/methods/channel.postMessage).
 
 `unpause` option is optional it's here to help you to control whether dialog
 should be unpaused when bot says something or not. By default it's true and
@@ -163,6 +169,7 @@ Parse the most recent message from the user. This method accepts one or two argu
 
 If an error handler isn't provided, this method will return the result of the first attempt
 to apply parser even if it's an undefined.
+
 ```js
 new Slackbot(/* API token */)
   .when(/hi/i).talk(async dialog => {
@@ -215,7 +222,8 @@ This example also shows us importance of better parser then one based on capital
 #### .pause(message: Message)
 Reply to all incoming user's messages with `message` until dialog is unpaused.
 Dialog unpauses when a message is sent to user or question is asked(`.say()`
-and `.ask()` methods). This method can help your bot to give status to user during some have calculations which takes some time.
+and `.ask()` methods). This method can help your bot to give status to user
+during some have calculations which takes some time.
 
 ```js
 new Slackbot(/* API token */)
@@ -231,6 +239,17 @@ new Slackbot(/* API token */)
 <img src="assets/blank.png" width="1" height="30"/>
 
 ## ✅ Testing
+
+Xene provides [test](https://www.npmjs.com/package/@xene/test) module to stub
+your bot and run assertions.
+
+For example let's test this bot
+
+```js
+new Slackbot(/* API token */)
+  .when(/hi/i).say('Hi there')
+  .when(/calc/i)
+```
 
 <img src="assets/blank.png" width="1" height="30"/>
 

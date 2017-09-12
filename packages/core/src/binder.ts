@@ -30,7 +30,7 @@ export class Binder<B extends Bot> {
 
   say(message: B['_']['BotMessage']) {
     const match = normalizeMatcher(this._matcher)
-    const handler = (msg: UserMessage, bot: B) => bot.say(msg.chat, message)
+    const handler = (msg: UserMessage, bot: B) => bot.say(msg.channel, message)
     this._bot._performerHandlers.push({ match, handler })
     return this._bot
   }

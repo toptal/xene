@@ -5,7 +5,7 @@ import { Binder } from '../binder'
 interface IContext extends TestContext { context: { bot: TestBot } }
 test.beforeEach(t => { t.context.bot = new TestBot() })
 
-const msg = (message) => ({ chat: '#', message })
+const msg = (message) => ({ channel: '#', message })
 
 test('Can bind with any matcher', (t: IContext) => {
   t.plan(3)
@@ -25,7 +25,7 @@ test('Throws on unknown matcher', (t: IContext) => {
 
 test('Can bind to any handler', (t: IContext) => {
   t.context.bot
-    .when('do').do(({ chat }, b) => b.say(chat, 'done'))
+    .when('do').do(({ channel }, b) => b.say(channel, 'done'))
     .when('talk').talk(d => d.say('talked'))
     .when('say').say('said')
 
