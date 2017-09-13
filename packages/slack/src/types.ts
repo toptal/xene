@@ -163,3 +163,62 @@ export type MiddlewareContext = {
    */
   ephemeral: string | Message
 }
+
+export type FileUploadOptions = {
+  channels: string[]
+  content: string
+  file: string
+  filename: string
+  filetype: string
+  initialComment: string
+  title: string
+}
+
+export type File = {
+  id: string,
+  created: number
+  timestamp: number
+  name: string
+  title: string
+  mimetype: string
+  filetype: string
+  prettyType: string
+  user: string
+  mode: string
+  editable: boolean,
+  isExternal: boolean
+  externalType: string
+  username: string
+  size: number
+  urlPrivate: string
+  urlPrivateDownload: string
+  thumb64: string
+  thumb80: string
+  thumb360: string
+  thumb360Gif: string
+  thumb360W: number
+  thumb360H: number
+  thumb480: string
+  thumb480W: number
+  thumb480H: number
+  thumb160: string
+  permalink: string
+  permalinkPublic: string
+  editLink: string
+  preview: string
+  previewHighlight: string
+  lines: number
+  linesMore: number
+  isPublic: boolean
+  publicUrlShared: boolean
+  displayAsBot: boolean
+  channels: string[]
+  groups: string[]
+  ims: string[]
+  initialComment: {}
+  numStars: number
+  isStarred: boolean
+  pinnedTo: string[]
+  reactions: { name: string, count: number, users: string[] }[]
+  commentsCount: number
+}

@@ -9,7 +9,7 @@ import { interpolate } from './helpers/interpolate'
 import { isPrivateChannel } from './helpers/channel-type'
 
 import { User, Message } from './types'
-import { Auth, RTM, Chat, Users, Groups, Channels } from './api'
+import { Auth, RTM, Chat, Users, Groups, Channels, Files } from './api'
 
 export class Slackbot extends Bot<string | Message> {
   // Default dispatcher, used when user didn't provide
@@ -29,6 +29,7 @@ export class Slackbot extends Bot<string | Message> {
   users: Users
   groups: Groups
   channels: Channels
+  files: Files
 
   constructor(options: {
     id?: string,
@@ -47,6 +48,7 @@ export class Slackbot extends Bot<string | Message> {
     this.users = new Users(options.appToken || options.botToken)
     this.groups = new Groups(options.appToken || options.botToken)
     this.channels = new Channels(options.appToken || options.botToken)
+    this.files = new Files(options.appToken || options.botToken)
 
     if (options.dispatcher) options.dispatcher.add(this.id, this)
     else Slackbot.dispatcher.add(this.id, this)
