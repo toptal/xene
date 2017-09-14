@@ -9,5 +9,5 @@ export function toSlack(message: Message) {
 
 export function fromSlack(message): Message {
   const { attachments, ...rest } = camel(message)
-  return { attachments: attachments.map(attachmentFormat.fromSlack), ...rest }
+  return { attachments: (attachments || []).map(attachmentFormat.fromSlack), ...rest }
 }
