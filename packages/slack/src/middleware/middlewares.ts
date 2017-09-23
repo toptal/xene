@@ -33,21 +33,22 @@ const processRequestWithHandler = async (handler: MiddlewareHandler, payload) =>
   let response
   const { ephemeral, message } = context
   const ephemeralAdded = ephemeral != null
-  const messageDeleted = message == null
-  const messageChanged = !messageDeleted && !isEqual(message, format.fromSlack(payload.original_message))
+  const deleted = message == null
+  const modified = !deleted && !isEqual(message, format.fromSlack(payload.original_message))
 
-  if (ephemeralAdded && messageChanged)
+  if (ephemeralAdded && modified)
     throw new Error("Can't show ephemeral message and update original message in the same time.")
 
-  if (messageChanged) response = format.toSlack(message)
-  if (messageDeleted) response = { delete_original: true }
+  if (modified) response = format.toSlack(message)
+  if (deleted) response = { delete_original: true }
   if (ephemeralAdded) {
     response = isString(ephemeral) ? { text: ephemeral } : format.toSlack(ephemeral)
     response.response_type = 'ephemeral'
     response.replace_original = false
-    response.delete_original = messageDeleted
+    response.delete_original = deleted
   }
 
+  if (!modified && !deleted && !ephemeralAdded) return
   const body = response || payload.original_message
   request.post({ uri: context.responseUrl, body, json: true })
 }
@@ -59,8 +60,8 @@ export const koa = async (handler: MiddlewareHandler, ctx: Koa.Context, next) =>
   // tslint:disable
   const payload = existingPayload(get(ctx, 'request.body.payload')) || await streamPayload(ctx.req)
   processRequestWithHandler(handler, payload)
-  ctx.body = payload.original_message
   ctx.status = 200
+  ctx.body = ''
   return next()
 }
 
