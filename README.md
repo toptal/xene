@@ -44,7 +44,7 @@ promises and in camel case 🙂
 Xene provides two main ways to talk with users — in response to some users'
 message and a way to start talking completely programmatically.
 
-### 📥 In response to message
+### 📥 Starting conversations in response to user's message
 To talk with a user when a user says something, first of all, we need to match
 user's message. Xene bots provide `.when()` method for this.
 
@@ -73,7 +73,7 @@ new Slackbot(/* API token */)
 ```
 <div align="center"><img src="assets/ex-1.png" width="400"/></div>
 
-### 📤 Initiate proactively
+### 📤 Starting conversations proactively
 
 The dialog can also be created proactively when you need them. To do so you can
 call `bot.dialog()` method. It expects channel id (slack channel would do) and an
@@ -102,36 +102,90 @@ getGloriousPurpose()
 In the examples above we've been dealing with instances of `Dialog` class.
 It provides following methods and properties.
 
-#### .bot: Bot
-The instance of the `Bot` to which dialog belongs to
+**Click on ▶ to expand reference.**
 
-```js
-dialog.bot
+<details>
+<summary>
+  <code>Dialog.prototype.bot</code> — access an instance of the Bot to which dialog belongs to
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+bot: Bot
 ```
 
-#### .channel: string
-The unique id of a channel where the dialog is happening.
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
 
-```js
-dialog.channel
+<details>
+<summary>
+  <code>Dialog.prototype.channel</code> — the unique id of a channel where the dialog is happening
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+channel: string
 ```
 
-#### .users: Array\<string>
-An array of ids of all users to whom dialog is attached to.
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
 
-```js
-dialog.users
+<details>
+<summary>
+  <code>Dialog.prototype.users</code> — an array of ids of all users to whom dialog is attached to
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+users: Array<string>
 ```
 
-#### .user: string
-The id of the primary user to whom dialog is attached to.
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
 
-```js
-dialog.user
+<details>
+<summary>
+  <code>Dialog.prototype.user</code> — the id of the primary user to whom dialog is attached to
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+user: string
 ```
 
-#### .on(event: string, callback: function)
-Add an event listener to life cycle events of a dialog.
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
+<details>
+<summary>
+  <code>Dialog.prototype.on()</code> — add an event listener to life cycle events of a dialog
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+on(event: string, callback: function)
+```
+
+**Example:**
 
 ```js
 dialog.on('end', _ => console.log('Dialog has ended.'))
@@ -142,15 +196,50 @@ dialog.on('incomingMessage', m => console.log(`Incoming message ${JSON.stringify
 dialog.on('outgoingMessage', m => console.log(`Outgoing message ${JSON.stringify(m)}`))
 ```
 
-#### .end()
-Abort dialog, use this to stop dialog. For example when users asks to.
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
+<details>
+<summary>
+  <code>Dialog.prototype.end()</code> — abort dialog, use this to stop dialog
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+end()
+```
+
+**Example:**
+For example, this method might be used to abort active dialog when users asks to.
 
 ```js
 dialog.on('abort', _ => dialog.end())
 ```
 
-#### .say(message: Message, [unpause: Boolean = true])
-Send a message to channel, type of the message depends on the bot to which dialog
+
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
+<details>
+<summary>
+  <code>Dialog.prototype.say()</code> — send a message to channel
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+```ts
+say(message: Message, [unpause: Boolean = true])
+```
+
+**Description:**
+
+Type of the message depends on the bot to which dialog
 belongs to. For Slackbot message can be either `string` or message object
 described [here](https://api.slack.com/methods/channel.postMessage).
 
@@ -158,17 +247,38 @@ described [here](https://api.slack.com/methods/channel.postMessage).
 should be unpaused when bot says something or not. By default it's true and
 dialog will be unpaused. [Read more about pasue.](#pause)
 
+**Example:**
+
 ```js
 dialog.say('Hello world!')
 dialog.pause('Paused!')
 dialog.say('Hi again', false)
 ```
 
-#### .parse(parser: Function || { parse: Function, isValid: Function } , [onError: Message || Function])
-Parse the most recent message from the user. This method accepts one or two arguments.
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
+<details>
+<summary>
+  <code>Dialog.prototype.parse()</code> — parse the most recent message from the user
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+parse(parser: Function || { parse: Function, isValid: Function } , [onError: Message || Function])
+```
+
+**Description:**
+This method accepts one or two arguments.
 
 If an error handler isn't provided, this method will return the result of the first attempt
 to apply parser even if it's an undefined.
+
+**Example:**
 
 ```js
 new Slackbot(/* API token */)
@@ -202,10 +312,30 @@ new Slackbot(/* API token */)
 
 <div align="center"><img src="assets/ex-4.png" width="400"/></div>
 
-#### .ask(question: Message, parser: Function || { parse: Function, isValid: Function }, [onError: Message || Function])
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
+<details>
+<summary>
+  <code>Dialog.prototype.ask()</code> — ask a question to user and parse response to the question
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+ask(question: Message, parser: Function || { parse: Function, isValid: Function }, [onError: Message || Function])
+```
+
+**Description:**
+
 Ask the `question` to user and parse response from user to the question. If
 parsing fails and error handler `onError` is defined it will be called. If
 error handler `onError` isn't defined than question will be asked again.
+
+**Example:**
 
 ```js
 new Slackbot(/* API token */)
@@ -216,29 +346,53 @@ new Slackbot(/* API token */)
     await dialog.say(`Nice to meet you, ${name}.`)
   })
 ```
+
 <div align="center"><img src="assets/ex-5.png" width="400"/></div>
 This example also shows us importance of better parser then one based on capital letter in front of the words 😅.
 
-#### .pause(message: Message)
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
+<details>
+<summary>
+  <code>Dialog.prototype.pause()</code> — pause dialog, reply with pause message until unpaused
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+pause(message: Message)
+```
+
+**Description:**
+
 Reply to all incoming user's messages with `message` until dialog is unpaused.
 Dialog unpauses when a message is sent to user or question is asked(`.say()`
 and `.ask()` methods). This method can help your bot to give status to user
 during some have calculations which takes some time.
 
+**Example:**
 ```js
 new Slackbot(/* API token */)
   .when(/meaning of life/i).talk(async dialog => {
     dialog.pause(`Wait human, I'm thinking...`)
     await dialog.say('OK, let me think about this.', false)
-    await new Promise(resolve, setTimeout(resolve, 24 * 60 * 60 * 1000)) // wait 24 hours
+    await new Promise(r => setTimeout(r, 24 * 60 * 60 * 1000)) // wait 24 hours
     await dialog.say('The answer is... 42.')
   })
 ```
 <div align="center"><img src="assets/ex-6.png" width="400"/></div>
 
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
 <img src="assets/blank.png" width="1" height="30"/>
 
-## ✅ Testing
+## ✅ Testing bots
 
 Xene provides [test](https://www.npmjs.com/package/@xene/test) module to stub
 your bot and run assertions.
@@ -246,9 +400,11 @@ your bot and run assertions.
 For example let's test this bot
 
 ```js
-new Slackbot(/* API token */)
+const bot = new Slackbot(/* API token */)
   .when(/hi/i).say('Hi there')
-  .when(/calc/i)
+  .when(/calc/i).talk(async dialog => {
+    const
+  })
 ```
 
 <img src="assets/blank.png" width="1" height="30"/>
