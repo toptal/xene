@@ -4,7 +4,8 @@
 
 Xene is a framework for building conversational bots with modern JavaScript(or
 TypeScript). From simple command based bots to rich natural language bots the
-framework provides all of the features needed to manage the conversational aspects of a bot.
+framework provides all of the features needed to manage the conversational
+aspects of a bot.
 
 ```js
 import { Slackbot } from '@xene/slack'
@@ -26,15 +27,16 @@ new Slackbot(/* API token */)
 Xene is split into different packages for different services and purposes.
 There are 2 main packages that differ from rest: `@xene/core` and `@xene/test`.
 
-- [`@xene/core`](https://www.npmjs.com/package/@xene/core) is the place where actual conversation API is implemented and all other packages(like
+- [`@xene/core`](https://www.npmjs.com/package/@xene/core) is the place where
+  actual conversation API is implemented and all other packages(like
 `@xene/slack`) derive from it.
 - [`@xene/test`](https://www.npmjs.com/package/@xene/test) defines a convenient
-wrapper to help you test your bots. It works nicely with all other packages
-(Slack or Telegram).
+  wrapper to help you test your bots. It works nicely with all other packages
+  (Slack or Telegram).
 - [`@xene/slack`](https://www.npmjs.com/package/@xene/slack) provides
-`Slackbot` which provides all features to build communication and it also
-provides all [api methods of Slack](https://api.slack.com/methods) with
-promises and in camel case 🙂
+  `Slackbot` which provides all features to build communication and it also
+  provides all [api methods of Slack](https://api.slack.com/methods) with
+  promises and in camel case 🙂
 - `@xene/telegram` is still in progress but will be as smooth as Slackbot 😉
 
 <img src="assets/blank.png" width="1" height="30"/>
@@ -76,8 +78,8 @@ new Slackbot(/* API token */)
 ### 📤 Starting conversations proactively
 
 The dialog can also be created proactively when you need them. To do so you can
-call `bot.dialog()` method. It expects channel id (slack channel would do) and an
-array of users' ids. Rest is the same as in the above example.
+call `bot.dialog()` method. It expects channel id (slack channel would do) and
+an array of users' ids. Rest is the same as in the above example.
 
 ```js
 import { Slackbot } from '@xene/slack'
@@ -106,7 +108,8 @@ It provides following methods and properties.
 
 <details>
 <summary>
-  <code>Dialog.prototype.bot</code> — access an instance of the Bot to which dialog belongs to
+  <code>Dialog.prototype.bot</code> — access an instance of the Bot to which
+  dialog belongs to
   <img src="assets/divider.png" width="100%" height="18"/>
 </summary>
 <p>
@@ -123,7 +126,8 @@ bot: Bot
 
 <details>
 <summary>
-  <code>Dialog.prototype.channel</code> — the unique id of a channel where the dialog is happening
+  <code>Dialog.prototype.channel</code> — the unique id of a channel where the
+  dialog is happening
   <img src="assets/divider.png" width="100%" height="18"/>
 </summary>
 <p>
@@ -140,7 +144,8 @@ channel: string
 
 <details>
 <summary>
-  <code>Dialog.prototype.users</code> — an array of ids of all users to whom dialog is attached to
+  <code>Dialog.prototype.users</code> — an array of ids of all users to whom
+  dialog is attached to
   <img src="assets/divider.png" width="100%" height="18"/>
 </summary>
 <p>
@@ -157,7 +162,8 @@ users: Array<string>
 
 <details>
 <summary>
-  <code>Dialog.prototype.user</code> — the id of the primary user to whom dialog is attached to
+  <code>Dialog.prototype.user</code> — the id of the primary user to whom dialog
+  is attached to
   <img src="assets/divider.png" width="100%" height="18"/>
 </summary>
 <p>
@@ -174,7 +180,8 @@ user: string
 
 <details>
 <summary>
-  <code>Dialog.prototype.on()</code> — add an event listener to life cycle events of a dialog
+  <code>Dialog.prototype.on()</code> — add an event listener to life cycle
+  events of a dialog
   <img src="assets/divider.png" width="100%" height="18"/>
 </summary>
 <p>
@@ -261,7 +268,8 @@ dialog.say('Hi again', false)
 
 <details>
 <summary>
-  <code>Dialog.prototype.parse()</code> — parse the most recent message from the user
+  <code>Dialog.prototype.parse()</code> — parse the most recent message from
+  the user
   <img src="assets/divider.png" width="100%" height="18"/>
 </summary>
 <p>
@@ -275,7 +283,8 @@ parse(parser: Function || { parse: Function, isValid: Function } , [onError: Mes
 **Description:**
 This method accepts one or two arguments.
 
-If an error handler isn't provided, this method will return the result of the first attempt
+If an error handler isn't provided, this method will return the result of the
+first attempt
 to apply parser even if it's an undefined.
 
 **Example:**
@@ -296,7 +305,8 @@ new Slackbot(/* API token */)
 If there is an error handler xene will call it for every failed attempt to parse
 user's message. Xene counts all parsing failed if `null` or `undefined` were
 returned from parser function. To fine tune this behavior you can pass an object
-as a parser with two methods — `parse` and `isValid`. Xene will call `isValid` to determine if parsing failed.
+as a parser with two methods — `parse` and `isValid`. Xene will call `isValid`
+to determine if parsing failed.
 
 ```js
 new Slackbot(/* API token */)
@@ -318,7 +328,8 @@ new Slackbot(/* API token */)
 
 <details>
 <summary>
-  <code>Dialog.prototype.ask()</code> — ask a question to user and parse response to the question
+  <code>Dialog.prototype.ask()</code> — ask a question to user and parse
+  response to the question
   <img src="assets/divider.png" width="100%" height="18"/>
 </summary>
 <p>
@@ -348,7 +359,8 @@ new Slackbot(/* API token */)
 ```
 
 <div align="center"><img src="assets/ex-5.png" width="400"/></div>
-This example also shows us importance of better parser then one based on capital letter in front of the words 😅.
+This example also shows us importance of better parser then one based on capital
+letter in front of the words 😅.
 
 <img src="assets/divider.png" width="100%" height="18"/>
 </p>
@@ -356,7 +368,8 @@ This example also shows us importance of better parser then one based on capital
 
 <details>
 <summary>
-  <code>Dialog.prototype.pause()</code> — pause dialog, reply with pause message until unpaused
+  <code>Dialog.prototype.pause()</code> — pause dialog, reply with pause message
+  until unpaused
   <img src="assets/divider.png" width="100%" height="18"/>
 </summary>
 <p>
@@ -397,13 +410,24 @@ new Slackbot(/* API token */)
 Xene provides [test](https://www.npmjs.com/package/@xene/test) module to stub
 your bot and run assertions.
 
-For example let's test this bot
+For example let's test following bot:
 
 ```js
+const quizes = {
+  math: [ { q: '2 + 2 = x', a: '4' }, { q: '|-10| - x = 12', a: '2' }],
+  // other quizes
+]
+
 const bot = new Slackbot(/* API token */)
   .when(/hi/i).say('Hi there')
-  .when(/calc/i).talk(async dialog => {
-    const
+  .when(/quiz/i).talk(async dialog => {
+    const kind = await dialog.ask('Ok, what kind of quizes do you prefer?')
+    for (const quiz of quizes[kind]) {
+      const answer = await dialog.ask(quiz.q, reply => reply)
+      if (answer === quiz.a) await dialog.say('Not bad for a human.')
+      else await dialog.say(`Stupid humans... Correct answer is ${quiz.a}.`)
+    }
+    await dialog.say(`These are all ${kind} quizes I've got.`)
   })
 ```
 
