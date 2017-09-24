@@ -3,7 +3,7 @@
 [![Travis](https://img.shields.io/travis/dempfi/xene.svg?style=flat-square&label=tests)](https://travis-ci.org/dempfi/xene) [![npm](https://img.shields.io/npm/dm/@xene/core.svg?style=flat-square)](https://www.npmjs.com/package/@xene/core) [![first timers only](http://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](http://www.firsttimersonly.com)
 
 Xene is a framework for building conversational bots with modern JavaScript(or
-TypeScript). From simple command based bots to rich natural language bots the
+TypeScript). From simple command-based bots to rich natural language bots the
 framework provides all of the features needed to manage the conversational
 aspects of a bot.
 
@@ -221,7 +221,7 @@ end()
 ```
 
 **Example:**
-For example, this method might be used to abort active dialog when users asks to.
+For example, this method might be used to abort active dialog when users ask to.
 
 ```js
 dialog.on('abort', _ => dialog.end())
@@ -250,9 +250,9 @@ Type of the message depends on the bot to which dialog
 belongs to. For Slackbot message can be either `string` or message object
 described [here](https://api.slack.com/methods/channel.postMessage).
 
-`unpause` option is optional it's here to help you to control whether dialog
-should be unpaused when bot says something or not. By default it's true and
-dialog will be unpaused. [Read more about pasue.](#pause)
+`unpause` is optional it's there to help you control whether dialog should be
+unpaused when bot says something or not. By default it's true and the dialog
+will be unpaused. [Read more about pause.](#pause)
 
 **Example:**
 
@@ -284,8 +284,7 @@ parse(parser: Function || { parse: Function, isValid: Function } , [onError: Mes
 This method accepts one or two arguments.
 
 If an error handler isn't provided, this method will return the result of the
-first attempt
-to apply parser even if it's an undefined.
+first attempt to apply parser even if it's an undefined.
 
 **Example:**
 
@@ -304,7 +303,7 @@ new Slackbot(/* API token */)
 
 If there is an error handler xene will call it for every failed attempt to parse
 user's message. Xene counts all parsing failed if `null` or `undefined` were
-returned from parser function. To fine tune this behavior you can pass an object
+returned from parser function. To fine-tune this behavior you can pass an object
 as a parser with two methods — `parse` and `isValid`. Xene will call `isValid`
 to determine if parsing failed.
 
@@ -342,8 +341,8 @@ ask(question: Message, parser: Function || { parse: Function, isValid: Function 
 
 **Description:**
 
-Ask the `question` to user and parse response from user to the question. If
-parsing fails and error handler `onError` is defined it will be called. If
+Ask the `question` to a user and parse the response from the user to the question.
+If parsing fails and error handler `onError` is defined it will be called. If
 error handler `onError` isn't defined than question will be asked again.
 
 **Example:**
@@ -382,10 +381,10 @@ pause(message: Message)
 
 **Description:**
 
-Reply to all incoming user's messages with `message` until dialog is unpaused.
-Dialog unpauses when a message is sent to user or question is asked(`.say()`
-and `.ask()` methods). This method can help your bot to give status to user
-during some have calculations which takes some time.
+Reply to all incoming user's messages with `message` until the dialog is
+unpaused. Dialog unpauses when a message is sent to user or question is asked
+(`.say()` and `.ask()` methods). This method can help your bot to give status to
+a user during some heavy calculation.
 
 **Example:**
 ```js
@@ -410,18 +409,18 @@ new Slackbot(/* API token */)
 Xene provides [test](https://www.npmjs.com/package/@xene/test) module to stub
 your bot and run assertions.
 
-For example let's test following bot:
+For example, let's test following bot:
 
 ```js
-const quizes = {
+const quizzes = {
   math: [ { q: '2 + 2 = x', a: '4' }, { q: '|-10| - x = 12', a: '2' }],
   // other quizes
 ]
 
-const bot = new Slackbot(/* API token */)
+const meanbot = new Slackbot(/* API token */)
   .when(/hi/i).say('Hi there')
   .when(/quiz/i).talk(async dialog => {
-    const kind = await dialog.ask('Ok, what kind of quizes do you prefer?')
+    const kind = await dialog.ask('Ok, what kind of quizzes do you prefer?')
     for (const quiz of quizes[kind]) {
       const answer = await dialog.ask(quiz.q, reply => reply)
       if (answer === quiz.a) await dialog.say('Not bad for a human.')
@@ -430,6 +429,44 @@ const bot = new Slackbot(/* API token */)
     await dialog.say(`These are all ${kind} quizes I've got.`)
   })
 ```
+
+First, to be able to test the bot we need to wrap it in tester object to get
+access to assertions methods. The exact same thing as with Sinon but assertions
+provided by `@xene/test` are dialog specific. Anyhoo, let's write the first
+assertion.
+
+```js
+imoport ava from 'ava'
+import { wrap } from '@xene/test'
+
+const subject = wrap(meanbot)
+
+test('It does reply to "hi"', async t => {
+  subject.user.says('Hi')
+  t.true(subject.bot.said('Hi there'))
+  // or the same but in one line
+  t.true(await subject.bot.on('Hi').says('Hi there'))
+})
+```
+
+That was simple. But dialogs can be quite complicated and to test them we need
+to write more stuff.
+
+```js
+test('It plays the quiz', async t => {
+  subject.user.says('quiz')
+  subject.user.says('math')
+  t.true(subject.bot.said('2 + 2 = x')
+  t.true(await subject.bot.on('1').says('Not bad for a human.'))
+  t.true(await subject.bot.on('1').says('Stupid humans... Correct answer is 2.'))
+  t.is(subject.bot.lastMessage.message, "These are all math quizes I've got.")
+  t.is(subject.bot.messages.length, 6)
+})
+```
+
+This is it, there are minor things that might be useful in more advanced
+scenarios. For example, each assertion method can also take user id and channel
+id. Check out API to learn about them.
 
 <img src="assets/blank.png" width="1" height="30"/>
 
