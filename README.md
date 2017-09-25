@@ -472,3 +472,7 @@ id. Check out API to learn about them.
 
 #### TypeScript
 Xene is written in TypeScript and npm package already includes all typings.
+
+<div align="right"><sup>
+  made with ❤️ by <a href="https://github.com/dempfi">@dempfi</a>
+</sup></div>
