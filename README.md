@@ -470,6 +470,197 @@ id. Check out API to learn about them.
 
 <img src="assets/blank.png" width="1" height="30"/>
 
+### ⚙️ Tester API
+
+`@xene/test` module at this moment exposes single function `wrap` which wraps
+your bot in the `Wrapper` class.
+
+**Click on ▶ to expand reference.**
+
+<details>
+<summary>
+  <code>wrap()</code> — wrap bot for further testing, stubbing it
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+wrap(bot: Bot)
+```
+
+**Description:**
+
+Wraps bot under the test exposing assertion methods.
+
+**Example:**
+
+```js
+import { wrap } from '@xene/test'
+import { bot } from '../somewhere/from/your/app'
+
+const subject = wrap(bot)
+```
+
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
+<details>
+<summary>
+  <code>Wrapper.prototype.user.says()</code> — mock a message from a user
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+wrapper.user.says(text: Message, [channel: String], [user: String])
+```
+
+
+**Description:**
+
+Imitate incoming user message from any channel and any user. If `channel` or
+`user` arguments aren't provided wrapper will generate random channel and user
+ids.
+
+**Example:**
+
+```js
+import { wrap } from '@xene/test'
+import { bot } from '../somewhere/from/your/app'
+
+const subject = wrap(bot)
+subject.user.says('Some message')
+subject.user.says('Some message', '#some-channel')
+subject.user.says('Some message', '#some-channel', '@some-user')
+```
+
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
+<details>
+<summary>
+  <code>Wrapper.prototype.bot.lastMessage</code> — retrieve last message bot
+  have send in the tests
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+wrapper.bot.lastMessage: { channel: String, message: BotMessage }
+```
+
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
+<details>
+<summary>
+  <code>Wrapper.prototype.bot.messages</code> — array of all messages bot have
+  send during the tests
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+wrapper.bot.messages: Array<{ channel: String, message: Message }>
+```
+
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
+<details>
+<summary>
+  <code>Wrapper.prototype.bot.said()</code> — assert particular message was
+  send
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+wrapper.bot.said(message: Message, [channel: String])
+```
+
+**Description:**
+
+Assert presense of `message` in list of all messages bot have send. If `channel`
+isn't provided only message will be compared with existing messages. Otherwise
+both `message` and `channel` will be compared.
+
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
+<details>
+<summary>
+  <code>Wrapper.prototype.bot.reset()</code> — reset assertions and messages
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+wrapper.bot.reset()
+```
+
+**Description:**
+
+Resets all messages and expectations. This method is designed to be used in
+`beforeEach` like test hooks.
+
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
+<details>
+<summary>
+  <code>Wrapper.prototype.bot.on()</code> — register expextation
+  <img src="assets/divider.png" width="100%" height="18"/>
+</summary>
+<p>
+
+**Signature:**
+
+```ts
+wrapper.bot.on(text: Message, [channel: String], [user: String]) -> { says(message: Message, [channel: String]) }
+```
+
+**Description:**
+
+Register async assertions which will be ran when bot replyes. `channel` and
+`user` are optional.
+
+**Example:**
+
+```js
+import { wrap } from '@xene/test'
+import { bot } from '../somewhere/from/your/app'
+
+test(async t => {
+  const subject = wrap(bot)
+  await subject.bot.on('hi').says('hola')
+  await subject.bot.on('hi', '#channel').says('hola', '#channel')
+  await subject.bot.on('hi', '#channel', '@user').says('hola', '#channel')
+})
+```
+
+<img src="assets/divider.png" width="100%" height="18"/>
+</p>
+</details>
+
 #### TypeScript
 Xene is written in TypeScript and npm package already includes all typings.
 
