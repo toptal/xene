@@ -1,5 +1,5 @@
 import { Slackbot } from './slackbot'
-import { camel } from './api/converters'
+import { camel } from './helpers/case'
 
 export class SlackbotDispatcher {
   private bots = new Map<string, Slackbot>()

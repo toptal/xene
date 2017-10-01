@@ -12,9 +12,11 @@ import { User, Message } from './types'
 import { Auth, RTM, Chat, Users, Groups, Channels, Files } from './api'
 
 export class Slackbot extends Bot<string | Message> {
-  // Default dispatcher, used when user didn't provide
-  // custom dispatcher. This is mostly used when user has
-  // one type of bot, which is a common case
+  /**
+   * Default dispatcher, used when user didn't provide
+   * custom dispatcher. This is mostly used when user has
+   * one type of bot, which is a common case
+   */
   static dispatcher = new SlackbotDispatcher()
   static middleware = middleware
   static oauthAccess = Auth.access

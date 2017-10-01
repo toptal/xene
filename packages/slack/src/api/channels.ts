@@ -1,73 +1,56 @@
-import { get, map, filter, find, head } from 'lodash/fp'
+import { head } from 'lodash/fp'
 import { Channel } from '../types'
 import { APIModule } from './base'
-import { camel, snake } from './converters'
+import { get } from '../helpers/get'
 
 export type Message = { type: string, ts: string, user: string, text: string }
 
 export class Channels extends APIModule {
-  archive(channel: string) {
-    return this.request('archive', { channel })
-  }
+  archive = (channel: string) =>
+    this.request('archive', { channel })
 
-  create(name: string, validate: boolean = false): Promise<Channel> {
-    return this.request('create', { name, validate }).then(get('channel')).then(camel)
-  }
+  create = (name: string, validate: boolean = false) =>
+    this.request('create', { name, validate }).then(get<Channel>('channel'))
 
-  history(channel: string, options) {
-    return this.request('history', { channel, ...options }).then(get('messages')).then(map(camel))
-  }
+  history = (channel: string, options) =>
+    this.request('history', { channel, ...options }).then(get<Message[]>('messages'))
 
-  info(channel: string | Partial<Channel>) {
-    if (typeof channel === 'string') return this.request('info', { channel }).then(get('channel')).then(camel)
-    return this.list().then(find(channel)) as any
-  }
+  info = (channel: string) =>
+    this.request('info', { channel }).then(get<Channel>('channel'))
 
-  invite(channel: string, user: string): Promise<Channel> {
-    return this.request('invite', { channel, user }).then(get('channel')).then(camel)
-  }
+  invite = (channel: string, user: string) =>
+    this.request('invite', { channel, user }).then(get<Channel>('channel'))
 
-  join(channel: string): Promise<Channel> {
-    return this.request('join', { name: channel }).then(get('channel')).then(camel)
-  }
+  join = (channel: string) =>
+    this.request('join', { name: channel }).then(get<Channel>('channel'))
 
-  kick(channel: string, user: string): Promise<void> {
-    return this.request('kick', { channel, user })
-  }
+  kick = (channel: string, user: string) =>
+    this.request('kick', { channel, user })
 
-  leave(channel: string): Promise<void> {
-    return this.request('leave', { channel })
-  }
+  leave = (channel: string): Promise<void> =>
+    this.request('leave', { channel })
 
-  list() {
-    return this.request('list').then(get('channels')).then(map(camel))
-  }
+  list = () =>
+    this.request('list').then(get<Channel[]>('channels'))
 
-  mark(channel: string, ts: string) {
-    return this.request('mark', { channel, ts })
-  }
+  mark = (channel: string, ts: string) =>
+    this.request('mark', { channel, ts })
 
-  rename(channel: string, name: string, validate: boolean = true): Promise<Channel> {
-    return this.request('rename', { channel, name, validate }).then(get('channel')).then(camel)
-  }
+  rename = (channel: string, name: string, validate: boolean = true): Promise<Channel> =>
+    this.request('rename', { channel, name, validate }).then(get<Channel>('channel'))
 
-  replies(channel: string, threadTs: string): Promise<Message[]> {
-    return this.request('rename', snake({ channel, threadTs })).then(get('messages')).then(camel)
-  }
+  replies = (channel: string, threadTs: string) =>
+    this.request('rename', { channel, threadTs }).then(get<Message[]>('messages'))
 
-  setPurpose(channel: string, purpose: string) {
-    return this.request('setPurpose', { channel, purpose })
-  }
+  setPurpose = (channel: string, purpose: string) =>
+    this.request('setPurpose', { channel, purpose })
 
-  setTopic(channel: string, topic: string) {
-    return this.request('setTopic', { channel, topic })
-  }
+  setTopic = (channel: string, topic: string) =>
+    this.request('setTopic', { channel, topic })
 
-  unarchive(channel: string) {
-    return this.request('unarchive', { channel })
-  }
+  unarchive = (channel: string) =>
+    this.request('unarchive', { channel })
 
-  getMessage(channel: string, ts: string) {
-    return this.history(channel, { inclusive: true, count: 1, latest: ts }).then(head)
-  }
+  getMessage = (channel: string, ts: string) =>
+    this.history(channel, { inclusive: true, count: 1, latest: ts }).then(head)
 }

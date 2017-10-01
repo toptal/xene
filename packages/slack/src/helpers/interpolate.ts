@@ -1,8 +1,8 @@
-import * as _ from 'lodash'
+import { isPlainObject, isArray, mapValues, template as tpl, isString } from 'lodash'
 
 export const interpolate = <T>(template: T, object: object): T => {
-  if (_.isPlainObject(template)) return _.mapValues(template, v => interpolate(v, object))
-  if (_.isArray(template)) return (template as any).map(v => interpolate(v, object))
-  if (_.isString(template)) return _.template(template)(object) as any
+  if (isPlainObject(template)) return mapValues(template, v => interpolate(v, object))
+  if (isArray(template)) return (template as any).map(v => interpolate(v, object))
+  if (isString(template)) return tpl(template)(object) as any
   return template
 }

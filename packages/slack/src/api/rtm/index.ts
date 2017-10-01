@@ -4,7 +4,6 @@ import { EventEmitter } from 'eventemitter3'
 import { APIModule } from '../base'
 import { logger } from '../../logger'
 import { On, Off } from './types'
-import * as converters from '../converters'
 
 const PING_INTERVAL = 5000
 const MAX_PONG_INTERVAL = 20000

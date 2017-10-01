@@ -5,7 +5,7 @@ import * as rawBody from 'raw-body'
 import * as request from 'request-promise-native'
 import { get, isString, isEqual } from 'lodash'
 
-import { camel } from '../api/converters'
+import { camel } from '../helpers/case'
 import * as format from '../helpers/formatters/message'
 import { MiddlewareContext, MiddlewareHandler } from '../types'
 

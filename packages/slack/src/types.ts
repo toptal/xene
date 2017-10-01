@@ -104,8 +104,7 @@ export type MessageOptions = {
 export type User = {
   id: string
   title: string
-  handle: string
-  fullName: string
+  realName: string
   teamId: string
   color: string
   deleted: boolean
