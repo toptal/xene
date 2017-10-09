@@ -436,7 +436,7 @@ provided by `@xene/test` are dialog specific. Anyhoo, let's write the first
 assertion.
 
 ```js
-imoport ava from 'ava'
+import ava from 'ava'
 import { wrap } from '@xene/test'
 
 const subject = wrap(meanbot)
