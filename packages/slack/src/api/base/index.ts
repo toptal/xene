@@ -1,10 +1,10 @@
-import { map, isObject } from 'lodash'
+import { mapValues, isObject } from 'lodash'
 import { request } from './request'
 import { APIError } from '../../errors'
 import { camel, snake } from '../../helpers/case'
 
 const stringify = (object: object) =>
-  map(snake(object), v => isObject(v) ? JSON.stringify(v) : v)
+  mapValues(snake(object), v => isObject(v) ? JSON.stringify(v) : v)
 
 const URI = (ns: string, method: string, token: string) =>
   `https://slack.com/api/${ns}.${method}?token=${token}`
