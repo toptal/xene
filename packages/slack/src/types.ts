@@ -114,6 +114,9 @@ export type User = {
   isPrimaryOwner: boolean
   isRestricted: boolean
   isUltraRestricted: boolean
+  tz: string
+  tzLabel: string
+  tzOffset: number
   profile: {
     avatarHash: string
     currentStatus: string
@@ -128,9 +131,6 @@ export type User = {
     phone: string
     realName: string
     skype: string
-    tz: string
-    tzLabel: string
-    tzOffset: number
   }
 }
 
