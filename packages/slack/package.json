@@ -28,7 +28,6 @@
     "raw-body": "^2.3.0",
     "request": "^2.81.0",
     "request-promise-native": "^1.0.4",
-    "uuid": "^3.1.0",
     "winston": "^2.3.1",
     "ws": "^3.1.0"
   },
@@ -39,7 +38,6 @@
     "@types/lodash": "^4.14.76",
     "@types/node": "^8.0.24",
     "@types/request-promise-native": "^1.0.2",
-    "@types/uuid": "^2.0.29",
     "@types/winston": "^2.3.3",
     "@types/ws": "^3.0.0",
     "ava": "^0.22.0",

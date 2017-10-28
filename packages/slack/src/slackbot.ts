@@ -1,91 +1,66 @@
-import * as uuid from 'uuid'
-import * as _ from 'lodash'
+import { isString } from 'lodash'
 import { Bot } from '@xene/core'
 
-import { SlackbotDispatcher } from './dispatcher'
 import { middleware } from './middleware'
-import { isMentioned } from './helpers/is-mentioned'
 import { interpolate } from './helpers/interpolate'
+import { isMentioned } from './helpers/is-mentioned'
 import { isPrivateChannel } from './helpers/channel-type'
 
-import { User, Message } from './types'
-import { Auth, RTM, Chat, Users, Groups, Channels, Files } from './api'
+import { User, Message, MiddlewareContext } from './types'
+import { Oauth, Auth, RTM, Chat, Users, Groups, Channels, Files } from './api'
 
 export class Slackbot extends Bot<string | Message> {
-  /**
-   * Default dispatcher, used when user didn't provide
-   * custom dispatcher. This is mostly used when user has
-   * one type of bot, which is a common case
-   */
-  static dispatcher = new SlackbotDispatcher()
-  static middleware = middleware
-  static oauthAccess = Auth.access
+  static Oauth = Oauth
 
-  id: string
-  bot: { id: string, name: string }
+  static dispatch = (ctx: MiddlewareContext) => {
+    const { team, action, channel: { id: channel }, user: { id: user } } = ctx
+    const slackbot = Slackbot.bots.find(b => b.self.team.id === team.id)
+    const selectedReplacer = `*:white_check_mark: ${action.value}*`
+    ctx.message.attachments!.forEach(a => {
+      if (!a.menus.some(m => m.id === action.id) &&
+        !a.buttons.some(m => m.id === action.id)) return
+      a.text = a.text ? `${a.text}\n${selectedReplacer}` : selectedReplacer
+      a.menus = []
+    })
+    slackbot.onMessage({ id: Date.now().toString(), channel, text: action.value, user })
+  }
+
+  static middlware = middleware(Slackbot.dispatch)
+  private static bots: Slackbot[] = []
+
+  self: {
+    id: string, name: string
+    team: { id: string, title: string }
+  }
 
   // API Modules
-  rtm: RTM
-  auth: Auth
-  chat: Chat
-  users: Users
-  groups: Groups
-  channels: Channels
-  files: Files
+  rtm = new RTM(this.token)
+  auth = new Auth(this.token)
+  chat = new Chat(this.token)
+  users = new Users(this.token)
+  files = new Files(this.token)
+  groups = new Groups(this.token)
+  channels = new Channels(this.token)
 
-  constructor(options: {
-    id?: string,
-    botToken: string,
-    appToken?: string,
-    dispatcher?: SlackbotDispatcher
-  }) {
+  constructor(private token: string) {
     super()
-    this.id = options.id || uuid.v4()
-
-    this.chat = new Chat(options.botToken)
-    this.rtm = new RTM(options.botToken)
-    // Some of these API scopes' methods require additional
-    // scopes which are defined only for apps and app tokens respectively
-    this.auth = new Auth(options.appToken || options.botToken)
-    this.users = new Users(options.appToken || options.botToken)
-    this.groups = new Groups(options.appToken || options.botToken)
-    this.channels = new Channels(options.appToken || options.botToken)
-    this.files = new Files(options.appToken || options.botToken)
-
-    if (options.dispatcher) options.dispatcher.add(this.id, this)
-    else Slackbot.dispatcher.add(this.id, this)
+    this.selfIdentify()
+    Slackbot.bots.push(this)
   }
 
   async say(channel: string, message: string | Message) {
     const init = { text: '', attachments: [] }
-    message = _.isString(message) ? { ...init, text: message } : { ...init, ...message }
-    message.attachments.forEach(a => a.callbackId = a.callbackId || this.id)
+    message = isString(message) ? { ...init, text: message } : { ...init, ...message }
     return this.chat.postMessage(channel, message)
   }
 
+  /**
+   * Connect to Slack RTM API
+   */
   listen() {
     this.rtm.on('message', this.onRtmMessage.bind(this))
-    this.rtm.connect().then(i => this.bot = i.self)
+    this.rtm.connect().then(i => this.self = i.self)
     return this
-  }
-
-  /**
-   * Process incoming interactive messages
-   * like button actions from slack
-   * Called from Dispatcher
-   */
-  async onInteractiveMessage(payload): Promise<Message> {
-    const selected = payload.actions[0]
-    const text = payload.originalMessage.text
-    let attachments = payload.originalMessage.attachments
-    attachments = attachments.map(this.markActionSelected.bind(this, selected))
-    this.onMessage({
-      channel: payload.channel.id,
-      user: payload.user.id,
-      text: selected.value,
-      id: payload.ts
-    })
-    return { text, attachments }
   }
 
   /**
@@ -93,20 +68,15 @@ export class Slackbot extends Bot<string | Message> {
    */
   private onRtmMessage(payload: { ts: string, text: string, user: string, channel: string }) {
     const { user, ts, text, channel } = payload
-    if (this.bot.id === user) return
-    const isBotMentioned = isMentioned(this.bot.id, text)
+    if (this.self.id === user) return
+    const isBotMentioned = isMentioned(this.self.id, text)
     const isPrivate = isPrivateChannel(channel)
     if (!isPrivate && !isBotMentioned) return
     this.onMessage({ id: ts, text, user, channel })
   }
 
-  private markActionSelected(action, attachment) {
-    const selectedReplacer = ':white_check_mark: ' + action.text
-    if (_.find(attachment.actions, ['value', action.value])) {
-      const title = attachment.title
-      delete attachment.actions
-      attachment.title = title ? (title + '\n' + selectedReplacer) : selectedReplacer
-    }
-    return attachment
+  private async selfIdentify() {
+    const { team, teamId, user, userId: id } = await this.auth.test()
+    this.self = { id, name: user, team: { id: teamId, title: team } }
   }
 }
