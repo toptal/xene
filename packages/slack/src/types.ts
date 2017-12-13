@@ -152,13 +152,11 @@ export type MiddlewareContext = {
    * Original message, all changes with this object will
    * be passed to the Slack. Assigning null or undefined
    * to this property will delete message in Slack
-   * @type {IMessage}
    */
   message: Message
 
   /**
    * Ephemeral message that will be seen only by user
-   * @type {string}
    */
   ephemeral: string | Message
 }

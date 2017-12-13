@@ -12,7 +12,12 @@ const URI = (ns: string, method: string, token: string) =>
 export abstract class APIModule {
   protected namespace: string
 
-  constructor(private token: string) {
+  private get token(): string {
+    if (typeof this.tokens === 'string') return this.tokens
+    return this.tokens.appToken || this.tokens.botToken
+  }
+
+  constructor(private tokens: string | { appToken?: string, botToken?: string }) {
     this.namespace = this.constructor.name.toLowerCase()
   }
 

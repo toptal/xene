@@ -25,7 +25,7 @@ export class Slackbot extends Bot<string | Message> {
     slackbot.onMessage({ id: Date.now().toString(), channel, text: action.value, user })
   }
 
-  static middlware = middleware(Slackbot.dispatch)
+  static middleware = middleware(Slackbot.dispatch)
   private static bots: Slackbot[] = []
 
   self: {
@@ -42,7 +42,7 @@ export class Slackbot extends Bot<string | Message> {
   groups = new Groups(this.token)
   channels = new Channels(this.token)
 
-  constructor(private token: string) {
+  constructor(private token: string | { appToken?: string, botToken?: string }) {
     super()
     this.selfIdentify()
     Slackbot.bots.push(this)
@@ -59,7 +59,6 @@ export class Slackbot extends Bot<string | Message> {
    */
   listen() {
     this.rtm.on('message', this.onRtmMessage.bind(this))
-    this.rtm.connect().then(i => this.self = i.self)
     return this
   }
 
