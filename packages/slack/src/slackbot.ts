@@ -2,7 +2,6 @@ import { isString } from 'lodash'
 import { Bot } from '@xene/core'
 
 import { middleware } from './middleware'
-import { interpolate } from './helpers/interpolate'
 import { isMentioned } from './helpers/is-mentioned'
 import { isPrivateChannel } from './helpers/channel-type'
 
@@ -25,6 +24,7 @@ export class Slackbot extends Bot<string | Message> {
     slackbot.onMessage({ id: Date.now().toString(), channel, text: action.value, user })
   }
 
+  // tslint:disable-next-line:member-ordering
   static middleware = middleware(Slackbot.dispatch)
   private static bots: Slackbot[] = []
 
@@ -34,13 +34,13 @@ export class Slackbot extends Bot<string | Message> {
   }
 
   // API Modules
-  rtm = new RTM(this.token)
   auth = new Auth(this.token)
-  chat = new Chat(this.token)
   users = new Users(this.token)
   files = new Files(this.token)
   groups = new Groups(this.token)
   channels = new Channels(this.token)
+  chat = new Chat(this.token)
+  rtm = new RTM(this.token)
 
   constructor(private token: string | { appToken?: string, botToken?: string }) {
     super()

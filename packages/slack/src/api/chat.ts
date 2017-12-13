@@ -7,6 +7,11 @@ type ChannelTs = { channel: string, ts: string }
 type EphemeralMessage = Message & { user: string }
 
 export class Chat extends APIModule {
+  protected get token() {
+    if (typeof this.tokens === 'string') return this.tokens
+    return this.tokens.botToken || this.tokens.appToken
+  }
+
   delete = (channel: string, ts: string, options: { asUser?: boolean } = {}): Promise<ChannelTs> =>
     this.request('delete', { channel, ts, ...options })
 

@@ -1,6 +1,5 @@
 export type CB = (...args: any[]) => any
 
-
 export class EventEmitter {
   private _subscribers = new Map<string, CB[]>()
   on = (event: string, cb: CB) => {

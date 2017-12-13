@@ -24,7 +24,9 @@ export class Dialog<
   get user() { return this.users[0] }
 
   constructor(bot: Bot, channel: string, users: string[]) {
-    this.bot = bot, this.channel = channel, this.users = users
+    this.bot = bot
+    this.users = users
+    this.channel = channel
     this._manager = new Manager(bot, channel, users)
     this.parse = this.parse.bind(this)
     this.ask = this.ask.bind(this)

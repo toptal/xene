@@ -1,4 +1,4 @@
-import { head } from 'lodash/fp'
+import { head } from 'lodash'
 import { Channel } from '../types'
 import { APIModule } from './base'
 import { get } from '../helpers/get'

@@ -12,6 +12,7 @@
       true,
       "never"
     ],
+    "no-implicit-dependencies": false,
     "object-literal-sort-keys": false,
     "interface-over-type-literal": false,
     "adjacent-overload-signatures": true,

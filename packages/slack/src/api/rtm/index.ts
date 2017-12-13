@@ -26,6 +26,11 @@ export class RTM extends APIModule {
   private pingTimer: NodeJS.Timer
   private lastPong = 0
 
+  protected get token() {
+    if (typeof this.tokens === 'string') return this.tokens
+    return this.tokens.botToken || this.tokens.appToken
+  }
+
   constructor(token) {
     super(token)
     this.on = this.ee.addListener.bind(this.ee)
