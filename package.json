@@ -26,6 +26,6 @@
     "sourceMap": true
   },
   "devDependencies": {
-    "lerna": "^2.1.0"
+    "lerna": "^2.5.1"
   }
 }
