@@ -48,10 +48,14 @@ export class Slackbot extends Bot<string | Message> {
     Slackbot.bots.push(this)
   }
 
-  async say(channel: string, message: string | Message) {
+  async say(channel: string, message: string | Message, ephemeral: boolean) {
     const init = { text: '', attachments: [] }
     message = isString(message) ? { ...init, text: message } : { ...init, ...message }
-    return this.chat.postMessage(channel, message)
+    if (ephemeral) {
+      return this.chat.postEphemeral(channel, message)
+    } else {
+      return this.chat.postMessage(channel, message)
+    }
   }
 
   /**
