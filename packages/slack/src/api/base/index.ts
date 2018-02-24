@@ -24,7 +24,6 @@ export abstract class APIModule {
   protected async request(method: string, form: object = {}) {
     const uri = URI(this.namespace, method, this.token)
     const response = await request(uri, stringify(form))
-    console.log(uri, response)
     if (!response.ok) throw new APIError(response.error)
     return camel(response)
   }
