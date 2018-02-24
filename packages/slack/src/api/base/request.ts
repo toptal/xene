@@ -9,7 +9,6 @@ const worker = async (task: Task, done) => {
   try {
     await rp.post({ uri: task.uri, json: true, form: task.form }).then(task.resolve)
   } catch (error) {
-    console.log(error, task.uri)
     if (error.statusCode !== 429) return task.reject(error)
     const delay = Number(error.response.headers['retry-after']) * 1000
     logger.info('Slack API rate limited for %s ms', delay)
