@@ -59,6 +59,7 @@ export class Slackbot extends Bot<string | Message> {
    */
   listen() {
     this.rtm.on('message', this.onRtmMessage.bind(this))
+    this.rtm.connect()
     return this
   }
 
