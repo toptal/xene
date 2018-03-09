@@ -116,7 +116,7 @@ It provides following methods and properties.
 
 **Signature:**
 
-```ts
+```js
 bot: Bot
 ```
 
@@ -134,7 +134,7 @@ bot: Bot
 
 **Signature:**
 
-```ts
+```js
 channel: string
 ```
 
@@ -152,7 +152,7 @@ channel: string
 
 **Signature:**
 
-```ts
+```js
 users: Array<string>
 ```
 
@@ -170,7 +170,7 @@ users: Array<string>
 
 **Signature:**
 
-```ts
+```js
 user: string
 ```
 
@@ -188,7 +188,7 @@ user: string
 
 **Signature:**
 
-```ts
+```js
 on(event: string, callback: function)
 ```
 
@@ -216,7 +216,7 @@ dialog.on('outgoingMessage', m => console.log(`Outgoing message ${JSON.stringify
 
 **Signature:**
 
-```ts
+```js
 end()
 ```
 
@@ -240,7 +240,7 @@ dialog.on('abort', _ => dialog.end())
 <p>
 
 **Signature:**
-```ts
+```js
 say(message: Message, [unpause: Boolean = true])
 ```
 
@@ -276,7 +276,7 @@ dialog.say('Hi again', false)
 
 **Signature:**
 
-```ts
+```js
 parse(parser: Function || { parse: Function, isValid: Function } , [onError: Message || Function])
 ```
 
@@ -335,7 +335,7 @@ new Slackbot(/* API token */)
 
 **Signature:**
 
-```ts
+```js
 ask(question: Message, parser: Function || { parse: Function, isValid: Function }, [onError: Message || Function])
 ```
 
@@ -375,7 +375,7 @@ letter in front of the words 😅.
 
 **Signature:**
 
-```ts
+```js
 pause(message: Message)
 ```
 
@@ -486,7 +486,7 @@ your bot in the `Wrapper` class.
 
 **Signature:**
 
-```ts
+```js
 wrap(bot: Bot)
 ```
 
@@ -516,7 +516,7 @@ const subject = wrap(bot)
 
 **Signature:**
 
-```ts
+```js
 wrapper.user.says(text: Message, [channel: String], [user: String])
 ```
 
@@ -553,7 +553,7 @@ subject.user.says('Some message', '#some-channel', '@some-user')
 
 **Signature:**
 
-```ts
+```js
 wrapper.bot.lastMessage: { channel: String, message: BotMessage }
 ```
 
@@ -571,7 +571,7 @@ wrapper.bot.lastMessage: { channel: String, message: BotMessage }
 
 **Signature:**
 
-```ts
+```js
 wrapper.bot.messages: Array<{ channel: String, message: Message }>
 ```
 
@@ -589,7 +589,7 @@ wrapper.bot.messages: Array<{ channel: String, message: Message }>
 
 **Signature:**
 
-```ts
+```js
 wrapper.bot.said(message: Message, [channel: String])
 ```
 
@@ -612,7 +612,7 @@ both `message` and `channel` will be compared.
 
 **Signature:**
 
-```ts
+```js
 wrapper.bot.reset()
 ```
 
@@ -634,7 +634,7 @@ Resets all messages and expectations. This method is designed to be used in
 
 **Signature:**
 
-```ts
+```js
 wrapper.bot.on(text: Message, [channel: String], [user: String]) -> { says(message: Message, [channel: String]) }
 ```
 
