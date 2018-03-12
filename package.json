@@ -1,20 +1,19 @@
 {
   "scripts": {
-    "bootstrap": "lerna bootstrap",
-
     "pretest": "yarn build",
     "test": "nyc ava -c=5 --verbose",
     "posttest": "yarn clean:test",
-
     "clean:dist": "lerna exec -- rm -rf dist",
     "clean:test": "lerna exec -- rm -rf dist/test",
-
     "prebuild": "lerna exec -- cp ../../tsconfig.json tsconfig.json",
-    "build": "lerna exec -- tsc",
+    "build": "lerna exec -- tsc --pretty",
     "postbuild": "lerna exec -- rm tsconfig.json",
-
-    "build:watch": "lerna exec -- tsc -w",
-    "lint": "lerna exec -- tslint -p ../../tsconfig.json -c ../../tslint.json -t stylish"
+    "watch": "yarn build -- -w",
+    "lint": "lerna exec -- tslint -p ../../tsconfig.json -c ../../tslint.json -t stylish",
+    "diff": "lerna diff",
+    "prerelease": "yarn build; yarn clean:test",
+    "release": "lerna publish",
+    "each": "lerna exec"
   },
   "private": true,
   "workspaces": [
@@ -40,6 +39,8 @@
     "sourceMap": true
   },
   "devDependencies": {
+    "@types/node": "^9.4.7",
+    "ava": "^0.25.0",
     "lerna": "^3.0.0-beta.2",
     "nyc": "^11.4.1",
     "tslint": "^5.9.1",

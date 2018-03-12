@@ -7,10 +7,7 @@
   "repository": "https://github.com/dempfi/xene",
   "author": "Ike Ku <dempfi@yahoo.com>",
   "license": "Apache-2.0",
-  "scripts": {
-    "prepublishOnly": "npm run build",
-    "watch": "tsc -w --pretty"
-  },
+  "scripts": {},
   "publishConfig": {
     "access": "public"
   },
@@ -22,8 +19,6 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.76",
-    "@types/node": "^8.0.24",
-    "ava": "^0.22.0"
+    "@types/lodash": "^4.14.76"
   }
 }
