@@ -9,9 +9,6 @@
   "license": "Apache-2.0",
   "scripts": {
     "prepublishOnly": "npm run build",
-    "test": "rm -rf dist && tsc && nyc ava -c=5 --verbose",
-    "lint": "tslint --project tsconfig.json -t stylish",
-    "build": "rm -rf dist && tsc -t ES6 && rm -rf dist/test",
     "watch": "tsc -w --pretty"
   },
   "publishConfig": {
@@ -27,9 +24,6 @@
   "devDependencies": {
     "@types/lodash": "^4.14.76",
     "@types/node": "^8.0.24",
-    "ava": "^0.22.0",
-    "nyc": "^11.1.0",
-    "tslint": "^5.6.0",
-    "typescript": "^2.5.2"
+    "ava": "^0.22.0"
   }
 }
