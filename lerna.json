@@ -11,8 +11,8 @@
       ]
     }
   },
-  "npmClientArgs": [
-    "--no-package-lock"
-  ],
+  "npmClient": "yarn",
+  "stream": true,
+  "useWorkspaces": true,
   "version": "independent"
 }

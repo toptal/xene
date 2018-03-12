@@ -9,9 +9,6 @@
   "license": "Apache-2.0",
   "scripts": {
     "prepublishOnly": "npm run build",
-    "test": "echo 'No test'",
-    "lint": "tslint --project tsconfig.json -t stylish",
-    "build": "rm -rf ./dist && tsc -t ES6",
     "watch": "tsc -w --pretty"
   },
   "publishConfig": {
@@ -40,9 +37,6 @@
     "@types/request-promise-native": "^1.0.2",
     "@types/winston": "^2.3.3",
     "@types/ws": "^3.0.0",
-    "ava": "^0.22.0",
-    "nyc": "^11.1.0",
-    "tslint": "^5.6.0",
-    "typescript": "^2.5.2"
+    "ava": "^0.22.0"
   }
 }
