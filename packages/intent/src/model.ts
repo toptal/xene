@@ -5,8 +5,8 @@ import { Intent } from './intent'
 export const SETTINGS = {
   iterations: 10000,
   shuffle: true,
-  error: .008,
-  rate: .5
+  error: .009,
+  rate: .3
 }
 
 export type Settings = Partial<typeof SETTINGS>

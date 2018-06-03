@@ -2,14 +2,14 @@ import { Dataset } from './dataset'
 import { Model, Settings } from './model'
 
 export class Intent {
-  static from(patterns: string[], label?: string) {
+  static from(utterances: string[], label?: string) {
     const intent = new Intent(label)
-    Dataset.add(intent, patterns)
+    Dataset.add(intent, utterances)
     return intent
   }
 
-  static match(sentence: string) {
-    const input = Dataset.input(sentence)
+  static match(utterance: string) {
+    const input = Dataset.input(utterance)
     const activation = Model.network.activate(input)
     return activation
       .map((value, index) => ({ value, intent: Dataset.intents[index] }))
@@ -23,11 +23,11 @@ export class Intent {
 
   private constructor(public label?: string) { }
 
-  isMatch(sentence: string) {
-    return Intent.match(sentence).some(i => i.intent === this)
+  isMatch(utterance: string) {
+    return Intent.match(utterance).some(i => i.intent === this)
   }
 
   toString() {
-    return `Intent<${this.label || 'anonymus'}>`
+    return `Intent{${this.label || 'anonymus'}}`
   }
 }

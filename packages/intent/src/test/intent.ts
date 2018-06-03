@@ -5,7 +5,7 @@ import { Intent } from '../'
 const testCases = [
   {
     label: 'greetings',
-    patterns: ['hi', 'hello', 'how are you', 'is anyone there?', 'good day'],
+    patterns: ['hi', 'hello', 'is anyone there?', 'good day'],
     tests: ['hi there']
   },
   {

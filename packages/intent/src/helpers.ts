@@ -1,17 +1,15 @@
-import * as Tokenizer from 'wink-tokenizer'
+import * as natural from 'natural'
+import * as compromise from 'compromise'
 import * as winkStem from 'wink-porter2-stemmer'
 
-const tokenizer = Tokenizer()
-tokenizer.defineConfig({ words: true })
+export const normalize = (sentence: string): string =>
+  compromise(sentence).normalize().out()
 
 export const tokenize = (sentence: string): string[] =>
-  tokenizer.tokenize(sentence)
-    .filter(({ tag }) => tag === 'word')
-    .map(({ value }) => value)
+  new natural.WordTokenizer().tokenize(normalize(sentence))
 
 export const stem = (sentence: string): string[] =>
-  tokenize(sentence).reduce((acc, t) =>
-    acc.concat(winkStem(t.toLowerCase())), [])
+  tokenize(sentence).map(winkStem)
 
 export const uniq = <T>(arr: T[]): T[] => {
   const result: T[] = []

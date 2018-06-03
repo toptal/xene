@@ -1,7 +1,7 @@
 {
-  "name": "@xene/intents",
+  "name": "@xene/entity",
   "version": "0.0.1",
-  "description": "Xene artificial intelligence powered intent analyzer",
+  "description": "Xene nlp powered entity analyzer",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/dempfi/xene",
@@ -14,14 +14,8 @@
   "files": [
     "dist"
   ],
-  "devDependencies": {
-    "@types/natural": "^0.2.33",
-    "@types/synaptic": "^1.0.3"
-  },
+  "devDependencies": {},
   "dependencies": {
-    "compromise": "^11.5.3",
-    "natural": "^0.5.6",
-    "synaptic": "^1.1.4",
-    "wink-porter2-stemmer": "^1.0.8"
+    "compromise": "^11.5.3"
   }
 }
