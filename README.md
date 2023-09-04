@@ -2,6 +2,8 @@
 
 [![Travis](https://img.shields.io/travis/dempfi/xene.svg?style=flat-square&label=tests)](https://travis-ci.org/dempfi/xene) [![npm](https://img.shields.io/npm/dm/@xene/core.svg?style=flat-square)](https://www.npmjs.com/package/@xene/core) [![first timers only](http://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](http://www.firsttimersonly.com)
 
+**At 2023, Xene is out-of-date with a lot of outdated dependencies and using old Slack API. Use at own risk**
+
 Xene is a framework for building conversational bots with modern JavaScript(or
 TypeScript). From simple command-based bots to rich natural language bots the
 framework provides all of the features needed to manage the conversational

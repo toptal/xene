@@ -4,8 +4,8 @@
   "description": "Core of the xene framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "repository": "https://github.com/dempfi/xene",
-  "author": "Ike Ku <dempfi@yahoo.com>",
+  "repository": "https://github.com/toptal/xene",
+  "author": "Toptal",
   "license": "Apache-2.0",
   "scripts": {},
   "publishConfig": {
