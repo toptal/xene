@@ -12,7 +12,7 @@ export class Oauth extends APIModule {
       code: options.code,
       redirect_uri: options.redirectUri
     }
-    const response = await request(uri, form)
+    const response = await request(uri, form, options.secret)
     if (!response.ok) throw new APIError(response.error)
     return camel(response)
   }
