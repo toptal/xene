@@ -1,6 +1,6 @@
 import * as winston from 'winston'
 const env = process.env.NODE_ENV || 'development'
-const level = env === 'development' ? 'verbose' : 'info'
+const level = env === 'development' || process.env.XENE_LOGS_VERBOSE ? 'verbose' : 'info'
 
 const transport = new (winston.transports.Console)({
   label: '@xene/slack',
