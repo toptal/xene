@@ -7,8 +7,9 @@ type Task = { uri: string, form: any, token: string, resolve: Callback, reject: 
 
 const worker = async (task: Task, done) => {
   try {
-    const headers = { "Authorization": `Bearer ${task.token}` }
-    await rp.post({ uri: task.uri, json: true, form: task.form, headers: headers }).then(task.resolve)
+    const headers = { Authorization: `Bearer ${task.token}` }
+    logger.verbose(`Slack API request to: ${task.uri}`)
+    await rp.post({ uri: task.uri, json: true, form: task.form, headers}).then(task.resolve)
   } catch (error) {
     if (error.statusCode !== 429) return task.reject(error)
     const delay = Number(error.response.headers['retry-after']) * 1000
