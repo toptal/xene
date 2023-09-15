@@ -1,6 +1,6 @@
 {
   "name": "@xene/slack",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Slack bot client for xene framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,7 +15,7 @@
     "dist"
   ],
   "dependencies": {
-    "@xene/core": "^0.3.0",
+    "@xene/core": "^0.3.1",
     "async": "^2.5.0",
     "eventemitter3": "^2.0.3",
     "lodash": "^4.17.4",
