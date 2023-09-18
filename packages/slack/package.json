@@ -18,10 +18,10 @@
     "@xene/core": "^0.3.1",
     "async": "^2.5.0",
     "eventemitter3": "^2.0.3",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.21",
     "raw-body": "^2.3.0",
-    "request": "^2.81.0",
-    "request-promise-native": "^1.0.4",
+    "@cypress/request": "^3.0.1",
+    "request-promise-native": "^1.0.9",
     "winston": "^2.3.1",
     "ws": "^3.1.0"
   },
@@ -29,8 +29,8 @@
     "@types/async": "^2.0.40",
     "@types/express": "^4.0.36",
     "@types/koa": "^2.0.39",
-    "@types/lodash": "^4.14.76",
-    "@types/request-promise-native": "^1.0.2",
+    "@types/lodash": "^4.14.198",
+    "@types/request-promise-native": "^1.0.18",
     "@types/winston": "^2.3.3",
     "@types/ws": "^3.0.0"
   }
