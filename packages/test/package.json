@@ -16,9 +16,9 @@
   ],
   "dependencies": {
     "@xene/core": "^0.3.1",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.76"
+    "@types/lodash": "^4.14.198"
   }
 }
