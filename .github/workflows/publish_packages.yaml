@@ -4,17 +4,18 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-       description: 'Branch to publish packages from'
-       required: true
-       default: 'master'
-    version:
-      description: 'Version to publish (major, minor, patch)'
-      required: true
-      default: 'patch'
-      options:
-        - 'patch'
-        - 'minor'
-        - 'major'
+        description: 'Branch to publish packages from'
+        required: true
+        default: 'master'
+      version:
+        description: 'Version to publish (major, minor, patch)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - 'patch'
+          - 'minor'
+          - 'major'
 
 # Do not allow concurrent runs
 concurrency: ${{ github.workflow }}-${{ github.ref }}
@@ -22,41 +23,48 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   publish:
     name: Publish Packages
-    runs-on: [ 'org/toptal', 'os/linux', 'arch/x64', 'size/standard' ]
+    runs-on: ubuntu-latest
     permissions: write-all
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ inputs.branch || master }}
+          ref: ${{ inputs.branch || 'master' }}
 
-      - name: GSM Secrets
-        id: secrets_manager
-        uses: toptal/actions/gsm-secrets@main
+      - name: Authenticate to Google Cloud using Workload Identity
+        uses: google-github-actions/auth@v1
         with:
           workload_identity_provider: ${{ secrets.GSM_PROJECT }}
           service_account: ${{ secrets.GSM_SA }}
-          secrets_name: |-
-            NPM_TOKEN_PUBLISH:toptal-ci/NPM_TOKEN_PUBLISH
-            SLACK_BOT_TOKEN:toptal-ci/SLACK_BOT_TOKEN
 
-      - name: Parse secrets
-        id: parse_secrets
-        uses: toptal/actions/expose-json-outputs@main
+      - name: Get the secrets from GSM
+        id: secrets_manager
+        uses: google-github-actions/get-secretmanager-secrets@v1
         with:
-          json: ${{ steps.secrets_manager.outputs.secrets }}
+          secrets: |-
+            NPM_TOKEN_PUBLISH:toptal-ci/NPM_TOKEN_PUBLISH
+            TOPTAL_BUILD_BOT_TOKEN:toptal-ci/TOPTAL_BUILD_BOT_TOKEN
+
+      - name: Set ENV Variables
+        run: |-
+          echo "NPM_TOKEN=${{ steps.secrets_manager.outputs.NPM_TOKEN_PUBLISH }}" >> $GITHUB_ENV
+          echo "GITHUB_TOKEN=${{ steps.secrets_manager.outputs.TOPTAL_BUILD_BOT_TOKEN }}" >> $GITHUB_ENV
 
       - name: Setup Node.js 16.x
         uses: actions/setup-node@v3
         with:
           node-version: 16
 
-      - name: Setup npm # Add a registry to npm config
+        # Add a registry to npm config.
+        # 'npm whoami' - is a check of the validity of the NPM token and connection.
+      - name: Setup npm
         run: |
-          npm set "//registry.npmjs.org/:_authToken=${{ steps.parse_secrets.outputs.NPM_TOKEN_PUBLISH }}"
+          npm set "//registry.npmjs.org/:_authToken=${{ env.NPM_TOKEN }}"
+          npm whoami
 
-      - name: Configure git user # Lerna should be able to make commits and create tags for new versions in repo
+        # Lerna should be able to make commits and create tags for new versions in repo as a user.
+      - name: Configure git user
         run: |
           git config --global user.email "bot@toptal.com"
           git config --global user.name "toptal-bot"
@@ -69,25 +77,10 @@ jobs:
         run: |
           yarn build
 
-      - name: Check version # without creating tags and commits (for tests)
+      - name: Bump versions
         run: |
-          yarn lerna version ${{ inputs.version }} --no-commit-hooks --no-git-tag-version --no-push --yes
+          yarn lerna version ${{ inputs.version }} --yes
 
-# TODO: Define a proper channel for notifications
-#      - name: Report to Slack
-#        if: ${{ failure() }}
-#        uses: slackapi/slack-github-action@v1
-#        with:
-#          channel-id: 'dev-x-notifications'
-#          slack-message: "Current master version of Xene is broken :redex:"
-#        env:
-#          SLACK_BOT_TOKEN: ${{ steps.parse_secrets.outputs.SLACK_BOT_TOKEN }}
-
-#      - name: Report to Slack
-#        if: ${{ success() }}
-#        uses: slackapi/slack-github-action@v1
-#        with:
-#          channel-id: 'dev-x-notifications'
-#          slack-message: "Current master version of Xene successfully released :green_heart:"
-#        env:
-#          SLACK_BOT_TOKEN: ${{ steps.parse_secrets.outputs.SLACK_BOT_TOKEN }}
+      - name: Publish packages
+        run: |
+          yarn lerna publish from-git --yes
