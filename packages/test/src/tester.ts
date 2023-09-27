@@ -1,6 +1,6 @@
 import { Bot } from '@xene/core'
-import { BotContext } from './bot-context'
 import { UserContext } from './user-context'
+import { BotContext } from './bot-context'
 
 export class Tester<B extends Bot> {
   bot = new BotContext(this._subject)
