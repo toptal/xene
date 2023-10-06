@@ -9,3 +9,4 @@ const transport = new (winston.transports.Console)({
   level
 })
 export const logger = new (winston.Logger)({ transports: [transport] })
+export const requestToLogLevel = process.env.XENE_LOGS_LOG_REQUEST_TO_INFO ? 'info' : 'verbose'
