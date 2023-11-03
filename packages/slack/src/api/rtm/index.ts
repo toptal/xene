@@ -39,8 +39,9 @@ export class RTM extends APIModule {
 
   connect = async () => {
     const promise = boundPromise()
-    const response = await this.request('connect')
+    const response = await this.request('connect', {}, true) // Retry in case of timeout
     this.ws = new WebSocket(response.url)
+    logger.verbose('Configuring WebSocket connection to %s', response.url)
     this.ws.on('message', this.emit.bind(this))
     this.ws.on('close', this.reconnect.bind(this))
     this.ws.on('open', () => promise.resolve(response))
@@ -86,6 +87,7 @@ export class RTM extends APIModule {
   }
 
   private wsSend(message) {
+    logger.verbose('Sending a message: %s', message)
     this.ws.send(JSON.stringify({ ...message, id: this.inc }))
     this.inc += 1
   }
