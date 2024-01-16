@@ -22,7 +22,7 @@
     "lodash": "^4.17.21",
     "raw-body": "^2.3.0",
     "request-promise-native": "^1.0.9",
-    "winston": "^2.3.1",
+    "winston": "~3.11.0",
     "ws": "^3.1.0"
   },
   "devDependencies": {
@@ -31,7 +31,6 @@
     "@types/koa": "^2.0.39",
     "@types/lodash": "^4.14.198",
     "@types/request-promise-native": "^1.0.18",
-    "@types/winston": "^2.3.3",
     "@types/ws": "^3.0.0"
   }
 }

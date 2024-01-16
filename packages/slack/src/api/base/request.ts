@@ -1,6 +1,7 @@
 import * as async from 'async'
 import * as rp from 'request-promise-native'
 import { logger, requestToLogLevel } from '../../logger'
+import { format } from 'util'
 
 type Callback = (arg: any) => void
 type Task = { uri: string, form: any, token: string, retriable: boolean, resolve: Callback, reject: Callback }
@@ -17,17 +18,17 @@ const worker = async (task: Task, done) => {
   } catch (error) {
     if (error.statusCode == 429) {
       const delayMs = (Number(error.response.headers['retry-after']) * 1000) || DEFAULT_RETRY_DELAY_MS
-      logger.info('Slack API rate limited for %sms', delayMs)
+      logger.info(format('Slack API rate limited for %sms', delayMs))
 
       retryRequest(task, delayMs)
     } else if (task.retriable && error.cause && RETRIABLE_CODES.includes(error.cause.code)) {
       const delayMs = DEFAULT_RETRY_DELAY_MS
-      logger.info('Slack API timeout: %s. Retrying in %sms', error.cause.code, delayMs)
+      logger.info(format('Slack API timeout: %s. Retrying in %sms', error.cause.code, delayMs))
 
       retryRequest(task, delayMs)
     } else {
       logger.error(error)
-      logger.error('Slack API request errored with status %s, timeout: %s, code: %s', error.statusCode, error.timeout, error.code)
+      logger.error(format('Slack API request errored with status %s, timeout: %s, code: %s', error.statusCode, error.timeout, error.code))
       task.reject(error)
     }
   }

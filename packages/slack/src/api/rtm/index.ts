@@ -4,6 +4,7 @@ import { EventEmitter } from 'eventemitter3'
 import { APIModule } from '../base'
 import { logger } from '../../logger'
 import { On, Off } from './types'
+import { format } from 'util'
 
 const PING_INTERVAL = 5000
 const MAX_PONG_INTERVAL = 20000
@@ -41,7 +42,7 @@ export class RTM extends APIModule {
     const promise = boundPromise()
     const response = await this.request('connect', {}, true) // Retry in case of timeout
     this.ws = new WebSocket(response.url)
-    logger.verbose('Configuring WebSocket connection to %s', response.url)
+    logger.verbose(`Configuring WebSocket connection to ${response.url}`)
     this.ws.on('message', this.emit.bind(this))
     this.ws.on('close', this.reconnect.bind(this))
     this.ws.on('open', () => promise.resolve(response))
@@ -56,7 +57,7 @@ export class RTM extends APIModule {
     const msg = JSON.parse(msgString)
     if (msg.type === 'hello') this.handleHello()
     if (msg.type === 'pong') this.lastPong = Date.now()
-    logger.verbose('Incoming RTM message %s', msg.type)
+    logger.verbose(`Incoming RTM message ${msg.type}`)
     this.ee.emit(msg.subtype ? `${msg.type}.${msg.subtype}` : msg.type, msg)
   }
 
@@ -87,7 +88,7 @@ export class RTM extends APIModule {
   }
 
   private wsSend(message) {
-    logger.verbose('Sending a message: %s', message)
+    logger.verbose(format('Sending a message: %s', message))
     this.ws.send(JSON.stringify({ ...message, id: this.inc }))
     this.inc += 1
   }
