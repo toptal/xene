@@ -4,6 +4,7 @@ import { EventEmitter } from 'eventemitter3'
 import { APIModule } from '../base'
 import { logger } from '../../logger'
 import { On, Off } from './types'
+import { format } from 'util'
 
 const PING_INTERVAL = 5000
 const MAX_PONG_INTERVAL = 20000
@@ -87,7 +88,7 @@ export class RTM extends APIModule {
   }
 
   private wsSend(message) {
-    logger.verbose(`Sending a message: ${message}`)
+    logger.verbose(format('Sending a message: %s', message))
     this.ws.send(JSON.stringify({ ...message, id: this.inc }))
     this.inc += 1
   }
