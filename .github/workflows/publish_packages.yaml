@@ -32,24 +32,26 @@ jobs:
           fetch-depth: 0
           ref: ${{ inputs.branch || 'master' }}
 
-      - name: Authenticate to Google Cloud using Workload Identity
-        uses: google-github-actions/auth@v1
+      - name: Get the secrets from GSM
+        id: secrets_manager
+        uses: toptal/davinci-github-actions/gsm-secrets@master
         with:
           workload_identity_provider: ${{ secrets.IDENTITY_POOL }}
           service_account: ${{ secrets.SA_IDENTITY_POOL }}
-
-      - name: Get the secrets from GSM
-        id: secrets_manager
-        uses: google-github-actions/get-secretmanager-secrets@v1
-        with:
-          secrets: |-
+          secrets_name: |-
             NPM_TOKEN_PUBLISH:toptal-ci/NPM_TOKEN_PUBLISH
             TOPTAL_BUILD_BOT_TOKEN:toptal-ci/TOPTAL_BUILD_BOT_TOKEN
 
+      - name: Parse secrets
+        id: parse_secrets
+        uses: toptal/davinci-github-actions/expose-json-outputs@master
+        with:
+          json: ${{ steps.secrets_manager.outputs.secrets }}
+
       - name: Set ENV Variables
         run: |-
-          echo "NPM_TOKEN=${{ steps.secrets_manager.outputs.NPM_TOKEN_PUBLISH }}" >> $GITHUB_ENV
-          echo "GITHUB_TOKEN=${{ steps.secrets_manager.outputs.TOPTAL_BUILD_BOT_TOKEN }}" >> $GITHUB_ENV
+          echo "NPM_TOKEN=${{ steps.parse_secrets.outputs.NPM_TOKEN_PUBLISH }}" >> $GITHUB_ENV
+          echo "GITHUB_TOKEN=${{ steps.parse_secrets.outputs.TOPTAL_BUILD_BOT_TOKEN }}" >> $GITHUB_ENV
 
       - name: Setup Node.js 16.x
         uses: actions/setup-node@v3
