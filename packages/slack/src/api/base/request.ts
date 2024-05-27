@@ -1,6 +1,7 @@
 import * as async from 'async'
 import { logger, requestToLogLevel } from '../../logger'
 import { format } from 'util'
+import { stringify } from 'querystring'
 
 type Callback = (arg: any) => void
 type Task = { uri: string, form: any, token: string, retriable: boolean, resolve: Callback, reject: Callback }
@@ -37,6 +38,10 @@ const postWithTimeout = (task: Task) => {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT)
 
+  const body = (typeof task.form === 'string')
+      ? encodeURIComponent(task.form.toString())
+      : encodeURIComponent(stringify(task.form))
+
   fetch(task.uri, {
     method: 'POST',
     headers: {
@@ -44,10 +49,9 @@ const postWithTimeout = (task: Task) => {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Accept': 'application/json'
     },
-    body: task.form,
+    body: body,
     signal: controller.signal
-  })
-    .then(res => res.json())
+  }).then(res => res.json())
     .finally(() => clearTimeout(timeout))
 }
 
