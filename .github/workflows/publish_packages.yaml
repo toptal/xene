@@ -8,7 +8,7 @@ on:
         required: true
         default: 'master'
       version:
-        description: 'Version to publish (major, minor, patch)'
+        description: 'Version to publish (major, minor, patch, premajor, preminor, prepatch)'
         required: true
         default: 'patch'
         type: choice
@@ -16,6 +16,9 @@ on:
           - 'patch'
           - 'minor'
           - 'major'
+          - 'prepatch'
+          - 'preminor'
+          - 'premajor'
 
 # Do not allow concurrent runs
 concurrency: ${{ github.workflow }}-${{ github.ref }}
