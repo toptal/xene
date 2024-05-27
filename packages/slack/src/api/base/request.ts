@@ -37,7 +37,7 @@ const postWithTimeout = (task: Task) => {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT)
 
-  const promise = fetch(task.uri, {
+  fetch(task.uri, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${task.token}`,
@@ -47,8 +47,6 @@ const postWithTimeout = (task: Task) => {
     body: task.form,
     signal: controller.signal
   })
-
-  return promise
     .then(res => res.json())
     .finally(() => clearTimeout(timeout))
 }

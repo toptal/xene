@@ -10,7 +10,6 @@ on:
       version:
         description: 'Version to publish (major, minor, patch, premajor, preminor, prepatch)'
         required: true
-        default: 'patch'
         type: choice
         options:
           - 'patch'
