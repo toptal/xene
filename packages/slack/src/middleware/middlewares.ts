@@ -2,7 +2,6 @@ import * as Koa from 'koa'
 import * as qs from 'querystring'
 import * as Express from 'express'
 import * as rawBody from 'raw-body'
-import * as request from 'request-promise-native'
 import { get, isString, isEqual } from 'lodash'
 
 import { camel } from '../helpers/case'
@@ -50,7 +49,11 @@ const processRequestWithHandler = async (handler: MiddlewareHandler, payload) =>
 
   if (!modified && !deleted && !ephemeralAdded) return
   const body = response || payload.original_message
-  request.post({ uri: context.responseUrl, body, json: true })
+  fetch(context.responseUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
 }
 
 export const koa = async (handler: MiddlewareHandler, ctx: Koa.Context, next) => {

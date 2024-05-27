@@ -1,5 +1,4 @@
 import * as async from 'async'
-import * as rp from 'request-promise-native'
 import { logger, requestToLogLevel } from '../../logger'
 import { format } from 'util'
 
@@ -11,9 +10,8 @@ const RETRIABLE_CODES = ['ETIMEDOUT', 'ESOCKETTIMEDOUT', 'EHOSTUNREACH', 'ECONNR
 
 const worker = async (task: Task, done) => {
   try {
-    const headers = { Authorization: `Bearer ${task.token}` }
     logger.log(requestToLogLevel, `Slack API request to: ${task.uri}`)
-    const result = await rp.post({ uri: task.uri, json: true, form: task.form, headers, timeout: REQUEST_TIMEOUT })
+    const result = await postWithTimeout(task)
     task.resolve(result)
   } catch (error) {
     if (error.statusCode == 429) {
@@ -33,6 +31,26 @@ const worker = async (task: Task, done) => {
     }
   }
   done()
+}
+
+const postWithTimeout = (task: Task) => {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT)
+
+  const promise = fetch(task.uri, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${task.token}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Accept': 'application/json'
+    },
+    body: task.form,
+    signal: controller.signal
+  })
+
+  return promise
+    .then(res => res.json())
+    .finally(() => clearTimeout(timeout))
 }
 
 const retryRequest = (task: Task, delayMs: number) => {
