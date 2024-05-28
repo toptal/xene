@@ -36,7 +36,7 @@ function _request(method, options): Promise<any> {
 
     let abortSignal = undefined
     let abortTimeout = undefined
-    if (options.timeout !== undefined) {
+    if (typeof options.timeout === 'number' && options.timeout > 0 && isFinite(options.timeout)) {
         const controller = new AbortController()
         abortTimeout = setTimeout(() => controller.abort(), options.timeout)
         abortSignal = controller.signal
