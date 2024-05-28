@@ -8,7 +8,7 @@ on:
         required: true
         default: 'master'
       version:
-        description: 'Version to publish (major, minor, patch)'
+        description: 'Version to publish'
         required: true
         default: 'patch'
         type: choice
@@ -16,11 +16,10 @@ on:
           - 'patch'
           - 'minor'
           - 'major'
-      prerelease:
-        description: 'Publish a prerelease version (tagged as "next", not "latest")'
-        required: true
-        type: boolean
-        default: false
+          - 'prepatch'
+          - 'preminor'
+          - 'premajor'
+          - 'prerelease'
 
 # Do not allow concurrent runs
 concurrency: ${{ github.workflow }}-${{ github.ref }}
@@ -84,23 +83,17 @@ jobs:
         run: |
           yarn build
 
-      - name: Bump versions (regular)
-        if: ${{ !inputs.prerelease }}
+      - name: Bump versions
         run: |
           yarn lerna version ${{ inputs.version }} --yes
 
-      - name: Publish packages (regular)
-        if: ${{ !inputs.prerelease }}
+      - name: Publish packages (latest)
+        if: startsWith('${{ inputs.version }}', 'pre') == false
         run: |
           yarn lerna publish from-git --yes
 
-      - name: Bump versions (prerelease)
-        if: ${{ inputs.prerelease }}
-        run: |
-          yarn lerna version pre${{ inputs.version }} --yes
-
-      - name: Publish packages (prerelease)
-        if: ${{ inputs.prerelease }}
+      - name: Publish packages (next)
+        if: startsWith('${{ inputs.version }}', 'pre') == true
         run: |
           yarn lerna publish from-git --dist-tag next --yes
 
