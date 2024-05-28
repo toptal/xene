@@ -1,12 +1,12 @@
-export function post(options) {
+export function post(options): Promise<any> {
     return _request('POST', options);
 }
 
-export function get(options) {
+export function get(options): Promise<any> {
     return _request('GET', options);
 }
 
-export function put(options) {
+export function put(options): Promise<any> {
     return _request('PUT', options);
 }
 
@@ -17,7 +17,7 @@ const request = {
 }
 export { request }
 
-function _request(method, options) {
+function _request(method, options): Promise<any> {
     let headers = { ...options.headers }
 
     let body = options.body
