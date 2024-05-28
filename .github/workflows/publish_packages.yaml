@@ -87,15 +87,9 @@ jobs:
         run: |
           yarn lerna version ${{ inputs.version }} --yes
 
-      - name: Publish packages (latest)
+      - name: Publish packages
         if: |
           !startsWith('${{ inputs.version }}', 'pre')
         run: |
-          yarn lerna publish from-git --yes
-
-      - name: Publish packages (next)
-        if: |
-          startsWith('${{ inputs.version }}', 'pre')
-        run: |
-          yarn lerna publish from-git --dist-tag next --yes
+          echo yarn lerna publish from-git --dist-tag ${{ startsWith(inputs.version, 'pre') && 'next' || 'latest' }} --yes
 
