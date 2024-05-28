@@ -11,8 +11,7 @@
     "rootDir": "src",
     "outDir": "dist",
     "lib": [
-      "es2016",
-      "DOM"
+      "es2016"
     ]
   },
   "exclude": [
