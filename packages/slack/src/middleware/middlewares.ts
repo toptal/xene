@@ -2,11 +2,11 @@ import * as Koa from 'koa'
 import * as qs from 'querystring'
 import * as Express from 'express'
 import * as rawBody from 'raw-body'
-import * as request from 'request-promise-native'
 import { get, isString, isEqual } from 'lodash'
 
 import { camel } from '../helpers/case'
 import * as format from '../helpers/formatters/message'
+import * as request from '../request'
 import { MiddlewareContext, MiddlewareHandler } from '../types'
 
 const streamPayload = req => rawBody(req, { encoding: true }).then<any>(qs.parse).then(i => JSON.parse(i.payload))

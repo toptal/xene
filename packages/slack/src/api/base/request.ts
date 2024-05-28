@@ -1,7 +1,8 @@
 import * as async from 'async'
-import * as rp from 'request-promise-native'
-import { logger, requestToLogLevel } from '../../logger'
 import { format } from 'util'
+
+import { logger, requestToLogLevel } from '../../logger'
+import * as rp from '../../request'
 
 type Callback = (arg: any) => void
 type Task = { uri: string, form: any, token: string, retriable: boolean, resolve: Callback, reject: Callback }
