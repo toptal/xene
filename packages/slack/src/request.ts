@@ -10,6 +10,13 @@ export function put(options) {
     return _request('PUT', options);
 }
 
+const request = {
+    post,
+    get,
+    put
+}
+export { request }
+
 function _request(method, options) {
     let headers = { ...options.headers }
 
