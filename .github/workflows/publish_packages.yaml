@@ -85,11 +85,11 @@ jobs:
 
       - name: Bump versions
         run: |
-          echo yarn lerna version ${{ inputs.version }} --yes
+          yarn lerna version ${{ inputs.version }} --yes
 
       - name: Publish packages
         if: |
           !startsWith('${{ inputs.version }}', 'pre')
         run: |
-          echo yarn lerna publish from-git --dist-tag ${{ startsWith(inputs.version, 'pre') && 'next' || 'latest' }} --yes
+          yarn lerna publish from-git --dist-tag ${{ startsWith(inputs.version, 'pre') && 'next' || 'latest' }} --yes
 
