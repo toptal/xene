@@ -85,7 +85,7 @@ jobs:
 
       - name: Bump versions
         run: |
-          yarn lerna version ${{ inputs.version }} --yes
+          echo yarn lerna version ${{ inputs.version }} --yes
 
       - name: Publish packages
         if: |
