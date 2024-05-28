@@ -8,17 +8,25 @@ on:
         required: true
         default: 'master'
       version:
-        description: 'Version to publish (major, minor, patch, premajor, preminor, prepatch)'
+        description: 'Version to publish'
         required: true
         default: 'patch'
         type: choice
         options:
+          # these will bump corresponding part of the version
+          # and publish it as 'latest' (which is the default when adding dependencies)
           - 'patch'
           - 'minor'
           - 'major'
+          # these will bump corresponding part of the version
+          # append something like -alpha.0
+          # and publish it as 'next' (which is only used when explicitly requested)
           - 'prepatch'
           - 'preminor'
           - 'premajor'
+          # if the current version is a release, then it does the same as 'prepatch'
+          # otherwise it bumps the counter (-alpha.0 -> -alpha.1 -> -alpha.2, etc.)
+          - 'prerelease'
 
 # Do not allow concurrent runs
 concurrency: ${{ github.workflow }}-${{ github.ref }}
@@ -86,6 +94,12 @@ jobs:
         run: |
           yarn lerna version ${{ inputs.version }} --yes
 
+      # publish using appropriate distribution tag (see comments for the 'version' input for details)
+      # the (x && y || z) construct below is thes same as ternary operator (x ? y : z)
+      # if the version starts with 'pre' then use 'next' as a distribution tag, otherwise use 'latest'
       - name: Publish packages
         run: |
-          yarn lerna publish from-git --yes
+          yarn lerna publish from-git \
+            --dist-tag ${{ startsWith(inputs.version, 'pre') && 'next' || 'latest' }} \
+            --yes
+
