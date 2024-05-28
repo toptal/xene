@@ -1,3 +1,7 @@
+import fetch from 'node-fetch'
+import AbortController from 'abort-controller'
+import { URLSearchParams } from 'url';
+
 export function post(options): Promise<any> {
     return _request('POST', options);
 }
@@ -17,7 +21,7 @@ const request = {
 }
 export { request }
 
-function _request(method, options): Promise<any> {
+async function _request(method, options): Promise<any> {
     let headers = { ...options.headers }
 
     let body = options.body
@@ -49,14 +53,12 @@ function _request(method, options): Promise<any> {
         signal: abortSignal
     })
 
-    if (abortTimeout !== undefined) {
-        promise = promise.finally(() => clearTimeout(abortTimeout))
-    }
-
-    if (options.json) {
-        return promise.then(response => response.json())
-    }
-    else {
-        return promise
+    try {
+        const result = await promise
+        return options.json ? result.json() : result
+    } finally {
+        if (abortTimeout !== undefined) {
+            clearTimeout(abortTimeout)
+        }
     }
 }
