@@ -1,4 +1,5 @@
 export { middleware } from './middleware'
 export { Slackbot } from './slackbot'
+export { SlackbotBolt } from './slackbot_bolt'
 export * from './types'
 export { default as request } from './request'
