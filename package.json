@@ -39,7 +39,7 @@
     "sourceMap": true
   },
   "devDependencies": {
-    "@types/node": "^12.20.0",
+    "@types/node": "^18.19.0",
     "ava": "^4.3.0",
     "lerna": "^6.4.1",
     "nyc": "^15.1.0",
