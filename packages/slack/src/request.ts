@@ -71,6 +71,9 @@ async function request(method, { uri, headers, body, form, json, timeout }): Pro
         return json ? response.json() : response
     }
     catch (err) {
+        if (err.name === 'AbortError') {
+            throw new FailedRequestError({code: 'ESOCKETTIMEDOUT', message: 'ESOCKETTIMEDOUT'})
+        }
         throw new FailedRequestError(err)
     }
 }
