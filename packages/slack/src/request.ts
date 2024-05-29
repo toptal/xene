@@ -22,6 +22,28 @@ function sanitizeTimeout(timeout) {
     return undefined
 }
 
+class BadStatusCodeError extends Error {
+    statusCode: number
+    response: any
+
+    constructor(response) {
+        super(`Bad status code: ${response.status}`)
+        this.statusCode = response.status
+        this.response = response
+    }
+}
+
+class FailedRequestError extends Error {
+    cause: any
+    code: string
+
+    constructor(err) {
+        super(`Request failed with code: ${err.code}`)
+        this.cause = err
+        this.code = err.code
+    }
+}
+
 async function request(method, { uri, headers, body, form, json, timeout }): Promise<any> {
     headers = { ...headers }
 
@@ -41,6 +63,14 @@ async function request(method, { uri, headers, body, form, json, timeout }): Pro
     timeout = sanitizeTimeout(timeout)
     const timeoutSignal = timeout && AbortSignal.timeout(timeout)
 
-    const result = await fetch(uri, { method, headers, body, signal: timeoutSignal })
-    return json ? result.json() : result
+    try {
+        const response = await fetch(uri, { method, headers, body, signal: timeoutSignal })
+        if (response.status >= 400) {
+            throw new BadStatusCodeError(response)
+        }
+        return json ? response.json() : response
+    }
+    catch (err) {
+        throw new FailedRequestError(err)
+    }
 }
