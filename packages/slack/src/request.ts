@@ -23,7 +23,7 @@ function sanitizeTimeout(timeout) {
 }
 
 function getJSON(response) {
-    if (response.status === 204) return '';
+    if (response.status === 204) return {};
     return response.json();
 }
 
