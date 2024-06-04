@@ -22,6 +22,11 @@ function sanitizeTimeout(timeout) {
     return undefined
 }
 
+function getJSON(response) {
+    if (response.status === 204) return '';
+    return response.json();
+}
+
 class BadStatusCodeError extends Error {
     statusCode: number
     response: any
@@ -68,7 +73,7 @@ async function request(method, { uri, headers, body, form, json, timeout }): Pro
         if (response.status >= 400) {
             throw new BadStatusCodeError(response)
         }
-        return json ? response.json() : response
+        return json ? getJSON(response) : response
     }
     catch (err) {
         if (err.name === 'AbortError') {
